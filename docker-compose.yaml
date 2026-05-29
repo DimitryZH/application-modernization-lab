@@ -1,0 +1,63 @@
+services:
+  api:
+    build: ./api
+    container_name: demo-api
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: "8080"
+      DATABASE_URL: "postgres://demo:demo@postgres:5432/demo"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build: ./worker
+    container_name: demo-worker
+    environment:
+      DATABASE_URL: "postgres://demo:demo@postgres:5432/demo"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    container_name: demo-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      API_BASE_URL: "http://api:8080"
+    depends_on:
+      - api
+
+  postgres:
+    image: postgres:16
+    container_name: demo-postgres
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: demo-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres-data: {}

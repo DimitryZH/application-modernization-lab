@@ -1,0 +1,13 @@
+{
+  "name": "compose-aspire-demo-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "pg": "^8.11.5",
+    "redis": "^4.6.13"
+  }
+}
