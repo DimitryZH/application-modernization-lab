@@ -19,6 +19,46 @@ docker compose logs --tail=100
 docker compose down
 ```
 
+## Run .NET Aspire version
+
+Prerequisites:
+
+- .NET 9 SDK with access to restore Aspire 9 packages/workloads
+- Docker Desktop or another Docker-compatible container runtime
+- NuGet access for first-time restore
+- Bash for `tests/smoke.sh`; on Windows, Git Bash is preferred because WSL `localhost` may not reach the Windows-hosted Aspire endpoints
+
+Set the PostgreSQL password parameter expected by the AppHost:
+
+```powershell
+$env:Parameters__postgres-password = "demo"
+```
+
+Build and start the AppHost:
+
+```powershell
+dotnet build
+dotnet run --project src/AppHost/AppHost.csproj --launch-profile http
+```
+
+In another terminal, run the existing smoke test:
+
+```bash
+./tests/smoke.sh
+```
+
+On Windows with Git Bash installed, the smoke test can also be run as:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" ./tests/smoke.sh
+```
+
+For a one-command local validation helper, run:
+
+```powershell
+.\scripts\validate-aspire.ps1
+```
+
 ## Expected smoke-test coverage
 
 The smoke test verifies:
