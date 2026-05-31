@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# .NET build outputs
+bin/
+obj/
+
+# Docker/runtime artifacts
+.docker/
+*.pid
+*.log
+
+# OS/editor noise
+.DS_Store
+.vscode/.ropeproject/
