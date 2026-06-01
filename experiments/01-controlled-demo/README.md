@@ -73,4 +73,4 @@ The smoke test verifies:
 
 Ask Codex to convert this Docker Compose application to a .NET Aspire AppHost and validate the result using the same smoke tests.
 
-See `AGENTS.md` for the required agent workflow.
+See `../../AGENTS.md` for the required agent workflow.

@@ -2,15 +2,17 @@
 
 ## Project Goal
 
-This repository is a controlled demo for testing whether Codex can migrate a Docker Compose based application to .NET Aspire.
+This repository contains controlled research experiments for testing whether Codex can migrate Docker Compose based applications to .NET Aspire.
 
-The goal is not only to generate Aspire code, but to validate functional equivalence between the original Docker Compose version and the Aspire version.
+Experiment 01, the original controlled demo, now lives under `experiments/01-controlled-demo`.
+
+The goal is not only to generate Aspire code, but to validate functional equivalence between the original Docker Compose version and the Aspire version for each experiment.
 
 ## Expected Workflow
 
 Before making migration changes:
 
-1. Inspect `docker-compose.yaml`.
+1. Inspect the experiment's Compose file, such as `experiments/01-controlled-demo/docker-compose.yaml`.
 2. Identify all services, ports, environment variables, volumes, dependencies, commands, health checks, and build contexts.
 3. Run the original Docker Compose stack.
 4. Execute the smoke tests.
@@ -46,6 +48,7 @@ Validation steps:
 Baseline Docker Compose validation:
 
 ```bash
+cd experiments/01-controlled-demo
 docker compose up -d --build
 ./tests/smoke.sh
 docker compose logs --tail=100
@@ -55,6 +58,7 @@ docker compose down
 Aspire validation:
 
 ```bash
+cd experiments/01-controlled-demo
 dotnet build
 dotnet run --project src/AppHost/AppHost.csproj
 ./tests/smoke.sh

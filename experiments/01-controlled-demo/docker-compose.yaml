@@ -1,3 +1,5 @@
+name: compose-to-aspire-demo
+
 services:
   api:
     build: ./api
