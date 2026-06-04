@@ -16,11 +16,16 @@ Docker Example Voting App migration attempted from a browser-constrained agent e
 
 Docker Example Voting App migration performed from Codex Desktop with fuller local execution capability. Result: 8/10. See [experiments/03-codex-desktop-voting-app](experiments/03-codex-desktop-voting-app/README.md).
 
+### Experiment 04 - Google Cloud DevBox
+
+Remote Google Cloud DevBox foundation for future Docker Compose to .NET Aspire migration validation over SSH. See [experiments/04-google-cloud-devbox](experiments/04-google-cloud-devbox/README.md).
+
 ## Key Findings
 
 - Browser agents are limited by execution environment.
 - Desktop agents can complete full migration workflows.
 - Observability requires application instrumentation.
+- Remote DevBox environments can separate migration execution from local workstation limits.
 
 ## Repository Structure
 
@@ -30,7 +35,8 @@ Docker Example Voting App migration performed from Codex Desktop with fuller loc
 |-- experiments/
 |   |-- 01-controlled-demo/
 |   |-- 02-open-source-voting-app/
-|   `-- 03-codex-desktop-voting-app/
+|   |-- 03-codex-desktop-voting-app/
+|   `-- 04-google-cloud-devbox/
 |-- LICENSE
 `-- README.md
 ```
