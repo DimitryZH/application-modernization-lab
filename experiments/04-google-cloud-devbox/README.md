@@ -4,7 +4,7 @@
 
 This experiment creates the foundation for running future Docker Compose to .NET Aspire migration workflows on a dedicated Google Cloud DevBox.
 
-The goal is to validate whether the same migration workflow used locally can be executed remotely through SSH on a Google Compute Engine VM, with repeatable prerequisite checks and evidence collection.
+The research goal is Remote Autonomous Compose-to-Aspire Migration Validation: validate whether the same migration workflow used locally can be executed remotely through SSH on a Google Compute Engine VM, with repeatable prerequisite checks, success criteria, scoring, and evidence collection.
 
 No application migration is implemented in this experiment. This directory only contains the DevBox design, setup workflow, helper scripts, and reporting structure.
 
@@ -47,11 +47,15 @@ experiments/04-google-cloud-devbox/
 |-- README.md
 |-- docs/
 |   |-- architecture.md
+|   |-- cost-and-cleanup-notes.md
 |   |-- devbox-requirements.md
+|   |-- experiment-04-roadmap.md
 |   |-- gcp-setup-plan.md
+|   |-- migration-validation-plan.md
+|   |-- scoring-model.md
 |   |-- ssh-access-model.md
-|   |-- validation-workflow.md
-|   `-- cost-and-cleanup-notes.md
+|   |-- success-criteria.md
+|   `-- validation-workflow.md
 |-- reports/
 |   `-- .gitkeep
 |-- scripts/
@@ -76,6 +80,9 @@ In scope:
 - DevBox prerequisite check.
 - Evidence collection helper.
 - Cost and cleanup guidance.
+- Migration validation methodology.
+- Success criteria and scoring model.
+- Experiment roadmap.
 
 Out of scope:
 
@@ -100,6 +107,13 @@ Future work should use this foundation to:
 9. document any differences from local execution.
 
 Functional equivalence should only be claimed after both Compose and Aspire validations pass on the DevBox.
+
+## Research methodology
+
+- [Migration validation plan](docs/migration-validation-plan.md)
+- [Success criteria](docs/success-criteria.md)
+- [Scoring model](docs/scoring-model.md)
+- [Experiment 04 roadmap](docs/experiment-04-roadmap.md)
 
 ## Quick start
 

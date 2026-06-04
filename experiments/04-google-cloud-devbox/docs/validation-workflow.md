@@ -4,6 +4,13 @@ This document describes the intended future workflow for running Docker Compose 
 
 No migration implementation is included in Experiment 04.
 
+For the formal research methodology, use:
+
+- [Migration validation plan](migration-validation-plan.md)
+- [Success criteria](success-criteria.md)
+- [Scoring model](scoring-model.md)
+- [Experiment 04 roadmap](experiment-04-roadmap.md)
+
 ## Workflow
 
 1. Prepare the DevBox.
