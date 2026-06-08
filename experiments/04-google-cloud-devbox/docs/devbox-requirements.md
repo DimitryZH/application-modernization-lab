@@ -7,7 +7,7 @@
 | Project | `ai-agent-host-497515` |
 | Region | `us-central1` |
 | Zone | `us-central1-a` |
-| VM name | `compose-aspire-devbox-04` |
+| VM name | `compose-aspire-devbox-01` |
 | Machine type | `e2-standard-2` |
 | Boot disk | 80 GB `pd-balanced` |
 | Operating system | Ubuntu LTS |

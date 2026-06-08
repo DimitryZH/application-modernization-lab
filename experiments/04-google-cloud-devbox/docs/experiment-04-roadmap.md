@@ -8,7 +8,7 @@ The roadmap keeps VM provisioning separate from migration execution so each stag
 
 ## Stage A: Design refinement
 
-Status: current stage.
+Status: complete.
 
 Objective:
 
@@ -42,6 +42,8 @@ Deliverables:
 
 ## Stage B: Create Google Cloud DevBox
 
+Status: complete.
+
 Objective:
 
 - create the first development VM using the manual `gcloud` workflow.
@@ -67,6 +69,8 @@ Deliverables:
 - initial cost and cleanup notes for the actual VM.
 
 ## Stage C: Validate DevBox environment
+
+Status: next stage.
 
 Objective:
 

@@ -3,7 +3,7 @@ set -euo pipefail
 
 PROJECT_ID="${PROJECT_ID:-ai-agent-host-497515}"
 ZONE="${ZONE:-us-central1-a}"
-VM_NAME="${VM_NAME:-compose-aspire-devbox-04}"
+VM_NAME="${VM_NAME:-compose-aspire-devbox-01}"
 TUNNEL_THROUGH_IAP="${TUNNEL_THROUGH_IAP:-false}"
 
 if ! command -v gcloud >/dev/null 2>&1; then

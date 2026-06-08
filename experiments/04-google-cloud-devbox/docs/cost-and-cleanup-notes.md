@@ -15,7 +15,7 @@ The main DevBox cost drivers are:
 Stop the DevBox when it is not actively being used:
 
 ```bash
-gcloud compute instances stop compose-aspire-devbox-04 \
+gcloud compute instances stop compose-aspire-devbox-01 \
   --project ai-agent-host-497515 \
   --zone us-central1-a
 ```
@@ -25,7 +25,7 @@ Stopping the VM stops compute charges, but persistent disk charges continue.
 ## Start the VM again
 
 ```bash
-gcloud compute instances start compose-aspire-devbox-04 \
+gcloud compute instances start compose-aspire-devbox-01 \
   --project ai-agent-host-497515 \
   --zone us-central1-a
 ```
@@ -35,7 +35,7 @@ gcloud compute instances start compose-aspire-devbox-04 \
 Delete the DevBox when the experiment is complete and the evidence has been collected:
 
 ```bash
-gcloud compute instances delete compose-aspire-devbox-04 \
+gcloud compute instances delete compose-aspire-devbox-01 \
   --project ai-agent-host-497515 \
   --zone us-central1-a
 ```

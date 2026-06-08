@@ -4,7 +4,7 @@ set -euo pipefail
 PROJECT_ID="${PROJECT_ID:-ai-agent-host-497515}"
 REGION="${REGION:-us-central1}"
 ZONE="${ZONE:-us-central1-a}"
-VM_NAME="${VM_NAME:-compose-aspire-devbox-04}"
+VM_NAME="${VM_NAME:-compose-aspire-devbox-01}"
 MACHINE_TYPE="${MACHINE_TYPE:-e2-standard-2}"
 BOOT_DISK_SIZE_GB="${BOOT_DISK_SIZE_GB:-80}"
 BOOT_DISK_TYPE="${BOOT_DISK_TYPE:-pd-balanced}"
@@ -14,7 +14,8 @@ NETWORK="${NETWORK:-default}"
 SUBNET="${SUBNET:-default}"
 NETWORK_TAGS="${NETWORK_TAGS:-devbox-ssh}"
 CREATE_EXTERNAL_IP="${CREATE_EXTERNAL_IP:-true}"
-ENABLE_OS_LOGIN="${ENABLE_OS_LOGIN:-false}"
+ENABLE_OS_LOGIN="${ENABLE_OS_LOGIN:-true}"
+NO_SERVICE_ACCOUNT="${NO_SERVICE_ACCOUNT:-true}"
 LABELS="${LABELS:-experiment=exp04,purpose=compose-aspire-devbox}"
 
 printf 'Google Cloud DevBox configuration\n'
@@ -29,6 +30,7 @@ printf 'Network/subnet:    %s/%s\n' "$NETWORK" "$SUBNET"
 printf 'Network tags:      %s\n' "$NETWORK_TAGS"
 printf 'External IP:       %s\n' "$CREATE_EXTERNAL_IP"
 printf 'OS Login metadata: %s\n' "$ENABLE_OS_LOGIN"
+printf 'Service account:   %s\n' "$([ "$NO_SERVICE_ACCOUNT" = "true" ] && printf 'none' || printf 'default')"
 printf 'Labels:            %s\n' "$LABELS"
 printf '\n'
 
@@ -67,6 +69,7 @@ CREATE_ARGS=(
   "--labels=$LABELS"
   "--maintenance-policy=MIGRATE"
   "--provisioning-model=STANDARD"
+  "--shielded-secure-boot"
   "--shielded-vtpm"
   "--shielded-integrity-monitoring"
 )
@@ -77,6 +80,10 @@ fi
 
 if [ "$CREATE_EXTERNAL_IP" != "true" ]; then
   CREATE_ARGS+=("--no-address")
+fi
+
+if [ "$NO_SERVICE_ACCOUNT" = "true" ]; then
+  CREATE_ARGS+=("--no-service-account" "--no-scopes")
 fi
 
 gcloud "${CREATE_ARGS[@]}"
