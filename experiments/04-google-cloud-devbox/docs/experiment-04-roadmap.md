@@ -181,6 +181,12 @@ Deliverables:
 
 ## Stage G: Publish Experiment 04 final assessment
 
+Status: complete.
+
+Final result: `PASS`
+
+Final score: `95 / 100`
+
 Objective:
 
 - produce the final research assessment for Experiment 04.
