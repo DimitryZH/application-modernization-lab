@@ -125,17 +125,17 @@ Deliverables:
 
 ## Stage E: Run first remote migration experiment
 
-Status: next stage.
+Status: complete.
 
 Objective:
 
-- perform the first remote Compose-to-Aspire migration and validate it on the DevBox.
+- validate the existing Experiment 03 Aspire migration on the DevBox against the Stage D Compose baseline.
 
 Entry criteria:
 
 - Stage D is complete;
 - baseline behavior is known;
-- migration scope is defined.
+- existing migration scope is defined.
 
 Exit criteria:
 
@@ -148,8 +148,7 @@ Exit criteria:
 
 Deliverables:
 
-- migration implementation;
-- migration report;
+- remote Aspire runtime validation report;
 - Aspire build evidence;
 - Aspire runtime evidence;
 - smoke test evidence;
