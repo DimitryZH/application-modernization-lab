@@ -70,7 +70,7 @@ Deliverables:
 
 ## Stage C: Validate DevBox environment
 
-Status: next stage.
+Status: complete.
 
 Objective:
 
@@ -95,6 +95,8 @@ Deliverables:
 - documented tooling gaps, if any.
 
 ## Stage D: Run first remote baseline validation
+
+Status: next stage.
 
 Objective:
 
