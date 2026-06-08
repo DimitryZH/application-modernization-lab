@@ -96,7 +96,7 @@ Deliverables:
 
 ## Stage D: Run first remote baseline validation
 
-Status: next stage.
+Status: complete.
 
 Objective:
 
@@ -124,6 +124,8 @@ Deliverables:
 - baseline logs.
 
 ## Stage E: Run first remote migration experiment
+
+Status: next stage.
 
 Objective:
 
