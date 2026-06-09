@@ -12,8 +12,10 @@ IMAGE_FAMILY="${IMAGE_FAMILY:-ubuntu-2404-lts-amd64}"
 IMAGE_PROJECT="${IMAGE_PROJECT:-ubuntu-os-cloud}"
 NETWORK="${NETWORK:-default}"
 SUBNET="${SUBNET:-default}"
-NETWORK_TAGS="${NETWORK_TAGS:-devbox-ssh}"
+NETWORK_TAGS="${NETWORK_TAGS:-devbox-iap-ssh}"
 CREATE_EXTERNAL_IP="${CREATE_EXTERNAL_IP:-true}"
+IAP_ALLOW_FIREWALL_RULE="${IAP_ALLOW_FIREWALL_RULE:-devbox-allow-iap-ssh}"
+PUBLIC_SSH_DENY_FIREWALL_RULE="${PUBLIC_SSH_DENY_FIREWALL_RULE:-devbox-deny-public-ssh}"
 ENABLE_OS_LOGIN="${ENABLE_OS_LOGIN:-true}"
 NO_SERVICE_ACCOUNT="${NO_SERVICE_ACCOUNT:-true}"
 LABELS="${LABELS:-experiment=exp04,purpose=compose-aspire-devbox}"
@@ -29,6 +31,8 @@ printf 'Image:             %s/%s\n' "$IMAGE_PROJECT" "$IMAGE_FAMILY"
 printf 'Network/subnet:    %s/%s\n' "$NETWORK" "$SUBNET"
 printf 'Network tags:      %s\n' "$NETWORK_TAGS"
 printf 'External IP:       %s\n' "$CREATE_EXTERNAL_IP"
+printf 'IAP allow rule:    %s\n' "$IAP_ALLOW_FIREWALL_RULE"
+printf 'Public SSH deny:   %s\n' "$PUBLIC_SSH_DENY_FIREWALL_RULE"
 printf 'OS Login metadata: %s\n' "$ENABLE_OS_LOGIN"
 printf 'Service account:   %s\n' "$([ "$NO_SERVICE_ACCOUNT" = "true" ] && printf 'none' || printf 'default')"
 printf 'Labels:            %s\n' "$LABELS"
@@ -44,6 +48,14 @@ if gcloud compute instances describe "$VM_NAME" --project "$PROJECT_ID" --zone "
   printf 'This script will not modify or replace an existing VM.\n' >&2
   exit 1
 fi
+
+for firewall_rule in "$IAP_ALLOW_FIREWALL_RULE" "$PUBLIC_SSH_DENY_FIREWALL_RULE"; do
+  if ! gcloud compute firewall-rules describe "$firewall_rule" --project "$PROJECT_ID" >/dev/null 2>&1; then
+    printf 'ERROR: Required hardened SSH firewall rule does not exist: %s\n' "$firewall_rule" >&2
+    printf 'Create and review both tagged SSH rules before creating the DevBox.\n' >&2
+    exit 1
+  fi
+done
 
 printf 'This will create a new development VM and may incur Google Cloud charges.\n'
 printf 'No destructive action will be performed by this script.\n'

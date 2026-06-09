@@ -21,6 +21,7 @@ This repository does not include a billing automation script. Billing state shou
 Required APIs:
 
 - Compute Engine API: `compute.googleapis.com`
+- Identity-Aware Proxy API: `iap.googleapis.com`
 - Service Usage API: `serviceusage.googleapis.com`
 - Cloud Resource Manager API: `cloudresourcemanager.googleapis.com`
 
@@ -30,6 +31,7 @@ If an API is missing, enable it explicitly:
 
 ```bash
 gcloud services enable compute.googleapis.com --project ai-agent-host-497515
+gcloud services enable iap.googleapis.com --project ai-agent-host-497515
 gcloud services enable serviceusage.googleapis.com --project ai-agent-host-497515
 gcloud services enable cloudresourcemanager.googleapis.com --project ai-agent-host-497515
 ```
@@ -43,7 +45,12 @@ cd experiments/04-google-cloud-devbox
 bash ./scripts/create-devbox-gce.sh
 ```
 
-The script prints its configuration and requires confirmation before creating the VM.
+The script defaults to the `devbox-iap-ssh` network tag and verifies that both reviewed SSH firewall rules exist before creating the VM:
+
+- `devbox-allow-iap-ssh` permits the IAP TCP forwarding range at priority `900`;
+- `devbox-deny-public-ssh` blocks direct public SSH at priority `1000`.
+
+The current minimal design retains an ephemeral external IP for outbound internet access because the default network has no Cloud NAT.
 
 ## 5. Connect through SSH
 
@@ -53,7 +60,7 @@ Use:
 bash ./scripts/connect-devbox.sh
 ```
 
-This uses `gcloud compute ssh` with the configured project, zone, and VM name.
+This uses `gcloud compute ssh --tunnel-through-iap` with the configured project, zone, and VM name.
 
 ## 6. Install tooling
 

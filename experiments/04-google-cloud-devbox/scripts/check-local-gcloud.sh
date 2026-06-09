@@ -5,6 +5,7 @@ PROJECT_ID="${PROJECT_ID:-ai-agent-host-497515}"
 
 REQUIRED_APIS=(
   "compute.googleapis.com"
+  "iap.googleapis.com"
   "serviceusage.googleapis.com"
   "cloudresourcemanager.googleapis.com"
 )

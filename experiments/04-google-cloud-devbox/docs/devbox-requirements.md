@@ -48,7 +48,11 @@ The DevBox needs outbound internet access for:
 - NuGet package restore;
 - Git repository access.
 
-Inbound access should be limited to SSH. Do not expose application ports publicly unless a specific validation requires it and the risk is understood.
+The current minimal design retains an ephemeral external IP for outbound internet access because the default network has no Cloud NAT. SSH access should use IAP TCP forwarding and OS Login.
+
+The `devbox-iap-ssh` network tag must have a higher-priority rule that allows TCP port 22 only from `35.235.240.0/20` and a lower-priority rule that denies TCP port 22 from `0.0.0.0/0`.
+
+Do not expose application ports publicly unless a specific validation requires it and the risk is understood.
 
 ## Repository expectations
 
