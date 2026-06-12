@@ -78,6 +78,8 @@ Result:
 
 ## Stage C - Full Aspire AppHost Implementation
 
+Status: **IN PROGRESS**
+
 Goals:
 
 - Create Aspire AppHost
@@ -89,6 +91,17 @@ Goals:
 Deliverable:
 
 - Full Aspire implementation
+
+### Stage C.1 - Aspire Foundation
+
+Status: **PASS** (completed 2026-06-12)
+
+Result:
+
+- Created the Experiment 05 Aspire solution and empty AppHost foundation.
+- Declared secret Aspire parameters without tracked values.
+- Established configuration-asset and image-pinning strategies.
+- Validated the foundation with `dotnet build`.
 
 ---
 
