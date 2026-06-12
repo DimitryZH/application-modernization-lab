@@ -89,3 +89,10 @@ The inventory now contains ten images. Stage C.4 adds the Stage A `jaeger`,
 `prometheus`, `opensearch`, and `grafana` image digests and image IDs. AppHost
 uses the readable Stage A tags together with `WithImageSHA256`, preserving the
 exact backend images while keeping their source identities reviewable.
+
+## Stage C.5 State
+
+The inventory now contains all 29 resolved deployment images. Stage C.5 adds
+the Collector and all remaining application, support, and orchestration
+service image digests captured from the running Stage A containers. Every
+AppHost container declaration is now pinned with `WithImageSHA256`.

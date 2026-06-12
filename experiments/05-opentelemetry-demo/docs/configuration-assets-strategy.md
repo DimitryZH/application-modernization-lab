@@ -81,13 +81,18 @@ metadata.
 
 | Destination | Upstream path | Owner | State | Notes |
 | --- | --- | --- | --- | --- |
-| `configuration-assets/flagd/demo.flagd.json` | `src/flagd/demo.flagd.json` | `flagd` | Unchanged | Mounted read-only at `/etc/flagd/demo.flagd.json`. |
+| `configuration-assets/flagd/demo.flagd.json` | `src/flagd/demo.flagd.json` | `flagd`, `flagd-ui` | Unchanged | Shared through writable directory mounts to preserve flagd UI mutation behavior. |
 | `configuration-assets/postgres/init.sql` | `src/postgresql/init.sql` | `astronomy-db` | Adapted | Only the two hardcoded role passwords were replaced with psql variables. Schemas, tables, grants, and seed data remain unchanged. |
 | `configuration-assets/postgres/01-init.sh` | None | `astronomy-db` | Aspire-specific adapter | Passes secret environment values to the adapted SQL through psql variables without storing them in tracked files. |
 | `configuration-assets/jaeger/config.yml` | `src/jaeger/config.yml` | `jaeger` | Unchanged content | Mounted read-only at `/etc/jaeger/config.yml`; tracked as mode `0644` for the non-root image. |
 | `configuration-assets/prometheus/prometheus-config.yaml` | `src/prometheus/prometheus-config.yaml` | `prometheus` | Unchanged content | Mounted read-only at `/etc/prometheus/prometheus-config.yaml`; tracked as mode `0644` for the non-root image. |
 | `configuration-assets/grafana/grafana.ini` | `src/grafana/grafana.ini` | `grafana` | Unchanged content | Mounted read-only at `/etc/grafana/grafana.ini`; tracked as mode `0644` for the non-root image. |
 | `configuration-assets/grafana/provisioning/` | `src/grafana/provisioning/` | `grafana` | Unchanged content | Complete provisioning tree mounted read-only; directories use `0755` and files use `0644` for the non-root image. |
+| `configuration-assets/otel-collector/otelcol-config.yml` | `src/otel-collector/otelcol-config.yml` | `otel-collector` | Unchanged | First Collector configuration layer. |
+| `configuration-assets/otel-collector/otelcol-config-full.yml` | `src/otel-collector/otelcol-config-full.yml` | `otel-collector` | Unchanged | Second Collector configuration layer with full-deployment receivers. |
+| `configuration-assets/otel-collector/otelcol-config-observability.yml` | `src/otel-collector/otelcol-config-observability.yml` | `otel-collector` | Unchanged | Third Collector configuration layer with backend exporters. |
+| `configuration-assets/otel-collector/otelcol-config-extras.yml` | `src/otel-collector/otelcol-config-extras.yml` | `otel-collector` | Unchanged | Final Collector customization layer. |
+| `configuration-assets/product-catalog/otel-config.yml` | `otel-config.yml` | `product-catalog` | Unchanged | Mounted read-only at `/otel-config.yml`. |
 
 All upstream copies are from commit
 `b5320139de38b789654a9653d5c4fda441b5cb8f`.

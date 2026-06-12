@@ -151,6 +151,22 @@ Result:
 - Validated the implementation with `dotnet build` and
   `dotnet build --no-restore`.
 
+### Stage C.5 - Application and Telemetry Layer
+
+Status: **PASS** (completed 2026-06-12)
+
+Result:
+
+- Added the OpenTelemetry Collector and all remaining application, support,
+  and orchestration resources.
+- Preserved the Collector's four-layer configuration order, backend
+  integrations, receivers, exporters, root runtime, and local host mounts.
+- Completed the 29-container Aspire topology and 29-entry image lock.
+- Preserved secret-backed application and Collector environment values.
+- Validated the complete static topology through Aspire manifest publication.
+- Validated the implementation with `dotnet build` and
+  `dotnet build --no-restore`.
+
 ---
 
 ## Stage D - Aspire Runtime Validation

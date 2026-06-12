@@ -93,6 +93,177 @@
       "imageId": "sha256:0f86bada30d65ef9d0183b90c1e2682ac92d53d95da8bed322b984ea78a4a73a",
       "captureSource": "docker inspect grafana; docker image inspect grafana/grafana:13.0.1",
       "notes": "Stage A Grafana image; configuration and provisioning tree are mounted from tracked assets."
+    },
+    {
+      "service": "otel-collector",
+      "repository": "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib",
+      "originalTag": "0.151.0",
+      "digest": "sha256:d57bfe8eee2378f31cb1193239fbcac521d54a5a071fca2bfc106916a32b892d",
+      "imageId": "sha256:d57bfe8eee2378f31cb1193239fbcac521d54a5a071fca2bfc106916a32b892d",
+      "captureSource": "docker inspect otel-collector; docker image inspect ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.151.0",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "product-catalog",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-product-catalog",
+      "digest": "sha256:c566213e753d53026a9a61e780eee956cb29eb1f33e9aefb99ea2cab576be086",
+      "imageId": "sha256:c566213e753d53026a9a61e780eee956cb29eb1f33e9aefb99ea2cab576be086",
+      "captureSource": "docker inspect product-catalog; docker image inspect ghcr.io/open-telemetry/demo:latest-product-catalog",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "product-reviews",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-product-reviews",
+      "digest": "sha256:37e804f6069c1188edb7d31826d5206d8f49f7347e1f544008bfe501d406528e",
+      "imageId": "sha256:37e804f6069c1188edb7d31826d5206d8f49f7347e1f544008bfe501d406528e",
+      "captureSource": "docker inspect product-reviews; docker image inspect ghcr.io/open-telemetry/demo:latest-product-reviews",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "cart",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-cart",
+      "digest": "sha256:313b70555dfd05db9658e2d30660cff2ec78ce5c101e6b44890414cd1a2cff0e",
+      "imageId": "sha256:313b70555dfd05db9658e2d30660cff2ec78ce5c101e6b44890414cd1a2cff0e",
+      "captureSource": "docker inspect cart; docker image inspect ghcr.io/open-telemetry/demo:latest-cart",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "recommendation",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-recommendation",
+      "digest": "sha256:fcc642c561bfc7ffc6262594f34e433ae127fbffc0e7ec28e2b2f34e1a470052",
+      "imageId": "sha256:fcc642c561bfc7ffc6262594f34e433ae127fbffc0e7ec28e2b2f34e1a470052",
+      "captureSource": "docker inspect recommendation; docker image inspect ghcr.io/open-telemetry/demo:latest-recommendation",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "payment",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-payment",
+      "digest": "sha256:f7934a1a494cd4a49eaa2e8d59dac247ea873ff682fbd7c6b1318cf3db43761d",
+      "imageId": "sha256:f7934a1a494cd4a49eaa2e8d59dac247ea873ff682fbd7c6b1318cf3db43761d",
+      "captureSource": "docker inspect payment; docker image inspect ghcr.io/open-telemetry/demo:latest-payment",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "shipping",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-shipping",
+      "digest": "sha256:3a048f8068e1bf0823145fa910aefade09dcf4bdb749ec26b360a2ad2520a159",
+      "imageId": "sha256:3a048f8068e1bf0823145fa910aefade09dcf4bdb749ec26b360a2ad2520a159",
+      "captureSource": "docker inspect shipping; docker image inspect ghcr.io/open-telemetry/demo:latest-shipping",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "quote",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-quote",
+      "digest": "sha256:992a49a73e0983efa1e8b5e887b19440e2fd2f54e4cd72d21d5bfcc91c312493",
+      "imageId": "sha256:992a49a73e0983efa1e8b5e887b19440e2fd2f54e4cd72d21d5bfcc91c312493",
+      "captureSource": "docker inspect quote; docker image inspect ghcr.io/open-telemetry/demo:latest-quote",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "currency",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-currency",
+      "digest": "sha256:211611bcdc81ad1190a887fd1c155bfa2dd23e7760b0f2d0986138af39a2c809",
+      "imageId": "sha256:211611bcdc81ad1190a887fd1c155bfa2dd23e7760b0f2d0986138af39a2c809",
+      "captureSource": "docker inspect currency; docker image inspect ghcr.io/open-telemetry/demo:latest-currency",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "email",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-email",
+      "digest": "sha256:c802eacd88bc8355ceb085be91efb5ba22f4a77812d44797bcd9e8aaa4386ab6",
+      "imageId": "sha256:c802eacd88bc8355ceb085be91efb5ba22f4a77812d44797bcd9e8aaa4386ab6",
+      "captureSource": "docker inspect email; docker image inspect ghcr.io/open-telemetry/demo:latest-email",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "image-provider",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-image-provider",
+      "digest": "sha256:cceea30974e0126a42a8ec076ea5189e4cebc60d7fb415e56899455031cd3732",
+      "imageId": "sha256:cceea30974e0126a42a8ec076ea5189e4cebc60d7fb415e56899455031cd3732",
+      "captureSource": "docker inspect image-provider; docker image inspect ghcr.io/open-telemetry/demo:latest-image-provider",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "ad",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-ad",
+      "digest": "sha256:59db3926ae76e1a0211d69edad8aa0456b34c2d7ae4269b85fa9a0905b68c800",
+      "imageId": "sha256:59db3926ae76e1a0211d69edad8aa0456b34c2d7ae4269b85fa9a0905b68c800",
+      "captureSource": "docker inspect ad; docker image inspect ghcr.io/open-telemetry/demo:latest-ad",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "telemetry-docs",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-telemetry-docs",
+      "digest": "sha256:bb11606350ab98ec9729c5d0ceda0e452c1dc160dbb0fcc79da6dd869d53f903",
+      "imageId": "sha256:bb11606350ab98ec9729c5d0ceda0e452c1dc160dbb0fcc79da6dd869d53f903",
+      "captureSource": "docker inspect telemetry-docs; docker image inspect ghcr.io/open-telemetry/demo:latest-telemetry-docs",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "flagd-ui",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-flagd-ui",
+      "digest": "sha256:114da8f13b35fc066e0cc64929ed76259bf49b4845b47e0dc9141e973930e6e4",
+      "imageId": "sha256:114da8f13b35fc066e0cc64929ed76259bf49b4845b47e0dc9141e973930e6e4",
+      "captureSource": "docker inspect flagd-ui; docker image inspect ghcr.io/open-telemetry/demo:latest-flagd-ui",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "checkout",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-checkout",
+      "digest": "sha256:6271870956cdcd328a5aa4329e28d9b8081d26c5bea2d9d3f07c868d8d53f97a",
+      "imageId": "sha256:6271870956cdcd328a5aa4329e28d9b8081d26c5bea2d9d3f07c868d8d53f97a",
+      "captureSource": "docker inspect checkout; docker image inspect ghcr.io/open-telemetry/demo:latest-checkout",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "frontend",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-frontend",
+      "digest": "sha256:9308ce492d52d8550858b26bfc78e4408f9ad61afc41f6e4330d100f7f733c91",
+      "imageId": "sha256:9308ce492d52d8550858b26bfc78e4408f9ad61afc41f6e4330d100f7f733c91",
+      "captureSource": "docker inspect frontend; docker image inspect ghcr.io/open-telemetry/demo:latest-frontend",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "frontend-proxy",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-frontend-proxy",
+      "digest": "sha256:7ea5a4f217c03b33b862d01a9a84b6e314884c1a8d96db6004bbdb0a37a2aa79",
+      "imageId": "sha256:7ea5a4f217c03b33b862d01a9a84b6e314884c1a8d96db6004bbdb0a37a2aa79",
+      "captureSource": "docker inspect frontend-proxy; docker image inspect ghcr.io/open-telemetry/demo:latest-frontend-proxy",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "load-generator",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-load-generator",
+      "digest": "sha256:5f6451c62411ae6110b2212dd829e7151509d607d77738f65ddf43fb0af6943c",
+      "imageId": "sha256:5f6451c62411ae6110b2212dd829e7151509d607d77738f65ddf43fb0af6943c",
+      "captureSource": "docker inspect load-generator; docker image inspect ghcr.io/open-telemetry/demo:latest-load-generator",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
+    },
+    {
+      "service": "fraud-detection",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-fraud-detection",
+      "digest": "sha256:1261e15a77dada6119e33e21ab1cb67770ae4c1c5a4a0cb2ebb6cf5e827758c5",
+      "imageId": "sha256:1261e15a77dada6119e33e21ab1cb67770ae4c1c5a4a0cb2ebb6cf5e827758c5",
+      "captureSource": "docker inspect fraud-detection; docker image inspect ghcr.io/open-telemetry/demo:latest-fraud-detection",
+      "notes": "Stage A image digest; explicit Aspire container preserves the resolved Compose contract."
     }
   ]
 }

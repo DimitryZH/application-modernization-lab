@@ -37,3 +37,11 @@ Stage C.4 adds unchanged upstream configuration for:
 Copied configuration content remains unchanged. Directories use mode `0755`
 and files use mode `0644` so the non-root backend images can read the tracked
 bind mounts on the DevBox.
+
+Stage C.5 adds unchanged upstream configuration for:
+
+- the four ordered OpenTelemetry Collector configuration layers;
+- the product-catalog OpenTelemetry SDK configuration.
+
+The flagd directory is mounted writable by both `flagd` and `flagd-ui` to
+preserve the upstream shared feature-flag editing contract.
