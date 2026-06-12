@@ -57,6 +57,42 @@
       "imageId": "sha256:393f062da55d4311a01919d4c130e440d9cb57bcd9f8e7ded6d5bbdf8cb8b2ab",
       "captureSource": "docker inspect accounting; docker image inspect ghcr.io/open-telemetry/demo:latest-accounting",
       "notes": "Stage A accounting consumer image; PostgreSQL password remains an Aspire secret expression."
+    },
+    {
+      "service": "jaeger",
+      "repository": "quay.io/jaegertracing/jaeger",
+      "originalTag": "2.14.1",
+      "digest": "sha256:39317a963b8006d0664bb1fc4c0bbdbf7cb9dcd20b9b57c23b6ebc09ab4f3cd6",
+      "imageId": "sha256:39317a963b8006d0664bb1fc4c0bbdbf7cb9dcd20b9b57c23b6ebc09ab4f3cd6",
+      "captureSource": "docker inspect jaeger; docker image inspect quay.io/jaegertracing/jaeger:2.14.1",
+      "notes": "Stage A Jaeger image; configuration is mounted from tracked assets."
+    },
+    {
+      "service": "prometheus",
+      "repository": "quay.io/prometheus/prometheus",
+      "originalTag": "v3.9.1",
+      "digest": "sha256:1f0f50f06acaceb0f5670d2c8a658a599affe7b0d8e78b898c1035653849a702",
+      "imageId": "sha256:1f0f50f06acaceb0f5670d2c8a658a599affe7b0d8e78b898c1035653849a702",
+      "captureSource": "docker inspect prometheus; docker image inspect quay.io/prometheus/prometheus:v3.9.1",
+      "notes": "Stage A Prometheus image; preserves OTLP receiver and stable host port strategy."
+    },
+    {
+      "service": "opensearch",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-opensearch",
+      "digest": "sha256:b56ba5f10cce29854dbfcdb4fbe561e733681dd542e5eaa55ff67b335e532858",
+      "imageId": "sha256:b56ba5f10cce29854dbfcdb4fbe561e733681dd542e5eaa55ff67b335e532858",
+      "captureSource": "docker inspect opensearch; docker image inspect ghcr.io/open-telemetry/demo:latest-opensearch",
+      "notes": "Stage A OpenSearch image; preserves single-node, security-disabled, heap, ulimit, and health contracts."
+    },
+    {
+      "service": "grafana",
+      "repository": "grafana/grafana",
+      "originalTag": "13.0.1",
+      "digest": "sha256:0f86bada30d65ef9d0183b90c1e2682ac92d53d95da8bed322b984ea78a4a73a",
+      "imageId": "sha256:0f86bada30d65ef9d0183b90c1e2682ac92d53d95da8bed322b984ea78a4a73a",
+      "captureSource": "docker inspect grafana; docker image inspect grafana/grafana:13.0.1",
+      "notes": "Stage A Grafana image; configuration and provisioning tree are mounted from tracked assets."
     }
   ]
 }

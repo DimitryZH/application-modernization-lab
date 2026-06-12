@@ -82,3 +82,10 @@ instrumented demo image rather than substituting a different broker image or
 Aspire integration. The accounting entry preserves the exact consumer image;
 its PostgreSQL password remains an Aspire secret expression and is not stored
 in the image inventory.
+
+## Stage C.4 State
+
+The inventory now contains ten images. Stage C.4 adds the Stage A `jaeger`,
+`prometheus`, `opensearch`, and `grafana` image digests and image IDs. AppHost
+uses the readable Stage A tags together with `WithImageSHA256`, preserving the
+exact backend images while keeping their source identities reviewable.

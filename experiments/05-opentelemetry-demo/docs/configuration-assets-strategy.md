@@ -51,6 +51,9 @@ stored in `configuration-assets/`.
 - Keep local-only host integrations, including the Collector Docker socket and
   host filesystem mounts, explicit and documented.
 - Do not use absolute DevBox paths in tracked AppHost code.
+- Keep read-only configuration directories executable and files readable by
+  non-root container users. Unless a stricter resource-specific mode is
+  required, copied directories use `0755` and copied files use `0644`.
 
 ## Parameter Strategy
 
@@ -81,6 +84,10 @@ metadata.
 | `configuration-assets/flagd/demo.flagd.json` | `src/flagd/demo.flagd.json` | `flagd` | Unchanged | Mounted read-only at `/etc/flagd/demo.flagd.json`. |
 | `configuration-assets/postgres/init.sql` | `src/postgresql/init.sql` | `astronomy-db` | Adapted | Only the two hardcoded role passwords were replaced with psql variables. Schemas, tables, grants, and seed data remain unchanged. |
 | `configuration-assets/postgres/01-init.sh` | None | `astronomy-db` | Aspire-specific adapter | Passes secret environment values to the adapted SQL through psql variables without storing them in tracked files. |
+| `configuration-assets/jaeger/config.yml` | `src/jaeger/config.yml` | `jaeger` | Unchanged content | Mounted read-only at `/etc/jaeger/config.yml`; tracked as mode `0644` for the non-root image. |
+| `configuration-assets/prometheus/prometheus-config.yaml` | `src/prometheus/prometheus-config.yaml` | `prometheus` | Unchanged content | Mounted read-only at `/etc/prometheus/prometheus-config.yaml`; tracked as mode `0644` for the non-root image. |
+| `configuration-assets/grafana/grafana.ini` | `src/grafana/grafana.ini` | `grafana` | Unchanged content | Mounted read-only at `/etc/grafana/grafana.ini`; tracked as mode `0644` for the non-root image. |
+| `configuration-assets/grafana/provisioning/` | `src/grafana/provisioning/` | `grafana` | Unchanged content | Complete provisioning tree mounted read-only; directories use `0755` and files use `0644` for the non-root image. |
 
 All upstream copies are from commit
 `b5320139de38b789654a9653d5c4fda441b5cb8f`.

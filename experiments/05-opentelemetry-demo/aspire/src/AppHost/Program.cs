@@ -74,4 +74,67 @@ builder.AddContainer("accounting", "ghcr.io/open-telemetry/demo", "latest-accoun
     .WaitFor(kafka)
     .WaitForStart(astronomyDb);
 
+var prometheus = builder.AddContainer("prometheus", "quay.io/prometheus/prometheus", "v3.9.1")
+    .WithImageSHA256("1f0f50f06acaceb0f5670d2c8a658a599affe7b0d8e78b898c1035653849a702")
+    .WithHttpEndpoint(targetPort: 9090, port: 9090, name: "http")
+    .WithBindMount("../../configuration-assets/prometheus/prometheus-config.yaml", "/etc/prometheus/prometheus-config.yaml", isReadOnly: true)
+    .WithArgs(
+        "--web.console.templates=/etc/prometheus/consoles",
+        "--web.console.libraries=/etc/prometheus/console_libraries",
+        "--storage.tsdb.retention.time=7d",
+        "--config.file=/etc/prometheus/prometheus-config.yaml",
+        "--storage.tsdb.path=/prometheus",
+        "--web.enable-lifecycle",
+        "--web.route-prefix=/",
+        "--web.enable-otlp-receiver",
+        "--enable-feature=exemplar-storage")
+    .WithHttpHealthCheck("/-/healthy");
+
+var jaeger = builder.AddContainer("jaeger", "quay.io/jaegertracing/jaeger", "2.14.1")
+    .WithImageSHA256("39317a963b8006d0664bb1fc4c0bbdbf7cb9dcd20b9b57c23b6ebc09ab4f3cd6")
+    .WithHttpEndpoint(targetPort: 16686, name: "ui")
+    .WithEndpoint(targetPort: 4317, name: "otlp-grpc")
+    .WithHttpEndpoint(targetPort: 13133, name: "health")
+    .WithEnvironment("JAEGER_HOST", "jaeger")
+    .WithEnvironment("JAEGER_GRPC_PORT", "4317")
+    .WithEnvironment("PROMETHEUS_ADDR", "prometheus:9090")
+    .WithEnvironment("OTEL_COLLECTOR_HOST", "otel-collector")
+    .WithEnvironment("OTEL_COLLECTOR_PORT_HTTP", "4318")
+    .WithEnvironment("MEMORY_MAX_TRACES", "25000")
+    .WithBindMount("../../configuration-assets/jaeger/config.yml", "/etc/jaeger/config.yml", isReadOnly: true)
+    .WithArgs("--config=file:/etc/jaeger/config.yml")
+    .WithReference(prometheus.GetEndpoint("http"))
+    .WithHttpHealthCheck("/status", endpointName: "health");
+
+var opensearch = builder.AddContainer("opensearch", "ghcr.io/open-telemetry/demo", "latest-opensearch")
+    .WithImageSHA256("b56ba5f10cce29854dbfcdb4fbe561e733681dd542e5eaa55ff67b335e532858")
+    .WithHttpEndpoint(targetPort: 9200, name: "http")
+    .WithEnvironment("cluster.name", "demo-cluster")
+    .WithEnvironment("node.name", "demo-node")
+    .WithEnvironment("bootstrap.memory_lock", "true")
+    .WithEnvironment("discovery.type", "single-node")
+    .WithEnvironment("OPENSEARCH_JAVA_OPTS", "-Xms400m -Xmx400m")
+    .WithEnvironment("DISABLE_INSTALL_DEMO_CONFIG", "true")
+    .WithEnvironment("DISABLE_SECURITY_PLUGIN", "true")
+    .WithContainerRuntimeArgs(
+        "--ulimit=memlock=-1:-1",
+        "--ulimit=nofile=65536:65536",
+        "--health-cmd=curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"'",
+        "--health-start-period=10s",
+        "--health-interval=5s",
+        "--health-timeout=10s",
+        "--health-retries=10")
+    .WithHttpHealthCheck("/_cluster/health");
+
+builder.AddContainer("grafana", "grafana/grafana", "13.0.1")
+    .WithImageSHA256("0f86bada30d65ef9d0183b90c1e2682ac92d53d95da8bed322b984ea78a4a73a")
+    .WithHttpEndpoint(targetPort: 3000, name: "http")
+    .WithEnvironment("GF_INSTALL_PLUGINS", "grafana-opensearch-datasource")
+    .WithBindMount("../../configuration-assets/grafana/grafana.ini", "/etc/grafana/grafana.ini", isReadOnly: true)
+    .WithBindMount("../../configuration-assets/grafana/provisioning", "/etc/grafana/provisioning", isReadOnly: true)
+    .WithReference(prometheus.GetEndpoint("http"))
+    .WithReference(jaeger.GetEndpoint("ui"))
+    .WithReference(opensearch.GetEndpoint("http"))
+    .WithHttpHealthCheck("/api/health");
+
 builder.Build().Run();

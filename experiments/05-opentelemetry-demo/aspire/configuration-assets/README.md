@@ -27,3 +27,13 @@ Stage C.2 adds:
   variables;
 - an Aspire-specific PostgreSQL initialization adapter that supplies secret
   parameter values to the SQL file.
+
+Stage C.4 adds unchanged upstream configuration for:
+
+- Jaeger;
+- Prometheus;
+- Grafana and its complete provisioning tree.
+
+Copied configuration content remains unchanged. Directories use mode `0755`
+and files use mode `0644` so the non-root backend images can read the tracked
+bind mounts on the DevBox.

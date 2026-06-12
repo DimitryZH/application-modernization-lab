@@ -135,6 +135,22 @@ Result:
 - Validated the implementation with `dotnet build` and
   `dotnet build --no-restore`.
 
+### Stage C.4 - Observability Backends Layer
+
+Status: **PASS** (completed 2026-06-12)
+
+Result:
+
+- Added digest-pinned `jaeger`, `prometheus`, `opensearch`, and `grafana`
+  container resources.
+- Added unchanged tracked Jaeger, Prometheus, and Grafana configuration assets.
+- Preserved backend endpoints, health checks, OpenSearch runtime constraints,
+  Prometheus OTLP receiver flags, and Grafana provisioning.
+- Validated all four direct health endpoints on an isolated Docker network
+  without disturbing the Stage A stack.
+- Validated the implementation with `dotnet build` and
+  `dotnet build --no-restore`.
+
 ---
 
 ## Stage D - Aspire Runtime Validation
