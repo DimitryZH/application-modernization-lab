@@ -6,7 +6,7 @@ var monitoringUserPassword = builder.AddParameter("monitoring-user-password", se
 _ = builder.AddParameter("openai-api-key", secret: true);
 _ = builder.AddParameter("flagd-ui-secret", secret: true);
 
-builder.AddContainer("astronomy-db", "postgres", "17.8")
+var astronomyDb = builder.AddContainer("astronomy-db", "postgres", "17.8")
     .WithImageSHA256("69dddb030ab69d669d8d7c6abf67aeb448178e5270d5f123a21f4f7ac8b46a24")
     .WithEndpoint(targetPort: 5432, name: "postgres")
     .WithEnvironment("POSTGRES_PASSWORD", postgresPassword)
@@ -40,5 +40,38 @@ builder.AddContainer("llm", "ghcr.io/open-telemetry/demo", "latest-llm")
     .WithReference(flagd.GetEndpoint("grpc"))
     .WaitForStart(flagd)
     .WithHttpHealthCheck("/v1/models");
+
+var kafka = builder.AddContainer("kafka", "ghcr.io/open-telemetry/demo", "latest-kafka")
+    .WithImageSHA256("4baa7327e27617fca641e09417d9e1442c6511f665548b5c4f4598ea25338194")
+    .WithEndpoint(targetPort: 9092, name: "broker")
+    .WithEndpoint(targetPort: 9093, name: "controller")
+    .WithEnvironment("KAFKA_ADVERTISED_LISTENERS", "PLAINTEXT://kafka:9092")
+    .WithEnvironment("KAFKA_LISTENERS", "PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093")
+    .WithEnvironment("KAFKA_CONTROLLER_QUORUM_VOTERS", "1@kafka:9093")
+    .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel-collector:4318")
+    .WithEnvironment("OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE", "cumulative")
+    .WithEnvironment("OTEL_RESOURCE_ATTRIBUTES", "service.namespace=opentelemetry-demo,service.version=latest,service.criticality=low")
+    .WithEnvironment("OTEL_SERVICE_NAME", "kafka")
+    .WithEnvironment("KAFKA_HEAP_OPTS", "-Xmx400m -Xms400m")
+    .WithContainerRuntimeArgs(
+        "--health-cmd=nc -z kafka 9092",
+        "--health-start-period=10s",
+        "--health-interval=5s",
+        "--health-timeout=10s",
+        "--health-retries=10");
+
+builder.AddContainer("accounting", "ghcr.io/open-telemetry/demo", "latest-accounting")
+    .WithImageSHA256("393f062da55d4311a01919d4c130e440d9cb57bcd9f8e7ded6d5bbdf8cb8b2ab")
+    .WithEnvironment("KAFKA_ADDR", "kafka:9092")
+    .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel-collector:4318")
+    .WithEnvironment("OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE", "cumulative")
+    .WithEnvironment("OTEL_RESOURCE_ATTRIBUTES", "service.namespace=opentelemetry-demo,service.version=latest,service.criticality=low")
+    .WithEnvironment("OTEL_SERVICE_NAME", "accounting")
+    .WithEnvironment("DB_CONNECTION_STRING", $"Host=astronomy-db;Username=astronomy_user;Password={astronomyUserPassword};Database=astronomy_db")
+    .WithEnvironment("OTEL_DOTNET_AUTO_TRACES_ENTITYFRAMEWORKCORE_INSTRUMENTATION_ENABLED", "false")
+    .WithReference(kafka.GetEndpoint("broker"))
+    .WithReference(astronomyDb.GetEndpoint("postgres"))
+    .WaitFor(kafka)
+    .WaitForStart(astronomyDb);
 
 builder.Build().Run();

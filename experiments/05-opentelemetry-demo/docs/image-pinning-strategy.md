@@ -73,3 +73,12 @@ The initial inventory contains the four Stage C.2 infrastructure images:
 were captured from the running Stage A containers before Stage C.2 resources
 were started. AppHost declarations preserve the readable source tags and pin
 the captured digests with `WithImageSHA256`.
+
+## Stage C.3 State
+
+The inventory now contains six images. Stage C.3 adds the Stage A `kafka` and
+`accounting` image digests and image IDs. The Kafka entry preserves the exact
+instrumented demo image rather than substituting a different broker image or
+Aspire integration. The accounting entry preserves the exact consumer image;
+its PostgreSQL password remains an Aspire secret expression and is not stored
+in the image inventory.

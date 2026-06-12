@@ -39,6 +39,24 @@
       "imageId": "sha256:a4ed209d643d2ceec18cf4a34671a1e24a2d9242de8270433a6e62691881ec06",
       "captureSource": "docker inspect llm; docker image inspect ghcr.io/open-telemetry/demo:latest-llm",
       "notes": "Stage A floating tag resolved to this immutable digest."
+    },
+    {
+      "service": "kafka",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-kafka",
+      "digest": "sha256:4baa7327e27617fca641e09417d9e1442c6511f665548b5c4f4598ea25338194",
+      "imageId": "sha256:4baa7327e27617fca641e09417d9e1442c6511f665548b5c4f4598ea25338194",
+      "captureSource": "docker inspect kafka; docker image inspect ghcr.io/open-telemetry/demo:latest-kafka",
+      "notes": "Stage A instrumented Kafka image; preserves single-broker KRaft, Java agent, and JMX configuration."
+    },
+    {
+      "service": "accounting",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-accounting",
+      "digest": "sha256:393f062da55d4311a01919d4c130e440d9cb57bcd9f8e7ded6d5bbdf8cb8b2ab",
+      "imageId": "sha256:393f062da55d4311a01919d4c130e440d9cb57bcd9f8e7ded6d5bbdf8cb8b2ab",
+      "captureSource": "docker inspect accounting; docker image inspect ghcr.io/open-telemetry/demo:latest-accounting",
+      "notes": "Stage A accounting consumer image; PostgreSQL password remains an Aspire secret expression."
     }
   ]
 }

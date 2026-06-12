@@ -119,6 +119,22 @@ Result:
 - Validated the implementation with `dotnet build` and
   `dotnet build --no-restore`.
 
+### Stage C.3 - Kafka and Accounting Layer
+
+Status: **PASS** (completed 2026-06-12)
+
+Result:
+
+- Added digest-pinned `kafka` and `accounting` container resources.
+- Preserved the instrumented single-broker KRaft listener, telemetry, JMX,
+  topic auto-creation, and replication-factor contracts.
+- Wired accounting to Kafka readiness and the parameterized PostgreSQL
+  connection contract.
+- Validated Kafka TCP readiness and accounting startup on an isolated Docker
+  network without disturbing the Stage A stack.
+- Validated the implementation with `dotnet build` and
+  `dotnet build --no-restore`.
+
 ---
 
 ## Stage D - Aspire Runtime Validation
