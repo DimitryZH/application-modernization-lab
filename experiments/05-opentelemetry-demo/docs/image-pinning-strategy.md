@@ -66,8 +66,10 @@ validation. Floating tags alone are not acceptable implementation pins.
 - Record why a digest changed and which validation stages must be repeated.
 - Keep registry credentials and other sensitive values out of the inventory.
 
-## Stage C.1 State
+## Stage C.2 State
 
-No container resources or image-lock entries are added in Stage C.1. The
-inventory is deliberately deferred until the first infrastructure resources
-are implemented and their Stage A image identities can be verified.
+The initial inventory contains the four Stage C.2 infrastructure images:
+`astronomy-db`, `valkey-cart`, `flagd`, and `llm`. Their digests and image IDs
+were captured from the running Stage A containers before Stage C.2 resources
+were started. AppHost declarations preserve the readable source tags and pin
+the captured digests with `WithImageSHA256`.

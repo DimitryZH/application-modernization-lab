@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "upstreamCommit": "b5320139de38b789654a9653d5c4fda441b5cb8f",
+  "captureDate": "2026-06-12",
+  "captureSource": "Stage A running containers inspected with docker inspect and docker image inspect",
+  "images": [
+    {
+      "service": "astronomy-db",
+      "repository": "postgres",
+      "originalTag": "17.8",
+      "digest": "sha256:69dddb030ab69d669d8d7c6abf67aeb448178e5270d5f123a21f4f7ac8b46a24",
+      "imageId": "sha256:69dddb030ab69d669d8d7c6abf67aeb448178e5270d5f123a21f4f7ac8b46a24",
+      "captureSource": "docker inspect astronomy-db; docker image inspect postgres:17.8",
+      "notes": "Stage A image digest; explicit container preserves command and parameterized init behavior."
+    },
+    {
+      "service": "valkey-cart",
+      "repository": "ghcr.io/valkey-io/valkey",
+      "originalTag": "9.0.2-alpine3.23",
+      "digest": "sha256:68677f85c863830af7836ff07c4a13b7f085ebeff62f4dedb71499ca27d229f2",
+      "imageId": "sha256:68677f85c863830af7836ff07c4a13b7f085ebeff62f4dedb71499ca27d229f2",
+      "captureSource": "docker inspect valkey-cart; docker image inspect ghcr.io/valkey-io/valkey:9.0.2-alpine3.23",
+      "notes": "Stage A image digest; explicit container preserves the valkey runtime user."
+    },
+    {
+      "service": "flagd",
+      "repository": "ghcr.io/open-feature/flagd",
+      "originalTag": "v0.14.2",
+      "digest": "sha256:ffd69c37e4ddb53ae1875ea2cc0ee7c653e2aaf317ac4f25dacc8aee8f34e59a",
+      "imageId": "sha256:ffd69c37e4ddb53ae1875ea2cc0ee7c653e2aaf317ac4f25dacc8aee8f34e59a",
+      "captureSource": "docker inspect flagd; docker image inspect ghcr.io/open-feature/flagd:v0.14.2",
+      "notes": "Stage A image digest; configuration file is mounted from tracked assets."
+    },
+    {
+      "service": "llm",
+      "repository": "ghcr.io/open-telemetry/demo",
+      "originalTag": "latest-llm",
+      "digest": "sha256:a4ed209d643d2ceec18cf4a34671a1e24a2d9242de8270433a6e62691881ec06",
+      "imageId": "sha256:a4ed209d643d2ceec18cf4a34671a1e24a2d9242de8270433a6e62691881ec06",
+      "captureSource": "docker inspect llm; docker image inspect ghcr.io/open-telemetry/demo:latest-llm",
+      "notes": "Stage A floating tag resolved to this immutable digest."
+    }
+  ]
+}

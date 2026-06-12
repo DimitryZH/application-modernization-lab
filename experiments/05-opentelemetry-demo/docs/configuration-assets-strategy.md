@@ -54,14 +54,13 @@ stored in `configuration-assets/`.
 
 ## Parameter Strategy
 
-Stage C.1 declares these Aspire parameters as secret values:
+The AppHost declares these Aspire parameters as secret values:
 
 | Aspire parameter | Future use |
 | --- | --- |
 | `postgres-password` | PostgreSQL administrator password |
-| `accounting-db-password` | Accounting database role password |
-| `product-catalog-db-password` | Product catalog database role password |
-| `product-reviews-db-password` | Product reviews database role password |
+| `astronomy-user-password` | Shared upstream `astronomy_user` role password |
+| `monitoring-user-password` | Upstream `monitoring_user` role password |
 | `openai-api-key` | `OPENAI_API_KEY` for product reviews |
 | `flagd-ui-secret` | flagd UI `SECRET_KEY_BASE` |
 
@@ -75,8 +74,13 @@ configuration or explicit resource environment declarations. Secret values
 must never appear in source, reports, logs, configuration assets, or image
 metadata.
 
-## Stage C.1 State
+## Tracked Asset Inventory
 
-The tracked asset directory currently contains only its README. Configuration
-copies and mounts will be added by the later Stage C implementation layers that
-own them.
+| Destination | Upstream path | Owner | State | Notes |
+| --- | --- | --- | --- | --- |
+| `configuration-assets/flagd/demo.flagd.json` | `src/flagd/demo.flagd.json` | `flagd` | Unchanged | Mounted read-only at `/etc/flagd/demo.flagd.json`. |
+| `configuration-assets/postgres/init.sql` | `src/postgresql/init.sql` | `astronomy-db` | Adapted | Only the two hardcoded role passwords were replaced with psql variables. Schemas, tables, grants, and seed data remain unchanged. |
+| `configuration-assets/postgres/01-init.sh` | None | `astronomy-db` | Aspire-specific adapter | Passes secret environment values to the adapted SQL through psql variables without storing them in tracked files. |
+
+All upstream copies are from commit
+`b5320139de38b789654a9653d5c4fda441b5cb8f`.

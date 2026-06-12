@@ -103,6 +103,22 @@ Result:
 - Established configuration-asset and image-pinning strategies.
 - Validated the foundation with `dotnet build`.
 
+### Stage C.2 - Infrastructure Layer
+
+Status: **PASS** (completed 2026-06-12)
+
+Result:
+
+- Added digest-pinned `astronomy-db`, `valkey-cart`, `flagd`, and `llm`
+  container resources.
+- Added tracked PostgreSQL initialization and flagd configuration assets.
+- Parameterized PostgreSQL administrator, application, and monitoring
+  passwords without tracked secret values.
+- Validated the Aspire manifest, PostgreSQL initialization contract, and LLM
+  endpoint; recorded the DevBox DCP startup limitation.
+- Validated the implementation with `dotnet build` and
+  `dotnet build --no-restore`.
+
 ---
 
 ## Stage D - Aspire Runtime Validation
