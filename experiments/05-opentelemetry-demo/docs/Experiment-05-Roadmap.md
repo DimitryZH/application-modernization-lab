@@ -201,6 +201,8 @@ Result:
 
 ## Stage E - Observability Validation
 
+Status: **PASS with documented baseline and datasource limitations** (completed 2026-06-13)
+
 Goals:
 
 - Validate traces
@@ -212,6 +214,21 @@ Goals:
 Deliverable:
 
 - Observability validation report
+
+Result:
+
+- Validated 19 Jaeger services and representative storefront and checkout
+  traces.
+- Validated application, Kafka, PostgreSQL, Valkey, NGINX, Docker, host, and
+  Collector metrics through Prometheus.
+- Validated the OpenSearch telemetry log index and service-attributed logs.
+- Validated Grafana health, three provisioned datasources, and eight
+  provisioned dashboards.
+- Confirmed the Collector's four-layer merge order and active traces, metrics,
+  logs, and Kafka telemetry paths.
+- Reproduced Stage A baseline limitations and documented a Grafana OpenSearch
+  datasource health-check false negative without finding an Aspire wiring
+  regression.
 
 ---
 
