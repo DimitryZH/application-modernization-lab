@@ -78,7 +78,7 @@ Result:
 
 ## Stage C - Full Aspire AppHost Implementation
 
-Status: **IN PROGRESS**
+Status: **PASS** (completed 2026-06-12)
 
 Goals:
 
@@ -171,6 +171,8 @@ Result:
 
 ## Stage D - Aspire Runtime Validation
 
+Status: **PASS with documented baseline limitations** (completed 2026-06-13)
+
 Goals:
 
 - Build Aspire solution
@@ -182,6 +184,18 @@ Goals:
 Deliverable:
 
 - Runtime validation report
+
+Result:
+
+- Started the complete Aspire AppHost and reached a stable 29-running-resource
+  state with no unhealthy or exited containers.
+- Validated all required frontend-proxy and Prometheus endpoints with HTTP 200.
+- Validated storefront browse, product, cart, checkout recovery, Kafka order,
+  accounting consumption, and Collector signal-processing paths.
+- Fixed frontend HTTP health modeling and preserved restart behavior for
+  checkout and fraud-detection.
+- Reproduced and documented the known fraud-detection, startup timing, Load
+  Generator, and Collector baseline limitations.
 
 ---
 

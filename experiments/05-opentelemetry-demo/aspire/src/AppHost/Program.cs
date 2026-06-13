@@ -279,7 +279,8 @@ var checkout = AddDemoService("checkout", "6271870956cdcd328a5aa4329e28d9b8081d2
     ("OTEL_SERVICE_NAME", "checkout"), ("PAYMENT_ADDR", "payment:50051"), ("PRODUCT_CATALOG_ADDR", "product-catalog:3550"), ("SHIPPING_ADDR", "http://shipping:50050"))
     .WithReference(cart.GetEndpoint("service")).WithReference(currency.GetEndpoint("service")).WithReference(email.GetEndpoint("service"))
     .WithReference(payment.GetEndpoint("service")).WithReference(productCatalog.GetEndpoint("service")).WithReference(shipping.GetEndpoint("service"))
-    .WithReference(kafka.GetEndpoint("broker")).WithReference(flagd.GetEndpoint("grpc")).WithReference(otelCollector.GetEndpoint("otlp-grpc")).WaitFor(kafka);
+    .WithReference(kafka.GetEndpoint("broker")).WithReference(flagd.GetEndpoint("grpc")).WithReference(otelCollector.GetEndpoint("otlp-grpc"))
+    .WithContainerRuntimeArgs("--restart=unless-stopped").WaitFor(kafka);
 
 var fraudDetection = builder.AddContainer("fraud-detection", "ghcr.io/open-telemetry/demo", "latest-fraud-detection")
     .WithImageSHA256("1261e15a77dada6119e33e21ab1cb67770ae4c1c5a4a0cb2ebb6cf5e827758c5")
@@ -287,9 +288,10 @@ var fraudDetection = builder.AddContainer("fraud-detection", "ghcr.io/open-telem
     .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel-collector:4318").WithEnvironment("OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE", "cumulative")
     .WithEnvironment("OTEL_INSTRUMENTATION_KAFKA_EXPERIMENTAL_SPAN_ATTRIBUTES", "true").WithEnvironment("OTEL_INSTRUMENTATION_MESSAGING_EXPERIMENTAL_RECEIVE_TELEMETRY_ENABLED", "true")
     .WithEnvironment("OTEL_RESOURCE_ATTRIBUTES", "service.namespace=opentelemetry-demo,service.version=2.2.0,service.criticality=low")
-    .WithEnvironment("OTEL_SERVICE_NAME", "fraud-detection").WithReference(kafka.GetEndpoint("broker")).WithReference(otelCollector.GetEndpoint("otlp-http")).WaitFor(kafka);
+    .WithEnvironment("OTEL_SERVICE_NAME", "fraud-detection").WithReference(kafka.GetEndpoint("broker")).WithReference(otelCollector.GetEndpoint("otlp-http"))
+    .WithContainerRuntimeArgs("--restart=unless-stopped").WaitFor(kafka);
 
-var frontend = AddDemoService("frontend", "9308ce492d52d8550858b26bfc78e4408f9ad61afc41f6e4330d100f7f733c91", 8080,
+var frontend = AddHttpDemoService("frontend", "9308ce492d52d8550858b26bfc78e4408f9ad61afc41f6e4330d100f7f733c91", 8080,
     ("AD_ADDR", "ad:9555"), ("CART_ADDR", "cart:7070"), ("CHECKOUT_ADDR", "checkout:5050"), ("CURRENCY_ADDR", "currency:7001"),
     ("ENV_PLATFORM", "local"), ("FLAGD_HOST", "flagd"), ("FLAGD_PORT", "8013"), ("FRONTEND_ADDR", "frontend:8080"),
     ("OTEL_COLLECTOR_HOST", "otel-collector"), ("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel-collector:4317"),
@@ -302,9 +304,7 @@ var frontend = AddDemoService("frontend", "9308ce492d52d8550858b26bfc78e4408f9ad
     .WithReference(currency.GetEndpoint("service")).WithReference(productCatalog.GetEndpoint("service")).WithReference(productReviews.GetEndpoint("service"))
     .WithReference(recommendation.GetEndpoint("service")).WithReference(shipping.GetEndpoint("service")).WithReference(imageProvider.GetEndpoint("service"))
     .WithReference(flagd.GetEndpoint("grpc")).WithReference(otelCollector.GetEndpoint("otlp-grpc"))
-    .WithContainerRuntimeArgs(
-        "--health-cmd=/nodejs/bin/node -e \"require('net').connect(8080,require('os').hostname(),function(){process.exit(0)}).on('error',function(){process.exit(1)})\"",
-        "--health-start-period=60s", "--health-interval=10s", "--health-timeout=10s", "--health-retries=5");
+    .WithHttpHealthCheck("/", endpointName: "service");
 
 var loadGenerator = AddDemoService("load-generator", "5f6451c62411ae6110b2212dd829e7151509d607d77738f65ddf43fb0af6943c", 8089,
     ("FLAGD_HOST", "flagd"), ("FLAGD_OFREP_PORT", "8016"), ("FLAGD_PORT", "8013"), ("LOCUST_AUTOSTART", "true"),
@@ -337,6 +337,20 @@ IResourceBuilder<ContainerResource> AddDemoService(string name, string digest, i
     var resource = builder.AddContainer(name, "ghcr.io/open-telemetry/demo", $"latest-{name}")
         .WithImageSHA256(digest)
         .WithEndpoint(targetPort: port, name: "service");
+
+    foreach (var (environmentName, value) in environment)
+    {
+        resource.WithEnvironment(environmentName, value);
+    }
+
+    return resource;
+}
+
+IResourceBuilder<ContainerResource> AddHttpDemoService(string name, string digest, int port, params (string Name, string Value)[] environment)
+{
+    var resource = builder.AddContainer(name, "ghcr.io/open-telemetry/demo", $"latest-{name}")
+        .WithImageSHA256(digest)
+        .WithHttpEndpoint(targetPort: port, name: "service");
 
     foreach (var (environmentName, value) in environment)
     {
