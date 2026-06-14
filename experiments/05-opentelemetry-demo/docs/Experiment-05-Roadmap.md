@@ -234,6 +234,8 @@ Result:
 
 ## Stage F - Functional and Operational Equivalence Review
 
+Status: **PASS with documented differences and baseline limitations** (completed 2026-06-13)
+
 Goals:
 
 - Compare Compose and Aspire deployments
@@ -244,9 +246,19 @@ Deliverable:
 
 - Equivalence review
 
+Result:
+
+- Confirmed 29/29 service coverage and equivalent required endpoint,
+  storefront, Kafka, accounting, and observability behavior.
+- Classified remaining issues as baseline, source, environment, observability,
+  resolved migration, or documented operational differences.
+- Found no unresolved Aspire migration failure.
+
 ---
 
 ## Stage G - Final Assessment
+
+Status: **PASS** (completed 2026-06-13)
 
 Goals:
 
@@ -258,3 +270,22 @@ Goals:
 Deliverable:
 
 - Final assessment report
+
+Result:
+
+- Final Experiment 05 score: **94/100**.
+- Final verdict: **PASS - full migration demonstrated with high functional and
+  observability equivalence**.
+- Cleaned up the post-reboot Aspire runtime; no Experiment 05 containers
+  remain, and images and volumes were preserved.
+
+---
+
+## Experiment 05 Final Result
+
+Status: **PASS** (completed 2026-06-13)
+
+The complete 29-service OpenTelemetry Demo was migrated to .NET Aspire and
+validated for build, runtime, functional, Kafka, and observability behavior.
+Known source, environment, and observability limitations remain documented;
+no unresolved migration failure was found.
