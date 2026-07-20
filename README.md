@@ -25,7 +25,7 @@ The experiments began with direct Codex-driven migrations and now extend to a go
 | 03 | Docker Example Voting App | Codex desktop workflow | 8/10 |
 | 04 | Google Cloud DevBox execution validation | Codex on a remote Linux DevBox | PASS — 95/100 |
 | 05 | Full OpenTelemetry Demo / Astronomy Shop migration | Codex on a controlled DevBox | PASS — 94/100 |
-| Current track | Online Boutique modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | Docker Compose baseline in progress |
+| Current track | Online Boutique modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | Docker Compose baseline validated; Aspire migration next |
 
 ## Current Agent-Orchestration Track
 
