@@ -2,7 +2,7 @@
 
 **AI-agent-driven experiments for migrating multi-service applications from Docker Compose to .NET Aspire.**
 
-This repository is a research lab that evaluates how AI coding agents and agent-orchestration workflows can plan them, implement, validate, and improve application-modernization work across progressively more complex systems.
+This repository is a research lab that evaluates how AI coding agents and agent-orchestration workflows can plan, implement, validate, and improve application-modernization work across progressively more complex systems.
 
 The experiments began with direct Codex-driven migrations and now extend to a governed OpenClaw/DevClaw workflow with role-based agents, GitHub-native task state, explicit human approval gates, and reusable migration knowledge.
 
