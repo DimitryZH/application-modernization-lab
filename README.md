@@ -25,7 +25,7 @@ The experiments began with direct Codex-driven migrations and now extend to a go
 | 03 | Docker Example Voting App | Codex desktop workflow | 8/10 |
 | 04 | Google Cloud DevBox execution validation | Codex on a remote Linux DevBox | PASS — 95/100 |
 | 05 | Full OpenTelemetry Demo / Astronomy Shop migration | Codex on a controlled DevBox | PASS — 94/100 |
-| Current track | Governed Compose-to-Aspire workflow | OpenClaw + DevClaw + OpenAI GPT-5.5 | Architecture approval stage |
+| Current track | Online Boutique modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | Docker Compose baseline in progress |
 
 ## Current Agent-Orchestration Track
 
@@ -122,7 +122,8 @@ The OpenClaw/DevClaw track tests whether role separation, GitHub-native workflow
 │   ├── 02-open-source-voting-app/
 │   ├── 03-codex-desktop-voting-app/
 │   ├── 04-google-cloud-devbox/
-│   └── 05-opentelemetry-demo/
+│   ├── 05-opentelemetry-demo/
+│   └── 06-online-boutique/
 ├── LICENSE
 └── README.md
 ```
