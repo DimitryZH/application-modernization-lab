@@ -4,7 +4,7 @@
 
 This repository is a research lab that evaluates how AI coding agents and agent-orchestration workflows can plan, implement, validate, and improve application-modernization work across progressively more complex systems.
 
-The experiments began with direct Codex-driven migrations and now extend to a governed OpenClaw/DevClaw workflow with role-based agents, GitHub-native task state, explicit human approval gates, and reusable migration knowledge.
+The experiments began with direct Codex-driven migrations and now extend to an OpenClaw/DevClaw workflow with role-based agents, GitHub-native task state, explicit human review, and operator-approved reusable migration knowledge.
 
 ## What This Repository Demonstrates
 
@@ -14,7 +14,7 @@ The experiments began with direct Codex-driven migrations and now extend to a go
 - AI-assisted architecture analysis, implementation, testing, and review;
 - remote agent execution on a controlled Linux DevBox;
 - GitHub-based task orchestration, auditability, and human-in-the-loop approvals;
-- migration patterns that can later be consolidated into reusable agent skills.
+- migration patterns that can be promoted into operator-approved reusable skills.
 
 ## Experiment Progression
 
@@ -25,17 +25,17 @@ The experiments began with direct Codex-driven migrations and now extend to a go
 | 03 | Docker Example Voting App | Codex desktop workflow | 8/10 |
 | 04 | Google Cloud DevBox execution validation | Codex on a remote Linux DevBox | PASS — 95/100 |
 | 05 | Full OpenTelemetry Demo / Astronomy Shop migration | Codex on a controlled DevBox | PASS — 94/100 |
-| Current track | Online Boutique modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | Docker Compose baseline validated; Aspire migration next |
+| 06 | Online Boutique modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | PASS - Docker Compose baseline and .NET Aspire migration independently validated; reusable migration skill applied |
 
-## Current Agent-Orchestration Track
+## Agent-Orchestration Track
 
-The current experiment evaluates more than an individual coding agent. It tests a governed multi-agent workflow in which:
+Experiment 06 evaluated more than an individual coding agent. It tested a multi-agent workflow in which:
 
 - **OpenClaw** provides the operator-facing control surface and agent runtime;
-- **DevClaw** manages projects, roles, task state, worker sessions, and approval gates;
+- **DevClaw** manages projects, roles, task state, worker sessions, and review state;
 - **OpenAI GPT-5.5** performs reasoning within architect and engineering sessions;
 - **GitHub Issues, labels, comments, branches, and pull requests** provide durable workflow state and an auditable evidence trail;
-- the **human operator** approves architecture, implementation, merge, and future knowledge promotion.
+- the **human operator** approves architecture, implementation, merge, and reusable knowledge promotion.
 
 ```mermaid
 flowchart LR
@@ -45,7 +45,7 @@ flowchart LR
     Agents[Role-based Agent Sessions]
     Workspace[Controlled DevBox Workspace]
     GitHub[GitHub Issues, Labels, Comments and PRs]
-    Skill[Future Approved Migration Skill]
+    Skill[Operator-Approved Workspace Skill]
 
     Human --> UI
     UI --> DevClaw
@@ -136,7 +136,7 @@ Each experiment contains its own source material, Aspire implementation, validat
 2. Experiment 05 equivalence review;
 3. Experiment 04 DevBox validation;
 4. Experiment 03 Voting App migration;
-5. the OpenClaw/DevClaw architecture-research issue and approval workflow.
+5. Experiment 06 Online Boutique migration and validation results.
 
 ## Technical Value 
 
