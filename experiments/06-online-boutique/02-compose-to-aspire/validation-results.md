@@ -118,4 +118,52 @@ docker compose -p online-boutique-exp06 -f experiments/06-online-boutique/01-kub
 
 ## Notes
 
-The repository validator is provided as `scripts/validate-aspire.ps1`, matching the Compose validator style. It was syntax-reviewed and the equivalent validation logic was executed with shell commands in this environment because `pwsh` is not installed on the DevBox.
+The repository validator is provided as `scripts/validate-aspire.ps1`, matching the Compose validator style. For the original 2026-07-20 evidence, it was syntax-reviewed and the equivalent validation logic was executed with shell commands because `pwsh` was not available in that environment at the time.
+
+## Validator Correction Evidence
+
+Date: 2026-07-21
+Environment update: PowerShell 7 was available at `/home/devclaw-svc/.local/bin/pwsh`.
+
+The Aspire validator was corrected to select containers by Aspire/DCP-managed resource identity before checking image digests, state, and environment. The selected containers must have:
+
+- `com.microsoft.developer.usvc-dev.group-version=usvc-dev.developer.microsoft.com/v1`;
+- `com.microsoft.developer.usvc-dev.name` matching the expected AppHost resource name plus DCP suffix, such as `frontend-pgmrsjpd`;
+- a shared DCP creator process identity across all required resources.
+
+Actual Aspire validation commands:
+
+```bash
+PATH="/home/devclaw-svc/.local/bin:$PATH" /home/devclaw-svc/.local/bin/pwsh -NoLogo -NoProfile -File experiments/06-online-boutique/02-compose-to-aspire/scripts/validate-aspire.ps1 -AppHostProject experiments/06-online-boutique/02-compose-to-aspire/src/OnlineBoutique.AppHost/OnlineBoutique.AppHost.csproj -StableSeconds 5
+PATH="/home/devclaw-svc/.local/bin:$PATH" /home/devclaw-svc/.local/bin/pwsh -NoLogo -NoProfile -File experiments/06-online-boutique/02-compose-to-aspire/scripts/validate-aspire.ps1 -AppHostProject experiments/06-online-boutique/02-compose-to-aspire/src/OnlineBoutique.AppHost/OnlineBoutique.AppHost.csproj -StartAppHost -StableSeconds 5
+```
+
+Result: PASS. The validator built the AppHost, checked frontend health, completed browse/cart/checkout/order workflow, verified required container stability, printed image inventory entries with Aspire/DCP labels, and passed in self-starting cleanup mode. The self-starting run reported labels such as `frontend-mystpdeq`.
+
+Concurrent Compose proof:
+
+```bash
+perl -pe 's/127\.0\.0\.1:8080:8080/127.0.0.1:18080:8080/' experiments/06-online-boutique/01-kubernetes-to-compose/compose.yaml >/tmp/online-boutique-compose-concurrent.yaml
+docker compose -p online-boutique-exp06-concurrent -f /tmp/online-boutique-compose-concurrent.yaml up -d
+PATH="/home/devclaw-svc/.local/bin:$PATH" /home/devclaw-svc/.local/bin/pwsh -NoLogo -NoProfile -File experiments/06-online-boutique/02-compose-to-aspire/scripts/validate-aspire.ps1 -AppHostProject experiments/06-online-boutique/02-compose-to-aspire/src/OnlineBoutique.AppHost/OnlineBoutique.AppHost.csproj -StableSeconds 5
+```
+
+Result: PASS while Aspire and Compose baseline containers were running concurrently. The validator inventory reported Aspire/DCP labels for every selected resource, proving same-image Compose containers were ignored.
+
+Compose-only negative proof:
+
+After stopping the Aspire AppHost and leaving the temporary Compose baseline running on `http://localhost:18080`, this command was run:
+
+```bash
+PATH="/home/devclaw-svc/.local/bin:$PATH" /home/devclaw-svc/.local/bin/pwsh -NoLogo -NoProfile -File experiments/06-online-boutique/02-compose-to-aspire/scripts/validate-aspire.ps1 -AppHostProject experiments/06-online-boutique/02-compose-to-aspire/src/OnlineBoutique.AppHost/OnlineBoutique.AppHost.csproj -BaseUrl http://localhost:18080 -StableSeconds 1
+```
+
+Result: EXPECTED FAIL. The Compose frontend health and shopping workflow succeeded, but the validator failed at the Aspire container assertion with `missing running Aspire-managed container for frontend`. This proves concurrent Docker Compose containers using the same pinned images cannot satisfy Aspire validation.
+
+Cleanup:
+
+```bash
+docker compose -p online-boutique-exp06-concurrent -f /tmp/online-boutique-compose-concurrent.yaml down -v --remove-orphans
+```
+
+Result: PASS. No Online Boutique containers remained running after cleanup.

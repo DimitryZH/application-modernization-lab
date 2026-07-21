@@ -84,27 +84,68 @@ function Convert-ImageReference {
 }
 
 function Get-ContainerIdForService {
-    param([hashtable]$Service)
+    param(
+        [hashtable]$Service,
+        [string]$AspireCreatorIdentity = $null
+    )
 
     $expectedImage = Convert-ImageReference -Image $Service.Image
     $ids = docker ps -q
+    $containerMatches = @()
     foreach ($id in $ids) {
+        $dcpName = docker inspect --format '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.name" }}' $id
+        $dcpGroupVersion = docker inspect --format '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.group-version" }}' $id
+        $dcpCreatorProcessId = docker inspect --format '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessId" }}' $id
+        $dcpCreatorProcessStartTime = docker inspect --format '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessStartTime" }}' $id
+        if ([string]::IsNullOrWhiteSpace($dcpName) -or $dcpName -notmatch "^$([regex]::Escape($Service.Name))-[a-z0-9]+$") {
+            continue
+        }
+        if ($dcpGroupVersion -ne "usvc-dev.developer.microsoft.com/v1") {
+            continue
+        }
+        if ([string]::IsNullOrWhiteSpace($dcpCreatorProcessId) -or [string]::IsNullOrWhiteSpace($dcpCreatorProcessStartTime)) {
+            continue
+        }
+
+        $creatorIdentity = "$dcpCreatorProcessId|$dcpCreatorProcessStartTime"
+        if ($AspireCreatorIdentity -and $creatorIdentity -ne $AspireCreatorIdentity) {
+            continue
+        }
+
         $image = docker inspect --format '{{.Config.Image}}' $id
         if ((Convert-ImageReference -Image $image) -eq $expectedImage) {
-            return $id
+            $containerMatches += [pscustomobject]@{
+                Id = $id
+                CreatorIdentity = $creatorIdentity
+                ResourceLabel = $dcpName
+            }
         }
     }
-    return $null
+
+    if ($containerMatches.Count -gt 1) {
+        $matchList = ($containerMatches | ForEach-Object { "$($_.Id):$($_.ResourceLabel)" }) -join ", "
+        throw "multiple Aspire containers matched $($Service.Name): $matchList"
+    }
+
+    if ($containerMatches.Count -eq 0) {
+        return $null
+    }
+
+    return $containerMatches[0]
 }
 
 function Assert-ServiceContainer {
-    param([hashtable]$Service)
+    param(
+        [hashtable]$Service,
+        [string]$AspireCreatorIdentity = $null
+    )
 
-    $id = Get-ContainerIdForService -Service $Service
-    if (-not $id) {
-        throw "missing running Aspire container for $($Service.Name)"
+    $container = Get-ContainerIdForService -Service $Service -AspireCreatorIdentity $AspireCreatorIdentity
+    if (-not $container) {
+        throw "missing running Aspire-managed container for $($Service.Name)"
     }
 
+    $id = $container.Id
     $state = docker inspect --format '{{.State.Running}} {{.State.Restarting}} {{.RestartCount}} {{.State.ExitCode}}' $id
     $parts = $state -split ' '
     if ($parts[0] -ne "true" -or $parts[1] -ne "false" -or $parts[3] -ne "0") {
@@ -116,7 +157,22 @@ function Assert-ServiceContainer {
         Assert-Contains -Text $env -Expected $expected -Message "container $($Service.Name) is missing expected environment value $expected"
     }
 
-    return $id
+    return $container
+}
+
+function Get-AspireCreatorIdentity {
+    $frontendService = $requiredServices | Where-Object { $_.Name -eq "frontend" } | Select-Object -First 1
+    $frontend = Assert-ServiceContainer -Service $frontendService
+    return $frontend.CreatorIdentity
+}
+
+function Assert-AspireContainerSet {
+    $aspireCreatorIdentity = Get-AspireCreatorIdentity
+    foreach ($service in $requiredServices) {
+        [void](Assert-ServiceContainer -Service $service -AspireCreatorIdentity $aspireCreatorIdentity)
+    }
+
+    return $aspireCreatorIdentity
 }
 
 $appHostProcess = $null
@@ -197,16 +253,16 @@ try {
 
     Invoke-Step "container stability window" {
         Start-Sleep -Seconds $StableSeconds
-        foreach ($service in $requiredServices) {
-            [void](Assert-ServiceContainer -Service $service)
-        }
+        [void](Assert-AspireContainerSet)
     }
 
     Invoke-Step "resolved image inventory" {
+        $aspireCreatorIdentity = Assert-AspireContainerSet
         foreach ($service in $requiredServices) {
-            $id = Assert-ServiceContainer -Service $service
+            $container = Assert-ServiceContainer -Service $service -AspireCreatorIdentity $aspireCreatorIdentity
+            $id = $container.Id
             $image = docker inspect --format '{{.Config.Image}}' $id
-            Write-Host "[validate-aspire] image $($service.Name)=$image"
+            Write-Host "[validate-aspire] image $($service.Name)=$image label=$($container.ResourceLabel)"
         }
     }
 

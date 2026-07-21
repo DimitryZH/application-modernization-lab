@@ -79,9 +79,10 @@ The validator:
 2. optionally starts the AppHost;
 3. waits for `GET /_healthz` to return `ok`;
 4. exercises product browsing, product detail, add-to-cart, Redis-backed cart display, checkout, and order completion with one web session;
-5. checks required service containers are running, not restarting, and exited with code `0`;
-6. checks key environment variables match the Compose baseline;
-7. prints the resolved image inventory.
+5. checks required Aspire-managed service containers are running, not restarting, and exited with code `0`;
+6. verifies those containers have Aspire/DCP resource labels matching the expected AppHost resources;
+7. checks key environment variables match the Compose baseline;
+8. prints the resolved image inventory and Aspire/DCP resource labels.
 
 ## Optional Load Generator
 
