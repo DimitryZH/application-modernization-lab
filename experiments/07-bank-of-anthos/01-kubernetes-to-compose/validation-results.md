@@ -48,7 +48,7 @@ Observed validator evidence:
 - Verified readiness for `userservice`, `contacts`, `balancereader`, `transactionhistory`, `ledgerwriter`, and frontend loopback endpoint.
 - Verified database initialization with four seeded demo users and seeded ledger transactions.
 - Logged in through frontend as `testuser` with local demo password `bankofanthos`.
-- Submitted a `.34` deposit through the frontend using the seeded external account and verified the ledger row was persisted.
+- Submitted a `$12.34` deposit through the frontend using the seeded external account and verified the ledger row was persisted.
 - Restarted with named volumes preserved and verified the validation transaction remained present.
 - Stopped `ledger-db` for the controlled negative check and confirmed validation failed as expected.
 - Completed normal cleanup with `docker compose down --remove-orphans`.
