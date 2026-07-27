@@ -1,0 +1,8 @@
+.local/
+*.cookie
+*.cookies
+*.log
+*.dump
+*.sql.dump
+jwtRS256.key
+jwtRS256.key.pub
