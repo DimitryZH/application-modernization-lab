@@ -130,7 +130,7 @@ submit_deposit() {
     --data-urlencode "uuid=${uuid}" \
     -o /tmp/bank-of-anthos-deposit-redirect.html
   curl -fsS -b "${COOKIE_JAR}" "${FRONTEND_URL}/home" -o /tmp/bank-of-anthos-after-deposit.html
-  grep -Eq 'Deposit successful|Transactions|Balance' /tmp/bank-of-anthos-after-deposit.html || fail "post-deposit home page did not show authenticated transaction content"
+  grep -Eq '($[[:space:]]*)?12[.]34|9099791699|808889588' /tmp/bank-of-anthos-after-deposit.html || fail "post-deposit home page did not show transaction-specific evidence for the validation deposit"
 }
 
 wait_for_transaction_count() {
