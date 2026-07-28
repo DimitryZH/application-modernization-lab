@@ -1,0 +1,6 @@
+.local/
+*.log
+*.dump
+*.dmp
+*.tmp
+validation-output/
