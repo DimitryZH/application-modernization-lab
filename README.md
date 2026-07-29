@@ -26,6 +26,7 @@ The experiments began with direct Codex-driven migrations and now extend to an O
 | 04 | Google Cloud DevBox execution validation | Codex on a remote Linux DevBox | PASS — 95/100 |
 | 05 | Full OpenTelemetry Demo / Astronomy Shop migration | Codex on a controlled DevBox | PASS — 94/100 |
 | 06 | Online Boutique modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | PASS - Docker Compose baseline and .NET Aspire migration independently validated; reusable migration skill applied |
+| 07 | Bank of Anthos modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | PASS - Docker Compose baseline and .NET Aspire migration independently validated; [skill knowledge review](experiments/07-bank-of-anthos/compose-to-aspire-skill-knowledge-review.md) recommends a targeted skill update |
 
 ## Agent-Orchestration Track
 
