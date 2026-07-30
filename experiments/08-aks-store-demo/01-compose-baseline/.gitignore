@@ -152,3 +152,5 @@ kind
 kustomize
 kustomization.yaml.local/
 .env
+# Experiment 08 local runtime evidence
+.local/
