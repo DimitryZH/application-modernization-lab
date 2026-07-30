@@ -1,0 +1,108 @@
+# Default values for aks-store-demo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+namespace: "dev"
+
+useRabbitMQ: true # when true, local rabbitmq container will be used
+useDocumentDB: true # when true, local documentdb container will be used
+
+useAzureAd: false # when true, Azure AD auth will be used for ai-service, order-service, and makeline-service
+managedIdentityName: "" # name of the Azure AD identity to use for the service account
+managedIdentityClientId: "" # client ID of the managed identity to use for the service account
+
+aiService:
+  # Specifies whether a ai-service deployment and service should be created
+  create: false
+  modelDeploymentName: ""
+  openAiEndpoint: ""
+  openAiKey: ""
+  openAiOrgId: ""
+  useAzureOpenAi: false
+  openAiImageEndpoint: ""
+  openAiImageModelName: ""
+  azureOpenAiApiVersion: "2024-12-01-preview"
+  azureOpenAiImageApiVersion: "2025-04-01-preview"
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/ai-service"
+    tag: "" # defaults to Chart.AppVersion
+
+orderService:
+  queueHost: "rabbitmq"
+  queuePort: "5672"
+  queueUsername: "username"
+  queuePassword: "password"
+  queueName: "orders"
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/order-service"
+    tag: "" # defaults to Chart.AppVersion
+
+makelineService:
+  orderQueueUri: "amqp://rabbitmq:5672"
+  orderQueueUsername: "username"
+  orderQueuePassword: "password"
+  orderQueueName: "orders"
+  orderQueueHost: ""
+  orderDBApi: "mongodb"
+  orderDBUri: "mongodb://documentdb:10260/?tls=true&tlsAllowInvalidCertificates=true"
+  orderDBListConnectionStringsUrl: ""
+  orderDBName: "orderdb"
+  orderDBCollectionName: "orders"
+  orderDBContainerName: "orders"
+  orderDBUsername: "username"
+  orderDBPassword: "password"
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/makeline-service"
+    tag: "" # defaults to Chart.AppVersion
+
+productService:
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/product-service"
+    tag: "" # defaults to Chart.AppVersion
+
+storeAdmin:
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/store-admin"
+    tag: "" # defaults to Chart.AppVersion
+  serviceType: LoadBalancer
+
+storeFront:
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/store-front"
+    tag: "" # defaults to Chart.AppVersion
+  serviceType: LoadBalancer
+
+virtualCustomer:
+  create: true
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/virtual-customer"
+    tag: "" # defaults to Chart.AppVersion
+  ordersPerHour: 20
+
+virtualWorker:
+  create: true
+  image:
+    repository: "ghcr.io/azure-samples/aks-store-demo/virtual-worker"
+    tag: "" # defaults to Chart.AppVersion
+  ordersPerHour: 10
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
