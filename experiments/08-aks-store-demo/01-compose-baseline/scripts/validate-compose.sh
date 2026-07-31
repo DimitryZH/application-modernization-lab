@@ -182,13 +182,29 @@ assert_service_restart_persistence() {
   record "Makeline-service restart preserved access to current-run order ${order_id}."
 }
 
-assert_stop_start_persistence() {
-  local order_id="$1" customer_id="$2"
+classify_stop_start_expected_failure() {
+  local order_id="$1" customer_id="$2" documentdb_id deadline status logs
+  documentdb_id="$(container_id documentdb)"
+  [[ -n "${documentdb_id}" ]] || fail "missing documentdb container before stop/start classification"
+
   compose stop >/dev/null
-  compose start >/dev/null
-  wait_for_stack
-  assert_order_visible "${order_id}" "${customer_id}"
-  record "Compose stop/start without deletion preserved current-run order ${order_id}."
+  compose start >/dev/null || true
+
+  deadline=$((SECONDS + 180))
+  status=""
+  while (( SECONDS < deadline )); do
+    status="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "${documentdb_id}" 2>/dev/null || true)"
+    [[ "${status}" == "unhealthy" || "${status}" == "exited" || "${status}" == "restarting" ]] && break
+    sleep 5
+  done
+
+  logs="$(docker logs "${documentdb_id}" 2>&1 || true)"
+  if ! grep -Eiq 'duplicate key|duplicate _id|01-users\.js|MongoBulkWriteError' <<<"${logs}"; then
+    fail "DocumentDB stop/start did not produce the approved duplicate seed-data failure signature"
+  fi
+
+  record "Compose stop/start with the existing DocumentDB container produced the approved EXPECTED FAILURE signature for duplicate upstream seed data after order ${order_id} for ${customer_id}; durable persistence is not claimed."
+  compose down --remove-orphans -v >/dev/null
 }
 
 classify_container_recreation() {
@@ -281,8 +297,7 @@ main() {
 
   IFS=: read -r order_id customer_id < <(run_current_order_flow)
   assert_service_restart_persistence "${order_id}" "${customer_id}"
-  assert_stop_start_persistence "${order_id}" "${customer_id}"
-  classify_container_recreation "${order_id}" "${customer_id}"
+  classify_stop_start_expected_failure "${order_id}" "${customer_id}"
   fresh_repeat_smoke
 
   compose down --remove-orphans >/dev/null
