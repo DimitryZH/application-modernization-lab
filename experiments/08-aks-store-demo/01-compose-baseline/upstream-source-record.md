@@ -6,6 +6,6 @@
 - Temporary checkout state at import: detached HEAD at the pinned commit, clean working tree
 - License: MIT License, preserved as `LICENSE.md`
 
-The tracked snapshot excludes nested `.git` metadata and upstream cloud/devcontainer/test scaffolding that is not required to build or validate the approved local Compose baseline.
+The tracked snapshot excludes nested `.git` metadata, upstream cloud/devcontainer/test scaffolding, and upstream infrastructure-as-code content under `infra/bicep` and `infra/terraform` that is outside the approved local Compose baseline scope.
 
 `upstream-source.sha256` records the preserved upstream application source and reference files used by the validator to confirm that the application source snapshot remains unchanged.

@@ -143,7 +143,11 @@ submit_unique_order() {
 
 find_order_id_for_customer() {
   local customer_id="$1" orders
-  orders="$(curl -fsS "${ADMIN_URL}/api/makeline/order/fetch")"
+  orders="$(curl -fsS "${ADMIN_URL}/api/makeline/order/fetch" || true)"
+  if [[ -z "${orders}" ]]; then
+    printf ''
+    return 0
+  fi
   printf '%s' "${orders}" | CUSTOMER_ID="${customer_id}" json_eval 'import json,os,sys; data=json.load(sys.stdin); matches=[o for o in data if o.get("customerId") == os.environ["CUSTOMER_ID"]]; print(matches[0].get("orderId", "") if matches else "")'
 }
 
@@ -168,8 +172,10 @@ fetch_order() {
 }
 
 assert_order_visible() {
-  local order_id="$1" customer_id="$2" order_customer
-  order_customer="$(fetch_order "${order_id}" | json_eval 'import json,sys; print(json.load(sys.stdin).get("customerId", ""))')"
+  local order_id="$1" customer_id="$2" order_customer order_json
+  order_json="$(fetch_order "${order_id}" || true)"
+  [[ -n "${order_json}" ]] || fail "DocumentDB-backed order ${order_id} was not fetchable"
+  order_customer="$(printf '%s' "${order_json}" | json_eval 'import json,sys; print(json.load(sys.stdin).get("customerId", ""))')"
   [[ "${order_customer}" == "${customer_id}" ]] || fail "DocumentDB-backed order ${order_id} did not contain customerId ${customer_id}"
 }
 
@@ -232,8 +238,8 @@ run_current_order_flow() {
   run_id="$(date -u +%Y%m%d%H%M%S)-$$"
   customer_id="aml08-${run_id}"
   pause_virtual_workload
-  status="$(submit_unique_order "${customer_id}")"
-  [[ "${status}" == "201" ]] || fail "order-service returned HTTP ${status} for current-run order"
+  status="$(submit_unique_order "${customer_id}" || true)"
+  [[ "${status}" == "201" ]] || fail "order-service returned HTTP ${status:-curl-failed} for current-run order"
   order_id="$(wait_for_order "${customer_id}")"
   assert_order_visible "${order_id}" "${customer_id}"
   record "Submitted unique current-run order for ${customer_id}; makeline assigned orderId ${order_id} and stored it in DocumentDB."
@@ -250,8 +256,8 @@ fresh_repeat_smoke() {
   assert_compose_identity
   wait_for_stack
   pause_virtual_workload
-  status="$(submit_unique_order "${customer_id}")"
-  [[ "${status}" == "201" ]] || fail "fresh repeat order-service returned HTTP ${status}"
+  status="$(submit_unique_order "${customer_id}" || true)"
+  [[ "${status}" == "201" ]] || fail "fresh repeat order-service returned HTTP ${status:-curl-failed}"
   order_id="$(wait_for_order "${customer_id}")"
   assert_order_visible "${order_id}" "${customer_id}"
   record "Fresh repeat run accepted and stored order ${order_id} for ${customer_id}."
@@ -280,6 +286,15 @@ main() {
 
   if [[ "${1:-}" == "--identity-only" ]]; then
     assert_compose_identity
+    exit 0
+  fi
+
+  if [[ "${1:-}" == "--recovery-order-only" ]]; then
+    assert_compose_identity
+    wait_for_stack
+    assert_rabbitmq_queue
+    IFS=: read -r recovery_order_id recovery_customer_id < <(run_current_order_flow)
+    record "RabbitMQ restoration recovery accepted and stored fresh order ${recovery_order_id} for ${recovery_customer_id} through makeline/DocumentDB."
     exit 0
   fi
 

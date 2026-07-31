@@ -21,3 +21,5 @@ Optional service:
 | `ai-service` | OpenAI-compatible text/image backend | Behind Compose profile `ai`; excluded from default PASS criteria |
 
 The local Compose adaptation removes fixed upstream `container_name` values so Compose project labels and service labels are the runtime identity. Backend ports are not published by default. Application-visible service DNS names remain unchanged.
+
+Infrastructure-as-code content from upstream `infra/bicep` and `infra/terraform` is intentionally excluded from this tracked Experiment 08A baseline because the approved scope is the local Docker Compose runtime and validation contract.

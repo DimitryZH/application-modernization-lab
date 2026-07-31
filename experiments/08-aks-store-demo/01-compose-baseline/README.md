@@ -22,7 +22,7 @@ Default UI endpoints are loopback only:
 
 The positive validator builds and starts the nine required non-AI services, verifies Compose identity labels, checks loopback exposure, validates product and unique current-run order workflows, verifies RabbitMQ queue identity, verifies DocumentDB-backed order visibility through makeline/admin APIs, classifies persistence, cleans up, and performs a fresh repeat run.
 
-The negative validator stops only the Experiment 08 RabbitMQ container and verifies the native identity validation fails non-zero before restoring RabbitMQ.
+The negative validator stops only the Experiment 08 RabbitMQ container, verifies native validation fails non-zero, restores RabbitMQ, refreshes the dependent order/makeline service connections, and then proves functional recovery with a fresh unique-order workflow through makeline/DocumentDB evidence.
 
 ## Cleanup
 

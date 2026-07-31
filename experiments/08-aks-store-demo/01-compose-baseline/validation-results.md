@@ -23,7 +23,7 @@ cd experiments/08-aks-store-demo/01-compose-baseline
 | DocumentDB evidence | Makeline/admin APIs return the current-run order from DocumentDB-backed state before the approved lifecycle failure classification. |
 | Persistence classification | `makeline-service` restart is PASS; full Compose stop/start with existing DocumentDB is EXPECTED FAILURE due duplicate upstream seed data; deletion/recreation persistence is not claimed. |
 | Recovery/fresh run | Positive validator performs a clean reset and proves a fresh startup can validate a new order after the expected stop/start failure classification. |
-| Negative validation | Stopping Experiment 08 RabbitMQ causes native validation to fail non-zero and recovery passes after restore. |
+| Negative validation | Stopping Experiment 08 RabbitMQ causes native validation to fail non-zero; after restoring RabbitMQ and refreshing dependent service connections, a fresh unique-order workflow proves makeline/DocumentDB recovery. |
 | Secret hygiene | `.local/` and `.env` are ignored; no real API credentials are committed. |
 
 ## Final Result
