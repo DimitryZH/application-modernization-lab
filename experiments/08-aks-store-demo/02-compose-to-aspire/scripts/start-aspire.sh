@@ -9,6 +9,10 @@ RUN_DIR="${EXP_DIR}/.local/run"
 PID_FILE="${RUN_DIR}/apphost.pid"
 LOG_FILE="${RUN_DIR}/apphost.log"
 ERR_FILE="${RUN_DIR}/apphost.err.log"
+IDENTITY_FILE="${RUN_DIR}/apphost-identity.env"
+
+# shellcheck source=aspire-run-state.sh
+source "${SCRIPT_DIR}/aspire-run-state.sh"
 
 log() { printf '[start-aspire] %s\n' "$*"; }
 fail() { printf '[start-aspire] ERROR: %s\n' "$*" >&2; exit 1; }
@@ -30,7 +34,7 @@ sdk="$(dotnet --version)"
 log "building AppHost with .NET SDK ${sdk}"
 dotnet build "${APPHOST_PROJECT}"
 
-rm -f "${LOG_FILE}" "${ERR_FILE}"
+rm -f "${LOG_FILE}" "${ERR_FILE}" "${IDENTITY_FILE}"
 log "starting AppHost"
 ASPNETCORE_URLS="http://127.0.0.1:18888" \
 ASPIRE_ALLOW_UNSECURED_TRANSPORT="true" \
@@ -46,4 +50,5 @@ if ! kill -0 "${pid}" >/dev/null 2>&1; then
   fail "AppHost exited during startup"
 fi
 
-log "AppHost PID ${pid}; logs under ${RUN_DIR}"
+capture_apphost_identity "${pid}"
+log "AppHost PID ${pid}; identity captured in ${IDENTITY_FILE}; logs under ${RUN_DIR}"

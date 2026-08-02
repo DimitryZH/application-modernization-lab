@@ -9,9 +9,16 @@ RUN_DIR="${EXP_DIR}/.local/run"
 PID_FILE="${RUN_DIR}/apphost.pid"
 LOG_FILE="${RUN_DIR}/apphost.log"
 ERR_FILE="${RUN_DIR}/apphost.err.log"
+IDENTITY_FILE="${RUN_DIR}/apphost-identity.env"
 REPORT_DIR="${EXP_DIR}/.local/validation"
 FAIL_OUT="${REPORT_DIR}/negative-rabbitmq-stopped.out"
 RECOVERY_OUT="${REPORT_DIR}/negative-rabbitmq-recovery.out"
+
+# shellcheck source=aspire-run-state.sh
+source "${SCRIPT_DIR}/aspire-run-state.sh"
+
+CURRENT_CREATOR=""
+RABBIT_ID=""
 
 log() { printf '[validate-negative] %s\n' "$*"; }
 fail() { printf '[validate-negative] ERROR: %s\n' "$*" >&2; exit 1; }
@@ -20,7 +27,7 @@ start_apphost() {
   mkdir -p "${RUN_DIR}"
   log "building AppHost for negative validation"
   dotnet build "${APPHOST_PROJECT}" >/dev/null
-  rm -f "${LOG_FILE}" "${ERR_FILE}"
+  rm -f "${LOG_FILE}" "${ERR_FILE}" "${IDENTITY_FILE}"
   log "starting AppHost for negative validation"
   ASPNETCORE_URLS="http://127.0.0.1:18888" \
   ASPIRE_ALLOW_UNSECURED_TRANSPORT="true" \
@@ -34,70 +41,56 @@ start_apphost() {
     cat "${ERR_FILE}" >&2 || true
     fail "AppHost exited during negative validation startup"
   fi
+  capture_apphost_identity "${pid}"
+}
+
+safe_failure_cleanup() {
+  local status=$?
+  trap - EXIT INT TERM
+  if [[ -n "${RABBIT_ID}" ]]; then
+    docker start "${RABBIT_ID}" >/dev/null 2>&1 || true
+  fi
+  if [[ -n "${CURRENT_CREATOR}" ]]; then
+    unpause_owned_workloads "${CURRENT_CREATOR}"
+    "${SCRIPT_DIR}/cleanup-aspire.sh" >/dev/null 2>&1 || true
+  elif [[ -f "${PID_FILE}" ]]; then
+    stop_apphost_pid "$(cat "${PID_FILE}")"
+  fi
+  exit "${status}"
 }
 
 mkdir -p "${REPORT_DIR}"
 rm -f "${FAIL_OUT}" "${RECOVERY_OUT}"
+trap safe_failure_cleanup EXIT INT TERM
 
-existing_creator=""
-for id in $(docker ps -q); do
-  name="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.name" }}' "${id}" 2>/dev/null || true)"
-  pid_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessId" }}' "${id}" 2>/dev/null || true)"
-  start_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessStartTime" }}' "${id}" 2>/dev/null || true)"
-  [[ "${name}" =~ ^store-front-[a-z0-9]+$ && -n "${pid_label}" && -n "${start_label}" ]] || continue
-  existing_creator="${pid_label}|${start_label}"
-done
-
-if [[ -z "${existing_creator}" ]]; then
-  log "starting Aspire stack before negative validation"
-  start_apphost
-  "${SCRIPT_DIR}/validate-aspire.sh" --identity-only --skip-cleanup >/dev/null
-else
-  "${SCRIPT_DIR}/validate-aspire.sh" --identity-only --skip-cleanup >/dev/null
+if [[ -f "${PID_FILE}" || -f "${IDENTITY_FILE}" ]]; then
+  fail "negative validation requires a fresh Experiment 08B AppHost; run scripts/cleanup-aspire.sh first"
 fi
 
-creator=""
-for id in $(docker ps -q); do
-  name="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.name" }}' "${id}" 2>/dev/null || true)"
-  pid_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessId" }}' "${id}" 2>/dev/null || true)"
-  start_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessStartTime" }}' "${id}" 2>/dev/null || true)"
-  [[ "${name}" =~ ^store-front-[a-z0-9]+$ && -n "${pid_label}" && -n "${start_label}" ]] || continue
-  creator="${pid_label}|${start_label}"
-done
-if [[ -z "${creator}" ]]; then
-  fail "could not determine current Aspire creator identity"
-fi
+log "starting fresh Aspire stack before negative validation"
+start_apphost
+"${SCRIPT_DIR}/validate-aspire.sh" --identity-only --skip-cleanup >/dev/null
+CURRENT_CREATOR="$(load_verified_apphost_identity)"
 
-rabbit_id=""
-for id in $(docker ps -q); do
-  name="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.name" }}' "${id}" 2>/dev/null || true)"
-  pid_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessId" }}' "${id}" 2>/dev/null || true)"
-  start_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessStartTime" }}' "${id}" 2>/dev/null || true)"
-  [[ "${name}" =~ ^rabbitmq-[a-z0-9]+$ && "${pid_label}|${start_label}" == "${creator}" ]] || continue
-  rabbit_id="${id}"
-done
-[[ -n "${rabbit_id}" ]] || fail "current-run Aspire rabbitmq resource was not found"
+match="$(container_for_identity rabbitmq "${CURRENT_CREATOR}" 0)" || fail "current-run Aspire rabbitmq resource was not found"
+RABBIT_ID="$(printf '%s\n' "${match}" | cut -f1)"
 
-log "stopping current-run Aspire RabbitMQ dependency ${rabbit_id}"
-docker stop "${rabbit_id}" >/dev/null
+log "stopping current-run Aspire RabbitMQ dependency ${RABBIT_ID}"
+docker stop "${RABBIT_ID}" >/dev/null
 
 if "${SCRIPT_DIR}/validate-aspire.sh" --recovery-order-only --skip-cleanup >"${FAIL_OUT}" 2>&1; then
-  docker start "${rabbit_id}" >/dev/null || true
+  docker start "${RABBIT_ID}" >/dev/null || true
   fail "validation unexpectedly passed while the current-run RabbitMQ resource was stopped"
 fi
 grep -Eiq 'rabbitmq|order-service|queue|order' "${FAIL_OUT}" || fail "negative failure did not identify RabbitMQ/order workflow failure"
 
 log "restoring RabbitMQ and dependent services"
-docker start "${rabbit_id}" >/dev/null
+docker start "${RABBIT_ID}" >/dev/null
+RABBIT_ID=""
 sleep 10
 for service in order-service makeline-service; do
-  for id in $(docker ps -q); do
-    name="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.name" }}' "${id}" 2>/dev/null || true)"
-    pid_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessId" }}' "${id}" 2>/dev/null || true)"
-    start_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessStartTime" }}' "${id}" 2>/dev/null || true)"
-    [[ "${name}" =~ ^${service}-[a-z0-9]+$ && "${pid_label}|${start_label}" == "${creator}" ]] || continue
-    docker restart "${id}" >/dev/null
-  done
+  match="$(container_for_identity "${service}" "${CURRENT_CREATOR}" 0)" || continue
+  docker restart "$(printf '%s\n' "${match}" | cut -f1)" >/dev/null
 done
 
 if ! "${SCRIPT_DIR}/validate-aspire.sh" --recovery-order-only --skip-cleanup >"${RECOVERY_OUT}" 2>&1; then
@@ -106,4 +99,6 @@ if ! "${SCRIPT_DIR}/validate-aspire.sh" --recovery-order-only --skip-cleanup >"$
 fi
 
 "${SCRIPT_DIR}/cleanup-aspire.sh"
+CURRENT_CREATOR=""
+trap - EXIT INT TERM
 log "RabbitMQ negative failure and fresh-order recovery passed"

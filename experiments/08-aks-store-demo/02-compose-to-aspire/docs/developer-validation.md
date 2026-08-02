@@ -1,6 +1,8 @@
 # Developer Validation
 
-Date: 2026-08-01 UTC
+Date: 2026-08-02 UTC
+
+This correction pass was completed directly by Codex as the operator and implementation agent. No DevClaw worker, subagent, developer session, tester session, or worker capability probe was used for this completion pass.
 
 ## Version and Source Preflight
 
@@ -23,7 +25,7 @@ Result: PASS.
 Evidence summary:
 
 - AppHost built successfully.
-- All nine required Aspire resources were selected by DCP labels with one shared creator identity.
+- All nine required Aspire resources were selected by DCP labels with one persisted AppHost creator identity.
 - Compose containers cannot satisfy validation because the validator requires Aspire/DCP labels and a shared current AppHost creator identity.
 - `store-front` and `store-admin` were reachable on loopback ports `8080` and `8081`.
 - Backend services had no host-published ports.
@@ -53,6 +55,64 @@ Evidence summary:
 - A fresh unique recovery order reached makeline and DocumentDB-backed state.
 - Cleanup removed Experiment 08B Aspire resources and released ports.
 
+## Cleanup Isolation Validation
+
+Command:
+
+```bash
+bash experiments/08-aks-store-demo/02-compose-to-aspire/scripts/validate-cleanup-isolation.sh
+```
+
+Result: PASS.
+
+Evidence summary:
+
+- The script starts a fresh current Experiment 08B AppHost and captures its persisted DCP creator identity.
+- It creates an unrelated DCP-labeled container with an overlapping `store-front-*` resource label but a different creator identity.
+- `cleanup-aspire.sh` removes only containers matching the persisted current AppHost identity.
+- The unrelated DCP-labeled container remains present and unchanged until the isolation script removes its own fixture.
+
+## Intentional Failure Cleanup Validation
+
+Command:
+
+```bash
+bash experiments/08-aks-store-demo/02-compose-to-aspire/scripts/validate-failure-cleanup.sh
+```
+
+Result: PASS.
+
+Evidence summary:
+
+- The script intentionally points storefront validation at an unreachable loopback endpoint.
+- The positive validator fails non-zero and preserves failure output under `.local/validation/`.
+- Failure handling removes only the owned Experiment 08B resources and stops the owned AppHost.
+- The persisted identity file is removed after cleanup, while diagnostic validation evidence remains.
+
+## Direct Codex Final Validation
+
+Command:
+
+```bash
+/tmp/direct-codex-validate-issue-16-pr17.sh
+```
+
+Result: PASS.
+
+Evidence summary:
+
+- Repository and branch preflight passed on `experiment-08/aks-store-aspire-migration`.
+- Exact .NET SDK `10.0.110` and Aspire AppHost SDK `13.4.6` were verified.
+- AppHost build passed.
+- Clean positive validation passed.
+- RabbitMQ negative validation and fresh-order functional recovery passed.
+- Cleanup isolation passed while an unrelated DCP-labeled container was present.
+- Intentional failure recovery and cleanup passed.
+- A second fresh clean positive validation passed after full cleanup.
+- Experiment 08A upstream source integrity passed.
+- `git diff --check`, executable mode verification, and secret scan passed.
+- Ports `8080`, `8081`, and `18888` were clear after cleanup checkpoints.
+
 ## Compose Isolation Validation
 
 Command:
@@ -74,7 +134,7 @@ Evidence summary:
 
 ## Cleanup and Hygiene
 
-- `docker ps -a` showed no remaining Experiment 08B Aspire-labeled containers after cleanup.
+- `docker ps -a` showed no remaining owned Experiment 08B Aspire-labeled containers after cleanup.
 - Ports `8080`, `8081`, and `18888` were clear after cleanup.
 - Raw logs and local evidence remain under ignored `.local/validation/`.
 - No named volume or durable persistence claim was added.
