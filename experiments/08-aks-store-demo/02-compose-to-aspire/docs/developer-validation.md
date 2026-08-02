@@ -89,6 +89,23 @@ Evidence summary:
 - Failure handling removes only the owned Experiment 08B resources and stops the owned AppHost.
 - The persisted identity file is removed after cleanup, while diagnostic validation evidence remains.
 
+## Ownership Guardrail Validation
+
+Command:
+
+```bash
+bash experiments/08-aks-store-demo/02-compose-to-aspire/scripts/validate-ownership-guardrails.sh
+```
+
+Result: PASS.
+
+Evidence summary:
+
+- Cleanup failed closed when the AppHost identity file was missing.
+- Cleanup failed closed when the AppHost identity file was incomplete.
+- Cleanup failed closed when the stored AppHost PID was stale.
+- Cleanup failed closed for a partial unrelated DCP identity and did not remove the unrelated DCP-labeled fixture.
+
 ## Direct Codex Final Validation
 
 Command:
@@ -107,6 +124,7 @@ Evidence summary:
 - Clean positive validation passed.
 - RabbitMQ negative validation and fresh-order functional recovery passed.
 - Cleanup isolation passed while an unrelated DCP-labeled container was present.
+- Ownership guardrails passed for missing, incomplete, stale, and partial unrelated DCP identity states.
 - Intentional failure recovery and cleanup passed.
 - A second fresh clean positive validation passed after full cleanup.
 - Experiment 08A upstream source integrity passed.

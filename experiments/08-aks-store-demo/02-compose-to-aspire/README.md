@@ -46,6 +46,7 @@ dotnet build src/AppHost/AksStore.AppHost.csproj
 scripts/validate-aspire.sh --start-apphost
 scripts/validate-negative.sh
 bash scripts/validate-cleanup-isolation.sh
+bash scripts/validate-ownership-guardrails.sh
 bash scripts/validate-failure-cleanup.sh
 scripts/cleanup-aspire.sh --full-reset
 ```
@@ -61,6 +62,8 @@ The validator captures the current AppHost PID, AppHost process start ticks, and
 The negative validator always starts a fresh Experiment 08B AppHost instance, stops only that current-run Aspire `rabbitmq` resource, requires the native validation path to fail non-zero on the RabbitMQ/order workflow, restores RabbitMQ, restarts dependent services, submits a fresh unique order, verifies makeline/DocumentDB recovery, and cleans up only Experiment 08B resources.
 
 Cleanup fails safely when the persisted AppHost identity is absent, incomplete, stale, ambiguous, inconsistent with the stored AppHost process, or missing any required Experiment 08B resource. Failure traps restore paused workload containers and RabbitMQ when required, preserve diagnostic evidence under `.local/validation/`, stop the owned AppHost, and remove only containers matching the persisted Experiment 08B AppHost identity.
+
+`scripts/validate-ownership-guardrails.sh` adversarially verifies missing, incomplete, stale, and partial unrelated DCP identities fail closed and do not remove unrelated resources.
 
 ## Persistence
 
