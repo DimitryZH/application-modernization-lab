@@ -2,7 +2,7 @@
 
 Experiment 08B is a fidelity migration from the accepted Docker Compose baseline to Aspire orchestration. It does not redesign the services, change application source, add cloud resources, or improve persistence semantics.
 
-The main Aspire-specific adaptation is resource identity: Docker container names are Aspire-generated, so validation uses DCP labels, expected resource-name prefixes, and a shared AppHost creator identity to tie evidence to the current run.
+The main Aspire-specific adaptation is resource identity: Docker container names are Aspire-generated and DCP labels identify the DCP apiserver creator process rather than the AppHost PID. Validation therefore captures the AppHost PID/start ticks and the complete DCP creator identity separately, verifies the AppHost is still the same running process, verifies the DCP creator labels, and requires all nine expected Experiment 08B resources to carry that exact identity before tying evidence or cleanup to the current run.
 
 Known limitations:
 

@@ -45,6 +45,8 @@ Run from this directory:
 dotnet build src/AppHost/AksStore.AppHost.csproj
 scripts/validate-aspire.sh --start-apphost
 scripts/validate-negative.sh
+bash scripts/validate-cleanup-isolation.sh
+bash scripts/validate-failure-cleanup.sh
 scripts/cleanup-aspire.sh --full-reset
 ```
 
@@ -54,9 +56,11 @@ Validation evidence is written to `.local/validation/`, which is ignored and mus
 
 The positive validator verifies the pinned versions, the Experiment 08A source hash, AppHost build, current Aspire/DCP resource identity, loopback-only UI exposure, backend internal exposure, required environment values, product proxy workflow, unique current-run order submission, RabbitMQ `orders` queue, makeline consumption, DocumentDB-backed order visibility, makeline restart persistence, cleanup, and untracked local evidence.
 
-The validator selects containers only when they have expected Aspire/DCP labels, expected resource names, and one shared AppHost creator identity. Docker Compose containers with the same images or service names cannot satisfy Aspire validation.
+The validator captures the current AppHost PID, AppHost process start ticks, and persisted DCP creator identity in `.local/run/apphost-identity.env`. Aspire/DCP labels use the DCP apiserver creator process, while the AppHost process monitors that DCP runtime. Positive validation and cleanup verify the stored AppHost PID is still the same running process, that the DCP creator process id/start-time labels match the persisted identity, and that all nine required Experiment 08B resources belong to that exact identity before selecting containers. Docker Compose containers with the same images or service names, stale Aspire containers, and unrelated DCP-labeled containers cannot satisfy validation or be removed by cleanup.
 
-The negative validator stops the current-run Aspire `rabbitmq` resource, requires the native validation path to fail non-zero on the RabbitMQ/order workflow, restores RabbitMQ, restarts dependent services, submits a fresh unique order, verifies makeline/DocumentDB recovery, and cleans up only Experiment 08B resources.
+The negative validator always starts a fresh Experiment 08B AppHost instance, stops only that current-run Aspire `rabbitmq` resource, requires the native validation path to fail non-zero on the RabbitMQ/order workflow, restores RabbitMQ, restarts dependent services, submits a fresh unique order, verifies makeline/DocumentDB recovery, and cleans up only Experiment 08B resources.
+
+Cleanup fails safely when the persisted AppHost identity is absent, incomplete, stale, ambiguous, inconsistent with the stored AppHost process, or missing any required Experiment 08B resource. Failure traps restore paused workload containers and RabbitMQ when required, preserve diagnostic evidence under `.local/validation/`, stop the owned AppHost, and remove only containers matching the persisted Experiment 08B AppHost identity.
 
 ## Persistence
 

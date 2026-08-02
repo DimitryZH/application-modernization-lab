@@ -28,8 +28,15 @@ RUN_DIR="${EXP_DIR}/.local/run"
 PID_FILE="${RUN_DIR}/apphost.pid"
 LOG_FILE="${RUN_DIR}/apphost.log"
 ERR_FILE="${RUN_DIR}/apphost.err.log"
+IDENTITY_FILE="${RUN_DIR}/apphost-identity.env"
 
-EXPECTED_SERVICES=(documentdb rabbitmq order-service makeline-service product-service store-front store-admin virtual-customer virtual-worker)
+# shellcheck source=aspire-run-state.sh
+source "${SCRIPT_DIR}/aspire-run-state.sh"
+
+APPHOST_PID=""
+CURRENT_CREATOR=""
+WORKLOAD_PAUSED=0
+RABBITMQ_STOPPED_ID=""
 
 log() { printf '[validate-aspire] %s\n' "$*"; }
 fail() { printf '[validate-aspire] ERROR: %s\n' "$*" >&2; exit 1; }
@@ -42,7 +49,7 @@ start_apphost_for_validation() {
   if [[ -f "${PID_FILE}" ]] && kill -0 "$(cat "${PID_FILE}")" >/dev/null 2>&1; then
     fail "AppHost already appears to be running as PID $(cat "${PID_FILE}"); run scripts/cleanup-aspire.sh first"
   fi
-  rm -f "${LOG_FILE}" "${ERR_FILE}"
+  rm -f "${LOG_FILE}" "${ERR_FILE}" "${IDENTITY_FILE}"
   log "starting AppHost for validation"
   ASPNETCORE_URLS="http://127.0.0.1:18888" \
   ASPIRE_ALLOW_UNSECURED_TRANSPORT="true" \
@@ -56,33 +63,19 @@ start_apphost_for_validation() {
     cat "${ERR_FILE}" >&2 || true
     fail "AppHost exited during startup"
   fi
+  capture_apphost_identity "${APPHOST_PID}"
+  CURRENT_CREATOR="$(load_verified_apphost_identity)"
   record "AppHost started for validation as PID ${APPHOST_PID}; dashboard bound to loopback port 18888."
+  record "Captured and persisted current AppHost DCP creator identity ${CURRENT_CREATOR}."
 }
 
 container_for() {
-  local service="$1" creator="${2:-}" matches=()
-  for id in $(docker ps -q); do
-    local name group pid_label start_label current
-    name="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.name" }}' "${id}" 2>/dev/null || true)"
-    group="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.group-version" }}' "${id}" 2>/dev/null || true)"
-    pid_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessId" }}' "${id}" 2>/dev/null || true)"
-    start_label="$(docker inspect -f '{{ index .Config.Labels "com.microsoft.developer.usvc-dev.creatorProcessStartTime" }}' "${id}" 2>/dev/null || true)"
-    [[ "${group}" == "usvc-dev.developer.microsoft.com/v1" ]] || continue
-    [[ "${name}" =~ ^${service}-[a-z0-9]+$ ]] || continue
-    [[ -n "${pid_label}" && -n "${start_label}" ]] || continue
-    current="${pid_label}|${start_label}"
-    [[ -z "${creator}" || "${current}" == "${creator}" ]] || continue
-    matches+=("${id}"$'\t'"${current}"$'\t'"${name}")
-  done
-  [[ "${#matches[@]}" -le 1 ]] || fail "multiple Aspire containers matched ${service}: ${matches[*]}"
-  [[ "${#matches[@]}" -eq 1 ]] || return 1
-  printf '%s\n' "${matches[0]}"
+  local service="$1" creator="$2"
+  container_for_identity "${service}" "${creator}" 0
 }
 
 creator_identity() {
-  local match
-  match="$(container_for store-front)" || fail "missing running Aspire-managed container for store-front"
-  printf '%s\n' "${match}" | cut -f2
+  load_verified_apphost_identity
 }
 
 assert_container_set() {
@@ -174,12 +167,35 @@ assert_rabbitmq_queue() {
 pause_workload() {
   local creator="$1"
   docker pause "$(id_for virtual-customer "${creator}")" "$(id_for virtual-worker "${creator}")" >/dev/null || true
+  WORKLOAD_PAUSED=1
   record "Paused virtual-customer and virtual-worker while collecting deterministic order evidence."
 }
 
 unpause_workload() {
   local creator="$1"
   docker unpause "$(id_for virtual-customer "${creator}")" "$(id_for virtual-worker "${creator}")" >/dev/null 2>&1 || true
+  WORKLOAD_PAUSED=0
+}
+
+safe_failure_cleanup() {
+  local status=$?
+  trap - EXIT INT TERM
+  if ((status != 0)); then
+    if [[ -n "${CURRENT_CREATOR}" ]]; then
+      if [[ -n "${RABBITMQ_STOPPED_ID}" ]]; then
+        docker start "${RABBITMQ_STOPPED_ID}" >/dev/null 2>&1 || true
+      fi
+      if ((WORKLOAD_PAUSED == 1)); then
+        unpause_owned_workloads "${CURRENT_CREATOR}"
+      fi
+      if ((SKIP_CLEANUP == 0)); then
+        "${SCRIPT_DIR}/cleanup-aspire.sh" >/dev/null 2>&1 || true
+      fi
+    elif ((START_APPHOST == 1)) && [[ -f "${PID_FILE}" ]]; then
+      stop_apphost_pid "$(cat "${PID_FILE}")"
+    fi
+  fi
+  exit "${status}"
 }
 
 submit_unique_order() {
@@ -216,12 +232,18 @@ assert_order_visible() {
 }
 
 run_current_order_flow() {
-  local creator="$1" suffix customer_id status order_id count
+  local creator="$1" suffix customer_id status order_id count deadline
   suffix="$(date -u +%Y%m%d%H%M%S)-$$"
   customer_id="aml08b-${suffix}"
   pause_workload "${creator}"
-  status="$(submit_unique_order "${customer_id}" || true)"
-  [[ "${status}" == "201" ]] || fail "order-service returned HTTP ${status:-curl-failed} for current-run order"
+  deadline=$((SECONDS + 240))
+  status=""
+  while true; do
+    status="$(submit_unique_order "${customer_id}" || true)"
+    [[ "${status}" == "201" ]] && break
+    (( SECONDS < deadline )) || fail "order-service returned HTTP ${status:-curl-failed} for current-run order"
+    sleep 5
+  done
   order_id="$(wait_for_order "${customer_id}")"
   assert_order_visible "${order_id}" "${customer_id}"
   count="$(curl -fsS "${FRONTEND_URL}/api/products" | json_eval 'import json,sys; print(len(json.load(sys.stdin)))')"
@@ -248,6 +270,7 @@ assert_no_tracked_runtime_artifacts() {
 }
 
 main() {
+  trap safe_failure_cleanup EXIT INT TERM
   require_command dotnet
   require_command docker
   require_command curl
@@ -270,22 +293,22 @@ main() {
   wait_for_http "store-front product proxy" "${FRONTEND_URL}/api/products"
   wait_for_http "store-admin product proxy" "${ADMIN_URL}/api/products"
 
-  creator="$(assert_container_set)"
-  assert_endpoint_exposure "${creator}"
-  assert_service_env "${creator}"
-  assert_rabbitmq_queue "${creator}"
+  CURRENT_CREATOR="$(assert_container_set)"
+  assert_endpoint_exposure "${CURRENT_CREATOR}"
+  assert_service_env "${CURRENT_CREATOR}"
+  assert_rabbitmq_queue "${CURRENT_CREATOR}"
 
   if (( IDENTITY_ONLY == 1 )); then
     exit 0
   fi
 
-  IFS=: read -r order_id customer_id < <(run_current_order_flow "${creator}")
+  IFS=: read -r order_id customer_id < <(run_current_order_flow "${CURRENT_CREATOR}")
   if (( RECOVERY_ONLY == 1 )); then
     record "RabbitMQ recovery accepted and stored fresh order ${order_id} for ${customer_id}."
     exit 0
   fi
 
-  assert_makeline_restart_persistence "${creator}" "${order_id}" "${customer_id}"
+  assert_makeline_restart_persistence "${CURRENT_CREATOR}" "${order_id}" "${customer_id}"
   record "DocumentDB restart/AppHost stop-start/container recreation durability are not claimed; no named volume was added."
 
   if (( SKIP_CLEANUP == 0 )); then
