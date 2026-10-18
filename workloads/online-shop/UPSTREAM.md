@@ -14,12 +14,13 @@ The frontend header and assistant templates carry modification notices: the docu
 
 Imported text files also have trailing whitespace/blank lines normalized for repository diff checks. This has no intended behavioral effect. The local `.gitattributes` keeps text in LF form and marks image/JAR files as binary. Executable scripts retain executable Git modes.
 
+The optional Spanner backend's default instance name in `src/cartservice/src/cartstore/SpannerCartStore.cs` is adapted to `online-shop`, with a modification notice in the source file. Explicit Spanner configuration still overrides this default. The selected Redis profile is unaffected; existing image mappings and digests are unchanged, and the source adaptation reaches images only after a future rebuild.
+
 Kubernetes modifications, exact image origins, future build boundaries and follow-ups are documented in [README.md](README.md). No service protocol, module name, import, dependency version or build recipe is intentionally changed. Shared definitions and generated protocol code remain upstream-compatible identifiers, without a claim of tested compatibility.
 
 ## Retained upstream naming and attribution
 
 - `hipstershop` / `Hipstershop` remains in protocol packages, generated bindings, Go module/import paths, C# namespaces, Java packages, Gradle output names and the matching Docker entrypoint. Renaming these would require coordinated code/protocol changes unrelated to user-facing branding.
-- `onlineboutique` remains as the upstream optional Spanner instance default in `src/cartservice/src/cartstore/SpannerCartStore.cs`. This is an inactive backend identifier, not a real project ID or a selected profile setting.
 - `CYMBAL_BRANDING`, `is_cymbal_brand` and related Go identifiers remain for the upstream favicon switch. `cymbal-*` classes/selectors remain in templates/styles; renaming them would require synchronized styling changes without user-facing benefit.
 - `Hipster_*`, `Cymbal_*` and `favicon-cymbal.ico` remain as imported asset filenames/references. Path-based logos retain upstream artwork; ordinary SVG title metadata is adapted to Online Shop. The main navigation no longer uses the upstream logo images. Binary icons are unchanged.
 - Public upstream links, copyright/license text, module URLs and service README build-output names remain accurate attribution or internal references. Their occurrences are not local product names.

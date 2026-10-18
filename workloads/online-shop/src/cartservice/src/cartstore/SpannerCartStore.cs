@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Modified for Online Shop: adapt the optional Spanner instance default.
+
 using System;
 using Google.Cloud.Spanner.Data;
 using Grpc.Core;
@@ -23,7 +25,7 @@ namespace cartservice.cartstore
     public class SpannerCartStore : ICartStore
     {
         private static readonly string TableName = "CartItems";
-        private static readonly string DefaultInstanceName = "onlineboutique";
+        private static readonly string DefaultInstanceName = "online-shop";
         private static readonly string DefaultDatabaseName = "carts";
         private readonly string databaseString;
 
