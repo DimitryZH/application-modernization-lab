@@ -1,0 +1,333 @@
+{
+  "mappingVersion": 1,
+  "application": "online-shop",
+  "profile": "online-shop-v1",
+  "platform": "linux/amd64",
+  "upstream": {
+    "repository": "https://github.com/GoogleCloudPlatform/microservices-demo",
+    "version": "v0.10.4",
+    "revision": "474d0f2eb73d97525234995a40d7781b7923a07d"
+  },
+  "baseline": {
+    "repository": "https://github.com/DimitryZH/container-platform",
+    "revision": "f9105f58aefd949a6729eea4ab31f7223dc05206",
+    "inventoryPath": "inventories/online-shop-sre-dev-v1.json",
+    "releasePath": "releases/baseline-2026-10-18.json",
+    "observationsPath": "releases/baseline-2026-10-18.observations.json",
+    "documentationPath": "docs/baseline.md"
+  },
+  "components": [
+    {
+      "id": "frontend",
+      "role": "application-service",
+      "workload": "frontend",
+      "service": "frontend",
+      "baselineAlias": "frontend",
+      "sourcePath": "src/frontend",
+      "buildContext": "src/frontend",
+      "dockerfile": "src/frontend/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-frontend",
+        "digest": "sha256:4ed23083391deed59d3dab4a3c72d6c49120f6100f45593b87a537dc094397cd",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "cartservice",
+      "role": "application-service",
+      "workload": "cartservice",
+      "service": "cartservice",
+      "baselineAlias": "cart",
+      "sourcePath": "src/cartservice",
+      "buildContext": "src/cartservice/src",
+      "dockerfile": "src/cartservice/src/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-cartservice",
+        "digest": "sha256:a48c617b36f12d755486b58feb4e04beeadf20216a017c4dbe5002c3bcd345b8",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "checkoutservice",
+      "role": "application-service",
+      "workload": "checkoutservice",
+      "service": "checkoutservice",
+      "baselineAlias": "checkout",
+      "sourcePath": "src/checkoutservice",
+      "buildContext": "src/checkoutservice",
+      "dockerfile": "src/checkoutservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-checkoutservice",
+        "digest": "sha256:51774b1e98dc0454ffcf3782f8a092ac5c440cbeaea25e1e0e416c92c7ba7b5b",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "paymentservice",
+      "role": "application-service",
+      "workload": "paymentservice",
+      "service": "paymentservice",
+      "baselineAlias": "payment",
+      "sourcePath": "src/paymentservice",
+      "buildContext": "src/paymentservice",
+      "dockerfile": "src/paymentservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-paymentservice",
+        "digest": "sha256:38912ba85fabc875a57cf981a691cfd3dca96c500ffd03b276bbf65ab6e98d08",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "adservice",
+      "role": "application-service",
+      "workload": "adservice",
+      "service": "adservice",
+      "baselineAlias": "adservice",
+      "sourcePath": "src/adservice",
+      "buildContext": "src/adservice",
+      "dockerfile": "src/adservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-adservice",
+        "digest": "sha256:5a6092151983bf98a05279ff5a64ae82e18f872a3a14b5eddd35da16434e20b8",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "currencyservice",
+      "role": "application-service",
+      "workload": "currencyservice",
+      "service": "currencyservice",
+      "baselineAlias": "currencyservice",
+      "sourcePath": "src/currencyservice",
+      "buildContext": "src/currencyservice",
+      "dockerfile": "src/currencyservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-currencyservice",
+        "digest": "sha256:475209eabe92828ec843d24dce59738cfe48def54eadcca807b26c0fd39158db",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "emailservice",
+      "role": "application-service",
+      "workload": "emailservice",
+      "service": "emailservice",
+      "baselineAlias": "emailservice",
+      "sourcePath": "src/emailservice",
+      "buildContext": "src/emailservice",
+      "dockerfile": "src/emailservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-emailservice",
+        "digest": "sha256:17cffb78f3d8383b0ee1ad8875fc0ef87b920a912302995ad127a5585f2160e2",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "loadgenerator",
+      "role": "auxiliary",
+      "workload": "loadgenerator",
+      "service": null,
+      "baselineAlias": "loadgenerator",
+      "sourcePath": "src/loadgenerator",
+      "buildContext": "src/loadgenerator",
+      "dockerfile": "src/loadgenerator/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-loadgenerator",
+        "digest": "sha256:fe1d8c6249789fbfe016d144a9cbbb5bffa1ede02769f6b24bd31e9beaadf68c",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "productcatalogservice",
+      "role": "application-service",
+      "workload": "productcatalogservice",
+      "service": "productcatalogservice",
+      "baselineAlias": "productcatalogservice",
+      "sourcePath": "src/productcatalogservice",
+      "buildContext": "src/productcatalogservice",
+      "dockerfile": "src/productcatalogservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-productcatalogservice",
+        "digest": "sha256:efa78eeacc26d7de07388c9c3eb90aeb0dfa8324fce33deb157393d5c1f39119",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "recommendationservice",
+      "role": "application-service",
+      "workload": "recommendationservice",
+      "service": "recommendationservice",
+      "baselineAlias": "recommendationservice",
+      "sourcePath": "src/recommendationservice",
+      "buildContext": "src/recommendationservice",
+      "dockerfile": "src/recommendationservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-recommendationservice",
+        "digest": "sha256:3f6cf3f0625b56d05e49741202167d0fcaf6c065ef386f66307e3e1a9dc895b8",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    },
+    {
+      "id": "redis-cart",
+      "role": "runtime-dependency",
+      "workload": "redis-cart",
+      "service": "redis-cart",
+      "baselineAlias": "redis",
+      "sourcePath": null,
+      "buildContext": null,
+      "dockerfile": null,
+      "discoveryTag": "7-alpine",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-redis-cart",
+        "digest": "sha256:81be8a1f52db5f99fe3de0bbbd2efce827f51ce409155a95e9bdbac8c2721ba6",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": null,
+        "reason": "Redis 7.4.8 metadata observed, but original source commit, producing run and exact publisher artifact lineage are not established."
+      }
+    },
+    {
+      "id": "shippingservice",
+      "role": "application-service",
+      "workload": "shippingservice",
+      "service": "shippingservice",
+      "baselineAlias": "shippingservice",
+      "sourcePath": "src/shippingservice",
+      "buildContext": "src/shippingservice",
+      "dockerfile": "src/shippingservice/Dockerfile",
+      "discoveryTag": "v0.10.4",
+      "image": {
+        "repository": "docker.io/dmitryzhuravlev/online-shop-shippingservice",
+        "digest": "sha256:ec32ef03a874640dbdceb7850327a3f38a7f20b06479be27786ff3fe25569ce2",
+        "kind": "manifest",
+        "platforms": [
+          "linux/amd64"
+        ]
+      },
+      "publishedImageTraceability": {
+        "status": "legacy",
+        "source": null,
+        "build": null,
+        "upstream": "https://github.com/GoogleCloudPlatform/microservices-demo/blob/474d0f2eb73d97525234995a40d7781b7923a07d/release/kubernetes-manifests.yaml",
+        "reason": "Exact upstream v0.10.4 manifest digest match observed; no authenticated source commit or producing build/publication run association was found for this namespace artifact."
+      }
+    }
+  ]
+}
