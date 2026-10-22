@@ -14,12 +14,14 @@
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using cartservice;
 
 CreateHostBuilder(args).Build().Run();
 
 static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
+        .ConfigureServices(services => services.Configure<HostOptions>(options => options.ShutdownTimeout = System.TimeSpan.FromSeconds(10)))
         .ConfigureWebHostDefaults(webBuilder =>
         {
             webBuilder.UseStartup<Startup>();

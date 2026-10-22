@@ -32,12 +32,12 @@ namespace cartservice.cartstore
 
         public async Task AddItemAsync(string userId, string productId, int quantity)
         {
-            Console.WriteLine($"AddItemAsync called with userId={userId}, productId={productId}, quantity={quantity}");
+            Telemetry.Log("storage.diagnostic","storage");
 
             try
             {
                 Hipstershop.Cart cart;
-                var value = await _cache.GetAsync(userId);
+                var value = await Telemetry.Cache("read",()=>_cache.GetAsync(userId));
                 if (value == null)
                 {
                     cart = new Hipstershop.Cart();
@@ -57,37 +57,37 @@ namespace cartservice.cartstore
                         existingItem.Quantity += quantity;
                     }
                 }
-                await _cache.SetAsync(userId, cart.ToByteArray());
+                await Telemetry.Cache("write",()=>_cache.SetAsync(userId, cart.ToByteArray()));
             }
             catch (Exception ex)
             {
-                throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
         }
 
         public async Task EmptyCartAsync(string userId)
         {
-            Console.WriteLine($"EmptyCartAsync called with userId={userId}");
+            Telemetry.Log("storage.diagnostic","storage");
 
             try
             {
                 var cart = new Hipstershop.Cart();
-                await _cache.SetAsync(userId, cart.ToByteArray());
+                await Telemetry.Cache("write",()=>_cache.SetAsync(userId, cart.ToByteArray()));
             }
             catch (Exception ex)
             {
-                throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
         }
 
         public async Task<Hipstershop.Cart> GetCartAsync(string userId)
         {
-            Console.WriteLine($"GetCartAsync called with userId={userId}");
+            Telemetry.Log("storage.diagnostic","storage");
 
             try
             {
                 // Access the cart from the cache
-                var value = await _cache.GetAsync(userId);
+                var value = await Telemetry.Cache("read",()=>_cache.GetAsync(userId));
 
                 if (value != null)
                 {
@@ -99,7 +99,7 @@ namespace cartservice.cartstore
             }
             catch (Exception ex)
             {
-                throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
         }
 

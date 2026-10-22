@@ -61,7 +61,7 @@ namespace cartservice.cartstore
 
     public async Task AddItemAsync(string userId, string productId, int quantity)
     {
-        Console.WriteLine($"AddItemAsync for {userId} called");
+        Telemetry.Log("storage.diagnostic","storage");
         try
         {
             await using var dataSource = NpgsqlDataSource.Create(connectionString);
@@ -96,14 +96,14 @@ namespace cartservice.cartstore
         catch (Exception ex)
         {
             throw new RpcException(
-                new Status(StatusCode.FailedPrecondition, $"Unable to access cart storage due to an internal error. {ex}"));
+                new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
         }
     }
 
 
         public async Task<Hipstershop.Cart> GetCartAsync(string userId)
         {
-            Console.WriteLine($"GetCartAsync called for userId={userId}");
+            Telemetry.Log("storage.diagnostic","storage");
             Hipstershop.Cart cart = new();
             cart.UserId = userId;
             try
@@ -132,7 +132,7 @@ namespace cartservice.cartstore
             catch (Exception ex)
             {
                 throw new RpcException(
-                    new Status(StatusCode.FailedPrecondition, $"Unable to access cart storage due to an internal error. {ex}"));
+                    new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
             return cart;
         }
@@ -140,7 +140,7 @@ namespace cartservice.cartstore
 
         public async Task EmptyCartAsync(string userId)
         {
-            Console.WriteLine($"EmptyCartAsync called for userId={userId}");
+            Telemetry.Log("storage.diagnostic","storage");
 
             try
             {
@@ -157,7 +157,7 @@ namespace cartservice.cartstore
             catch (Exception ex)
             {
                 throw new RpcException(
-                    new Status(StatusCode.FailedPrecondition, $"Unable to access cart storage due to an internal error. {ex}"));
+                    new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
         }
 
