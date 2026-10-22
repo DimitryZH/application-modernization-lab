@@ -22,14 +22,18 @@ RUN pip install --prefix="/install" -r requirements.txt
 
 FROM base
 
+ARG SOURCE_REVISION=development
+LABEL org.opencontainers.image.revision=$SOURCE_REVISION
+ENV ONLINE_SHOP_VERSION=$SOURCE_REVISION
+
 WORKDIR /loadgen
 
 COPY --from=builder /install /usr/local
 
 # Add application code.
-COPY locustfile.py .
+COPY locustfile.py telemetry.py ./
 
 # enable gevent support in debugger
 ENV GEVENT_SUPPORT=True
 
-ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u "${USERS:-10}" -r "${RATE:-1}" 2>&1
+ENTRYPOINT exec locust --host="http://${FRONTEND_ADDR}" --headless -u "${USERS:-10}" -r "${RATE:-1}" 2>&1
