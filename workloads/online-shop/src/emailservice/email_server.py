@@ -134,7 +134,7 @@ def start(dummy_mode):
     health_pb2_grpc.add_HealthServicer_to_server(service, server)
 
     port = os.environ.get("PORT", "8080")
-    logger.info("listening on port: " + port)
+    telemetry.diagnostic("startup", "INFO")
     server.add_insecure_port("[::]:" + port)
     server.start()
     telemetry.stoppers.append(lambda: server.stop(5).wait(5))

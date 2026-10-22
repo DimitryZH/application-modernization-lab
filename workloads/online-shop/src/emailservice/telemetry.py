@@ -1,5 +1,6 @@
 # Copyright 2026 Online Shop contributors. SPDX-License-Identifier: Apache-2.0
 """Explicit telemetry: no instrumentors, agents, or patched transports."""
+import contextvars
 import contextlib
 import functools
 import json
@@ -45,9 +46,13 @@ def init():
     if initialized:
         return
     initialized = True
-    if not os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT") and os.getenv("COLLECTOR_SERVICE_ADDR"):
+    if not os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT") and os.getenv(
+        "COLLECTOR_SERVICE_ADDR"
+    ):
         legacy = os.environ["COLLECTOR_SERVICE_ADDR"]
-        os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = legacy if "://" in legacy else "http://" + legacy
+        os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = (
+            legacy if "://" in legacy else "http://" + legacy
+        )
     propagate.set_global_textmap(TraceContextTextMapPropagator())
     if enabled():
         resource = Resource.create(
@@ -135,11 +140,26 @@ def install_signals():
     signal.signal(signal.SIGINT, termination)
 
 
-def log(event, operation, outcome="ok"):
+def log(event, operation, outcome="ok", severity=None, category="application"):
+    print(
+        json.dumps(log_record(event, operation, outcome, severity, category)),
+        flush=True,
+    )
+
+
+def log_record(
+    event,
+    operation,
+    outcome="ok",
+    severity=None,
+    category="application",
+    timestamp=None,
+):
     sc = trace.get_current_span().get_span_context()
     row = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "severity": "INFO",
+        "timestamp": timestamp or datetime.now(timezone.utc).isoformat(),
+        "severity": severity or ("INFO" if outcome == "ok" else "ERROR"),
+        "category": category,
         "message": event,
         "event": event,
         "operation": operation,
@@ -154,67 +174,99 @@ def log(event, operation, outcome="ok"):
             span_id=format(sc.span_id, "016x"),
             trace_flags=int(sc.trace_flags),
         )
-    print(json.dumps(row), flush=True)
+    if outcome != "ok":
+        row["error.type"] = outcome
+    return row
+
+
+_outcome = contextvars.ContextVar("operation_outcome", default=None)
+
+
+def fail(outcome):
+    # Callers supply bounded protocol classifications, never exception messages.
+    state = _outcome.get()
+    if state is not None:
+        state[0] = outcome
+    span = trace.get_current_span()
+    span.set_status(Status(StatusCode.ERROR, "operation failed"))
+    span.set_attribute("error.type", outcome)
 
 
 @contextlib.contextmanager
 def operation(name, kind=SpanKind.INTERNAL, parent=None):
-    if not enabled():
-        # The API no-op tracer does not promise to preserve an explicit parent.
-        # Keep a non-recording context without constructing export workers.
-        with trace.use_span(trace.get_current_span(parent), end_on_exit=False):
-            yield trace.get_current_span()
-            log("operation.completed", name)
-        return
+    active = enabled()
     start = time.monotonic()
-    outcome = "ok"
-    tracer = trace.get_tracer("online-shop." + SERVICE)
-    with tracer.start_as_current_span(
-        name,
-        context=parent,
-        kind=kind,
-        record_exception=False,
-        set_status_on_exception=False,
-    ) as span:
-        try:
-            yield span
-        except BaseException as error:
-            outcome = error.code().name if isinstance(error, grpc.RpcError) else "operation_failed"
-            span.set_status(Status(StatusCode.ERROR, "operation failed"))
-            span.set_attribute("error.type", outcome)
-            raise
-        finally:
-            meter = metrics.get_meter("online-shop." + SERVICE)
-            attrs = {"operation": name, "kind": kind.name.lower(), "outcome": outcome}
-            meter.create_counter(
-                "online_shop.transport.requests", unit="{request}"
-            ).add(1, attrs)
-            meter.create_histogram("online_shop.transport.duration", unit="s").record(
-                time.monotonic() - start, attrs
-            )
-            if outcome != "ok":
-                meter.create_counter(
-                    "online_shop.transport.errors", unit="{request}"
-                ).add(1, attrs)
-            if kind == SpanKind.INTERNAL:
-                meter.create_counter(
-                    "online_shop.business.operations", unit="{operation}"
-                ).add(1, {"operation": name, "outcome": outcome})
-            log("operation.completed", name, outcome)
+    state = ["ok"]
+    token = _outcome.set(state)
+    scope = (
+        trace.get_tracer("online-shop." + SERVICE).start_as_current_span(
+            name,
+            context=parent,
+            kind=kind,
+            record_exception=False,
+            set_status_on_exception=False,
+        )
+        if active
+        else trace.use_span(trace.get_current_span(parent), end_on_exit=False)
+    )
+    try:
+        with scope as span:
+            try:
+                yield span
+            except BaseException as error:
+                if state[0] == "ok":
+                    fail(
+                        error.code().name
+                        if isinstance(error, grpc.RpcError)
+                        else "operation_failed"
+                    )
+                raise
+            finally:
+                outcome = state[0]
+                if active:
+                    meter = metrics.get_meter("online-shop." + SERVICE)
+                    attrs = {
+                        "operation": name,
+                        "kind": kind.name.lower(),
+                        "outcome": outcome,
+                    }
+                    meter.create_counter(
+                        "online_shop.transport.requests", unit="{request}"
+                    ).add(1, attrs)
+                    meter.create_histogram(
+                        "online_shop.transport.duration", unit="s"
+                    ).record(time.monotonic() - start, attrs)
+                    if outcome != "ok":
+                        meter.create_counter(
+                            "online_shop.transport.errors", unit="{request}"
+                        ).add(1, attrs)
+                    if kind == SpanKind.INTERNAL:
+                        meter.create_counter(
+                            "online_shop.business.operations", unit="{operation}"
+                        ).add(1, {"operation": name, "outcome": outcome})
+                log(
+                    "operation.completed",
+                    name,
+                    outcome,
+                    category="dependency" if kind == SpanKind.CLIENT else "application",
+                )
+    finally:
+        _outcome.reset(token)
 
 
 def rpc(name):
     def decorate(handler):
         @functools.wraps(handler)
         def wrapped(self, request, context):
-            parent = propagate.extract(dict(context.invocation_metadata()), context=otel_context.Context())
+            parent = propagate.extract(
+                dict(context.invocation_metadata()), context=otel_context.Context()
+            )
             with operation(name, SpanKind.SERVER, parent) as span:
                 with operation(SERVICE + "." + name.rsplit("/", 1)[-1]):
                     result = handler(self, request, context)
                 code = context.code() if hasattr(context, "code") else None
                 if code is not None and code.name != "OK":
-                    span.set_status(Status(StatusCode.ERROR, "rpc failed"))
-                    span.set_attribute("error.type", code.name)
+                    fail(code.name)
                 return result
 
         return wrapped
@@ -237,15 +289,39 @@ def catalog_call(stub, request, server_context=None):
         )
 
 
+def diagnostic(category, severity="ERROR"):
+    if category not in ("startup", "configuration", "dependency", "application"):
+        category = "application"
+    outcome = (
+        category + "_failure"
+        if severity in ("ERROR", "FATAL")
+        else "warning" if severity == "WARN" else "ok"
+    )
+    log(category + ".diagnostic", category, outcome, severity, category)
+
+
 class SafeFormatter(logging.Formatter):
     def format(self, record):
+        category = getattr(record, "telemetry_category", "application")
+        if category not in ("startup", "configuration", "dependency", "application"):
+            category = "application"
+        severity = {logging.WARNING: "WARN", logging.CRITICAL: "FATAL"}.get(
+            record.levelno, record.levelname
+        )
+        outcome = (
+            category + "_failure"
+            if record.levelno >= logging.ERROR
+            else "warning" if record.levelno >= logging.WARNING else "ok"
+        )
         return json.dumps(
-            {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "severity": record.levelname,
-                "message": "application.diagnostic",
-                "service.name": SERVICE,
-            }
+            log_record(
+                category + ".diagnostic",
+                category,
+                outcome,
+                severity,
+                category,
+                datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
+            )
         )
 
 

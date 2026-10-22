@@ -39,10 +39,20 @@ def request(l, method, path, data=None, **kwargs):
     with telemetry.operation(method + " " + route, SpanKind.CLIENT) as span:
         headers = dict(kwargs.pop("headers", {}))
         propagate.inject(headers)
-        response = l.client.request(method, path, data=data, name=route, headers=headers, **kwargs)
+        try:
+            response = l.client.request(
+                method, path, data=data, name=route, headers=headers, **kwargs
+            )
+        except Exception:
+            telemetry.fail("transport_error")
+            raise
         span.set_attribute("http.response.status_code", response.status_code)
-        if response.status_code >= 400 or response.status_code == 0:
-            span.set_status(telemetry.Status(telemetry.StatusCode.ERROR, "http failed"))
+        if response.status_code == 0:
+            telemetry.fail("transport_error")
+        elif response.status_code >= 500:
+            telemetry.fail("http_5xx")
+        elif response.status_code >= 400:
+            telemetry.fail("http_4xx")
         return response
 
 
