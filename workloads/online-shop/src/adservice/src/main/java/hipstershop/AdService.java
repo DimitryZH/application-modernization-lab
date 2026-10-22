@@ -17,7 +17,6 @@
 package hipstershop;
 
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import hipstershop.Demo.Ad;
 import hipstershop.Demo.AdRequest;
@@ -34,7 +33,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,6 +54,7 @@ public final class AdService {
 
     server =
         ServerBuilder.forPort(port)
+            .intercept(Telemetry.interceptor())
             .addService(new AdServiceImpl())
             .addService(healthMgr.getHealthService())
             .build()
@@ -69,6 +68,7 @@ public final class AdService {
                   System.err.println(
                       "*** shutting down gRPC ads server since JVM is shutting down");
                   AdService.this.stop();
+                  Telemetry.shutdown();
                   System.err.println("*** server shut down");
                 }));
     healthMgr.setStatus("", ServingStatus.SERVING);
@@ -78,6 +78,12 @@ public final class AdService {
     if (server != null) {
       healthMgr.clearStatus("");
       server.shutdown();
+      try {
+        if (!server.awaitTermination(5, TimeUnit.SECONDS)) server.shutdownNow();
+      } catch (InterruptedException e) {
+        server.shutdownNow();
+        Thread.currentThread().interrupt();
+      }
     }
   }
 
@@ -93,9 +99,10 @@ public final class AdService {
     @Override
     public void getAds(AdRequest req, StreamObserver<AdResponse> responseObserver) {
       AdService service = AdService.getInstance();
-      try {
+      var selection = Telemetry.tracer.spanBuilder("ad.select").startSpan();
+      try (var scope = selection.makeCurrent()) {
         List<Ad> allAds = new ArrayList<>();
-        logger.info("received ad request (context_words=" + req.getContextKeysList() + ")");
+        Telemetry.log("selection.started", "ad.select", "ok");
         if (req.getContextKeysCount() > 0) {
           for (int i = 0; i < req.getContextKeysCount(); i++) {
             Collection<Ad> ads = service.getAdsByCategory(req.getContextKeys(i));
@@ -105,15 +112,23 @@ public final class AdService {
           allAds = service.getRandomAds();
         }
         if (allAds.isEmpty()) {
+          selection.addEvent("selection.fallback");
           // Serve random ads.
           allAds = service.getRandomAds();
         }
         AdResponse reply = AdResponse.newBuilder().addAllAds(allAds).build();
         responseObserver.onNext(reply);
+        Telemetry.business.add(
+            1,
+            io.opentelemetry.api.common.Attributes.of(
+                io.opentelemetry.api.common.AttributeKey.stringKey("operation"), "ad.select"));
         responseObserver.onCompleted();
       } catch (StatusRuntimeException e) {
-        logger.log(Level.WARN, "GetAds Failed with status {}", e.getStatus());
+        selection.setStatus(io.opentelemetry.api.trace.StatusCode.ERROR, "selection failed");
         responseObserver.onError(e);
+      } finally {
+        Telemetry.log("operation.completed", "ad.select", "ok");
+        selection.end();
       }
     }
   }
@@ -192,42 +207,10 @@ public final class AdService {
         .build();
   }
 
-  private static void initStats() {
-    if (System.getenv("DISABLE_STATS") != null) {
-      logger.info("Stats disabled.");
-      return;
-    }
-    logger.info("Stats enabled, but temporarily unavailable");
-
-    long sleepTime = 10; /* seconds */
-    int maxAttempts = 5;
-
-    // TODO(arbrown) Implement OpenTelemetry stats
-
-  }
-
-  private static void initTracing() {
-    if (System.getenv("DISABLE_TRACING") != null) {
-      logger.info("Tracing disabled.");
-      return;
-    }
-    logger.info("Tracing enabled but temporarily unavailable");
-    logger.info("See https://github.com/GoogleCloudPlatform/microservices-demo/issues/422 for more info.");
-
-    // TODO(arbrown) Implement OpenTelemetry tracing
-
-    logger.info("Tracing enabled - Stackdriver exporter initialized.");
-  }
-
   /** Main launches the server from the command line. */
   public static void main(String[] args) throws IOException, InterruptedException {
 
-    new Thread(
-            () -> {
-              initStats();
-              initTracing();
-            })
-        .start();
+    Telemetry.init();
 
     // Start the RPC server. You shouldn't see any output from gRPC before this.
     logger.info("AdService starting.");

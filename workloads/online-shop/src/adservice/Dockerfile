@@ -19,13 +19,17 @@ WORKDIR /app
 COPY ["build.gradle", "gradlew", "./"]
 COPY gradle gradle
 RUN chmod +x gradlew
-RUN ./gradlew downloadRepos
+RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon downloadRepos
 
 COPY . .
 RUN chmod +x gradlew
-RUN ./gradlew installDist
+RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon installDist test
 
 FROM eclipse-temurin:25-jre-alpine@sha256:bf9c91071c4f90afebb31d735f111735975d6fe2b668a82339f8204202203621
+
+ARG SOURCE_REVISION=development
+LABEL org.opencontainers.image.revision=$SOURCE_REVISION
+ENV ONLINE_SHOP_VERSION=$SOURCE_REVISION
 
 # @TODO: https://github.com/GoogleCloudPlatform/microservices-demo/issues/2517
 # Download Stackdriver Profiler Java agent
