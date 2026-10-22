@@ -12,6 +12,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -69,5 +71,25 @@ func TestDisableOverridesEnable(t *testing.T) {
 	t.Setenv("OTEL_SDK_DISABLED", "true")
 	if enabled() {
 		t.Fatal("disable ignored")
+	}
+}
+
+func TestHTTPUserInputCannotCreateSpanOrMetricDimensions(t *testing.T) {
+	exporter := tracetest.NewInMemoryExporter()
+	provider := sdktrace.NewTracerProvider(sdktrace.WithSyncer(exporter))
+	defer provider.Shutdown(context.Background())
+	previous := telemetryTracer
+	telemetryTracer = provider.Tracer("test")
+	defer func() { telemetryTracer = previous }()
+	handler := httpTelemetry(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) }))
+	handler.ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("UNTRUSTED-1234", "/product/private-canary", nil))
+	spans := exporter.GetSpans()
+	if len(spans) != 1 || spans[0].Name != "OTHER /product/{id}" {
+		t.Fatalf("unbounded span name: %v", spans)
+	}
+	for _, attr := range spans[0].Attributes {
+		if strings.Contains(attr.Value.AsString(), "private-canary") {
+			t.Fatal("raw path captured")
+		}
 	}
 }

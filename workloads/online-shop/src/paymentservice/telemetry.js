@@ -225,7 +225,7 @@ async function shutdown() {
     await Promise.all(
       stoppers.map((stop) => new Promise((resolve) => stop(resolve))),
     );
-    await Promise.all(providers.map((p) => p.shutdown()));
+    await Promise.allSettled(providers.map((p) => p.shutdown()));
     clearTimeout(watchdog);
     process.exit(0);
   } catch {

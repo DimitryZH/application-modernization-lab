@@ -137,14 +137,26 @@ func record(ctx context.Context, kind, method string, start time.Time, err error
 	}
 	telemetryLog(ctx, "request.completed", method, outcome)
 }
-type operationState struct { outcome string }
+
+type operationState struct{ outcome string }
 type operationKey struct{}
-func operation(ctx context.Context,name string)(context.Context,func()) {
- ctx,span:=telemetryTracer.Start(ctx,name)
- state:=&operationState{outcome:"ok"};ctx=context.WithValue(ctx,operationKey{},state)
- return ctx,func(){business.Add(ctx,1,metric.WithAttributes(attribute.String("operation",name),attribute.String("outcome",state.outcome)));telemetryLog(ctx,"operation.completed",name,state.outcome);span.End()}
+
+func operation(ctx context.Context, name string) (context.Context, func()) {
+	ctx, span := telemetryTracer.Start(ctx, name)
+	state := &operationState{outcome: "ok"}
+	ctx = context.WithValue(ctx, operationKey{}, state)
+	return ctx, func() {
+		business.Add(ctx, 1, metric.WithAttributes(attribute.String("operation", name), attribute.String("outcome", state.outcome)))
+		telemetryLog(ctx, "operation.completed", name, state.outcome)
+		span.End()
+	}
 }
-func failOperation(ctx context.Context){if state,ok:=ctx.Value(operationKey{}).(*operationState);ok{state.outcome="error"};trace.SpanFromContext(ctx).SetStatus(otelcodes.Error,"operation failed")}
+func failOperation(ctx context.Context) {
+	if state, ok := ctx.Value(operationKey{}).(*operationState); ok {
+		state.outcome = "error"
+	}
+	trace.SpanFromContext(ctx).SetStatus(otelcodes.Error, "operation failed")
+}
 func degraded(ctx context.Context, name string) {
 	trace.SpanFromContext(ctx).AddEvent(name)
 	business.Add(ctx, 1, metric.WithAttributes(attribute.String("operation", name), attribute.String("outcome", "degraded")))
@@ -242,7 +254,9 @@ func httpTelemetry(next http.Handler) http.Handler {
 		rec := &httpStatus{ResponseWriter: w}
 		start := time.Now()
 		next.ServeHTTP(rec, r.WithContext(ctx))
- if rec.status==0 {rec.status=http.StatusOK}
+		if rec.status == 0 {
+			rec.status = http.StatusOK
+		}
 		var err error
 		if rec.status >= 500 {
 			err = status.Error(codes.Internal, "http failure")
@@ -284,4 +298,10 @@ func strconvParseRatio(v string) (float64, error) {
 	return n, e
 }
 
-func metricInterval() time.Duration { n,err:=strconv.Atoi(envOr("OTEL_METRIC_EXPORT_INTERVAL","10000"));if err!=nil||n<1000 {n=10000};return time.Duration(n)*time.Millisecond }
+func metricInterval() time.Duration {
+	n, err := strconv.Atoi(envOr("OTEL_METRIC_EXPORT_INTERVAL", "10000"))
+	if err != nil || n < 1000 {
+		n = 10000
+	}
+	return time.Duration(n) * time.Millisecond
+}

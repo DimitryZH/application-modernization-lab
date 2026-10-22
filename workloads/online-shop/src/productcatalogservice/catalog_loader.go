@@ -31,8 +31,13 @@ import (
 )
 
 func loadCatalog(ctx context.Context, catalog *pb.ListProductsResponse) (err error) {
- ctx, finish := operation(ctx, "catalog.load")
- defer func(){if err!=nil {failOperation(ctx)};finish()}()
+	ctx, finish := operation(ctx, "catalog.load")
+	defer func() {
+		if err != nil {
+			failOperation(ctx)
+		}
+		finish()
+	}()
 	catalogMutex.Lock()
 	defer catalogMutex.Unlock()
 

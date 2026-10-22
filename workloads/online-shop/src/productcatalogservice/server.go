@@ -133,7 +133,6 @@ func run(port string) string {
 	return listener.Addr().String()
 }
 
-
 func initProfiling(service, version string) {
 	for i := 1; i <= 3; i++ {
 		if err := profiler.Start(profiler.Config{
