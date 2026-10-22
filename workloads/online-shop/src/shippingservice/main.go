@@ -66,14 +66,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	var srv *grpc.Server
-	if os.Getenv("DISABLE_STATS") == "" {
-		log.Info("Stats enabled, but temporarily unavailable")
-		srv = grpc.NewServer(grpc.UnaryInterceptor(unaryServer))
-	} else {
-		log.Info("Stats disabled.")
-		srv = grpc.NewServer(grpc.UnaryInterceptor(unaryServer))
-	}
+	srv := grpc.NewServer(grpc.UnaryInterceptor(unaryServer))
 	svc := &server{}
 	registerStop(func(ctx context.Context) {
 		done := make(chan struct{})
@@ -147,9 +140,6 @@ func (s *server) ShipOrder(ctx context.Context, in *pb.ShipOrderRequest) (*pb.Sh
 	}, nil
 }
 
-func initStats() {
-	//TODO(arbrown) Implement OpenTelemetry stats
-}
 
 func initProfiling(service, version string) {
 	// TODO(ahmetb) this method is duplicated in other microservices using Go

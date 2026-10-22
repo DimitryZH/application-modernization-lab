@@ -133,9 +133,6 @@ func run(port string) string {
 	return listener.Addr().String()
 }
 
-func initStats() {
-	// TODO(drewbr) Implement OpenTelemetry stats
-}
 
 func initProfiling(service, version string) {
 	for i := 1; i <= 3; i++ {

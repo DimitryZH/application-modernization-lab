@@ -30,9 +30,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func loadCatalog(ctx context.Context, catalog *pb.ListProductsResponse) error {
-	_, finish := operation(ctx, "catalog.load")
-	defer finish()
+func loadCatalog(ctx context.Context, catalog *pb.ListProductsResponse) (err error) {
+ ctx, finish := operation(ctx, "catalog.load")
+ defer func(){if err!=nil {failOperation(ctx)};finish()}()
 	catalogMutex.Lock()
 	defer catalogMutex.Unlock()
 

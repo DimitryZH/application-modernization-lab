@@ -59,6 +59,7 @@ func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductReque
 	}
 
 	if found == nil {
+ failOperation(ctx)
 		return nil, status.Errorf(codes.NotFound, "no product with ID %s", req.Id)
 	}
 	return found, nil

@@ -17,14 +17,18 @@ FROM golang:1.24.3-alpine AS builder
 WORKDIR /src
 # restore dependencies
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
 COPY . .
 
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
-RUN CGO_ENABLED=0 GOOS=linux go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 GOOS=linux go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
 
 FROM scratch
+
+ARG SOURCE_REVISION=development
+LABEL org.opencontainers.image.revision=$SOURCE_REVISION
+ENV ONLINE_SHOP_VERSION=$SOURCE_REVISION
 
 WORKDIR /src
 COPY --from=builder /productcatalogservice ./server
