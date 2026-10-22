@@ -120,15 +120,17 @@ const duration = meter.createHistogram("online_shop.transport.duration", {
 const business = meter.createCounter("online_shop.business.operations", {
   unit: "{operation}",
 });
-function log(event, operation, outcome = "ok") {
+function log(event, operation, outcome = "ok", severity = outcome === "ok" ? "INFO" : "ERROR", category = "application") {
   const sc = trace.getSpanContext(context.active());
   const row = {
     timestamp: new Date().toISOString(),
-    severity: "INFO",
+    severity,
+    category,
     message: event,
     event,
     operation,
     outcome,
+    ...(outcome !== "ok" ? {"error.type": outcome} : {}),
     "service.name": service,
     "service.namespace": "online-shop",
     "service.version": process.env.ONLINE_SHOP_VERSION || "development",
@@ -165,9 +167,10 @@ function unary(method, handler) {
               message: "rpc failed",
             });
             span.setAttribute("error.type", "rpc_failed");
-            errors.add(1, { operation: method });
+
           }
           const attrs = { operation: method, kind: "server", outcome };
+          if (err) errors.add(1, attrs);
           requests.add(1, attrs);
           duration.record(Number(process.hrtime.bigint() - start) / 1e9, attrs);
           log("request.completed", method, outcome);
@@ -234,14 +237,16 @@ async function shutdown() {
 }
 process.once("SIGTERM", shutdown);
 process.once("SIGINT", shutdown);
+function diagnostic(severity, category = "application") {
+  if (!["startup", "configuration", "dependency", "application"].includes(category)) category = "application";
+  const outcome = ["ERROR", "FATAL"].includes(severity) ? category + "_failure" : severity === "WARN" ? "warning" : "ok";
+  log(category + ".diagnostic", category, outcome, severity, category);
+}
 module.exports = {
-  unary,
-  operation,
-  log,
-  stoppers,
+  unary, operation, log, diagnostic, stoppers,
   logger: {
-    info: () => log("application.diagnostic", "diagnostic"),
-    warn: () => log("application.diagnostic", "diagnostic"),
-    error: () => log("application.diagnostic", "diagnostic"),
+    info: () => diagnostic("INFO"),
+    warn: () => diagnostic("WARN"),
+    error: () => diagnostic("ERROR"),
   },
 };

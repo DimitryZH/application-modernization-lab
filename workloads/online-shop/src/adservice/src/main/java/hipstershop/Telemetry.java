@@ -127,6 +127,10 @@ public final class Telemetry {
               ContextPropagators.create(
                   io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator.getInstance()));
     }
+    instruments();
+  }
+
+  static void instruments() {
     tracer = otel.getTracer("online-shop.adservice");
     var meter = otel.getMeter("online-shop.adservice");
     requests = meter.counterBuilder("online_shop.transport.requests").setUnit("{request}").build();
@@ -148,11 +152,19 @@ public final class Telemetry {
   }
 
   public static void log(String event, String operation, String outcome) {
+    log(event, operation, outcome, outcome.equals("ok") ? "INFO" : "ERROR", "application");
+  }
+  public static void diagnostic(String category, String severity) {
+    if (!Set.of("startup", "configuration", "dependency", "application").contains(category)) category="application";
+    if (!Set.of("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL").contains(severity)) severity="ERROR";
+    log(category+".diagnostic", category, Set.of("ERROR", "FATAL").contains(severity) ? category+"_failure" : severity.equals("WARN") ? "warning" : "ok", severity, category);
+  }
+  static void log(String event, String operation, String outcome, String severity, String category) {
     var sc = Span.current().getSpanContext();
     System.out.println(
         "{\"timestamp\":\""
             + Instant.now()
-            + "\",\"severity\":\"INFO\",\"message\":\""
+            + "\",\"severity\":\"" + severity + "\",\"category\":\"" + category + "\",\"message\":\""
             + event
             + "\",\"event\":\""
             + event
@@ -160,6 +172,7 @@ public final class Telemetry {
             + operation
             + "\",\"outcome\":\""
             + outcome
+            + (outcome.equals("ok") ? "" : "\",\"error.type\":\"" + outcome)
             + "\",\"service.name\":\"adservice\",\"service.namespace\":\"online-shop\",\"service.version\":\""
             + env("ONLINE_SHOP_VERSION", "development").replaceAll("[^a-zA-Z0-9._+-]", "_")
             + "\",\"trace_id\":\""
@@ -208,7 +221,7 @@ public final class Telemetry {
                     if (!status.isOk()) {
                       span.setStatus(StatusCode.ERROR, "rpc failed");
                       span.setAttribute("error.type", outcome);
-                      errors.add(1, Attributes.of(AttributeKey.stringKey("operation"), method));
+
                     }
                     Attributes attrs =
                         Attributes.builder()
@@ -216,6 +229,7 @@ public final class Telemetry {
                             .put("kind", "server")
                             .put("outcome", outcome)
                             .build();
+                    if (!status.isOk()) errors.add(1, attrs);
                     requests.add(1, attrs);
                     durations.record((System.nanoTime() - start) / 1e9, attrs);
                     log("request.completed", method, outcome);

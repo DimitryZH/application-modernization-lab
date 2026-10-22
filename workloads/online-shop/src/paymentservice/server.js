@@ -63,8 +63,9 @@ class HipsterShopServer {
     server.bindAsync(
       `[::]:${port}`,
       grpc.ServerCredentials.createInsecure(),
-      function () {
-        logger.info(`PaymentService gRPC server started on port ${port}`);
+      function (error) {
+        if (error) { telemetry.diagnostic("ERROR", "startup"); throw new Error("server startup failed"); }
+        telemetry.diagnostic("INFO", "startup");
         server.start();
       },
     );

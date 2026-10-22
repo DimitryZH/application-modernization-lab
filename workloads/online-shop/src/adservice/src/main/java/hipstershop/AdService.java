@@ -59,7 +59,7 @@ public final class AdService {
             .addService(healthMgr.getHealthService())
             .build()
             .start();
-    logger.info("Ad Service started, listening on " + port);
+    Telemetry.diagnostic("startup", "INFO");
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
@@ -213,9 +213,11 @@ public final class AdService {
     Telemetry.init();
 
     // Start the RPC server. You shouldn't see any output from gRPC before this.
-    logger.info("AdService starting.");
+    Telemetry.diagnostic("startup", "INFO");
     final AdService service = AdService.getInstance();
-    service.start();
+    try { service.start(); }
+    catch (IllegalArgumentException failure) { Telemetry.diagnostic("configuration", "FATAL"); System.exit(1); }
+    catch (IOException failure) { Telemetry.diagnostic("startup", "FATAL"); System.exit(1); }
     service.blockUntilShutdown();
   }
 }

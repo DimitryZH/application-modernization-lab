@@ -155,8 +155,9 @@ function main() {
   server.bindAsync(
     `[::]:${PORT}`,
     grpc.ServerCredentials.createInsecure(),
-    function () {
-      logger.info(`CurrencyService gRPC server started on port ${PORT}`);
+    function (error) {
+      if (error) { telemetry.diagnostic("ERROR", "startup"); throw new Error("server startup failed"); }
+      telemetry.diagnostic("INFO", "startup");
       server.start();
     },
   );

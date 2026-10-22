@@ -122,3 +122,5 @@ applicationDistribution.into('bin') {
 }
 
 test { useJUnitPlatform() }
+
+dependencies { testImplementation "io.opentelemetry:opentelemetry-sdk-testing" }
