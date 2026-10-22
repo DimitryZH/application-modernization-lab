@@ -144,11 +144,11 @@ func main() {
 	handler = ensureSessionID(handler)             // add session ID
 	handler = httpTelemetry(handler)               // add OTel tracing
 
-	log.Infof("starting server on " + addr + ":" + srvPort)
+	log.WithField("telemetry.category", "startup").Infof("starting server on " + addr + ":" + srvPort)
 	server := &http.Server{Addr: addr + ":" + srvPort, Handler: handler}
 	registerStop(func(ctx context.Context) { _ = server.Shutdown(ctx) })
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		log.Fatal(err)
+		log.WithField("telemetry.category", "startup").Fatal(err)
 	}
 	select {}
 }
@@ -164,7 +164,7 @@ func initProfiling(log logrus.FieldLogger, service, version string) {
 			// ProjectID must be set if not running on GCP.
 			// ProjectID: "my-project",
 		}); err != nil {
-			log.Warnf("warn: failed to start profiler: %+v", err)
+			log.WithField("telemetry.category", "dependency").Warnf("warn: failed to start profiler: %+v", err)
 		} else {
 			log.Info("started Stackdriver profiler")
 			return
@@ -173,7 +173,7 @@ func initProfiling(log logrus.FieldLogger, service, version string) {
 		log.Debugf("sleeping %v to retry initializing Stackdriver profiler", d)
 		time.Sleep(d)
 	}
-	log.Warn("warning: could not initialize Stackdriver profiler after retrying, giving up")
+	log.WithField("telemetry.category", "dependency").Warn("warning: could not initialize Stackdriver profiler after retrying, giving up")
 }
 
 func mustMapEnv(target *string, envKey string) {

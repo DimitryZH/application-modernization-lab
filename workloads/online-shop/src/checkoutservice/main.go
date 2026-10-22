@@ -101,11 +101,11 @@ func main() {
 	mustConnGRPC(ctx, &svc.emailSvcConn, svc.emailSvcAddr)
 	mustConnGRPC(ctx, &svc.paymentSvcConn, svc.paymentSvcAddr)
 
-	log.Infof("service config: %+v", svc)
+	log.WithField("telemetry.category", "configuration").Infof("service config: %+v", svc)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		log.Fatal(err)
+		log.WithField("telemetry.category", "startup").Fatal(err)
 	}
 
 	var srv *grpc.Server
@@ -126,10 +126,10 @@ func main() {
 	})
 	pb.RegisterCheckoutServiceServer(srv, svc)
 	healthpb.RegisterHealthServer(srv, svc)
-	log.Infof("starting to listen on tcp: %q", lis.Addr().String())
+	log.WithField("telemetry.category", "startup").Infof("starting to listen on tcp: %q", lis.Addr().String())
 	err = srv.Serve(lis)
 	if err != nil {
-		log.Fatal(err)
+		log.WithField("telemetry.category", "startup").Fatal(err)
 	}
 	select {}
 }
@@ -144,7 +144,7 @@ func initProfiling(service, version string) {
 			// ProjectID must be set if not running on GCP.
 			// ProjectID: "my-project",
 		}); err != nil {
-			log.Warnf("failed to start profiler: %+v", err)
+			log.WithField("telemetry.category", "dependency").Warnf("failed to start profiler: %+v", err)
 		} else {
 			log.Info("started Stackdriver profiler")
 			return
@@ -153,7 +153,7 @@ func initProfiling(service, version string) {
 		log.Infof("sleeping %v to retry initializing Stackdriver profiler", d)
 		time.Sleep(d)
 	}
-	log.Warn("could not initialize Stackdriver profiler after retrying, giving up")
+	log.WithField("telemetry.category", "dependency").Warn("could not initialize Stackdriver profiler after retrying, giving up")
 }
 
 func mustMapEnv(target *string, envKey string) {
@@ -187,7 +187,7 @@ func (cs *checkoutService) Watch(req *healthpb.HealthCheckRequest, ws healthpb.H
 func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error) {
 	ctx, finish := operation(ctx, "checkoutservice.PlaceOrder")
 	defer finish()
-	log.Infof("[PlaceOrder] user_id=%q user_currency=%q", req.UserId, req.UserCurrency)
+	log.WithContext(ctx).Infof("[PlaceOrder] user_id=%q user_currency=%q", req.UserId, req.UserCurrency)
 
 	orderID, err := uuid.NewUUID()
 	if err != nil {
@@ -215,7 +215,7 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 		failOperation(ctx)
 		return nil, status.Errorf(codes.Internal, "failed to charge card: %+v", err)
 	}
-	log.Infof("payment went through (transaction_id: %s)", txID)
+	log.WithContext(ctx).Infof("payment went through (transaction_id: %s)", txID)
 
 	shippingTrackingID, err := cs.shipOrder(ctx, req.Address, prep.cartItems)
 	if err != nil {
@@ -237,9 +237,9 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 
 	if err := cs.sendOrderConfirmation(ctx, req.Email, orderResult); err != nil {
 		degraded(ctx, "confirmation.failed")
-		log.Warnf("failed to send order confirmation to %q: %+v", req.Email, err)
+		log.WithContext(ctx).Warnf("failed to send order confirmation to %q: %+v", req.Email, err)
 	} else {
-		log.Infof("order confirmation email sent to %q", req.Email)
+		log.WithContext(ctx).Infof("order confirmation email sent to %q", req.Email)
 	}
 	resp := &pb.PlaceOrderResponse{Order: orderResult}
 	return resp, nil

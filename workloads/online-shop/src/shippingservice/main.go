@@ -63,7 +63,7 @@ func main() {
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.WithField("telemetry.category", "startup").Fatalf("failed to listen: %v", err)
 	}
 
 	srv := grpc.NewServer(grpc.UnaryInterceptor(unaryServer))
@@ -79,7 +79,7 @@ func main() {
 	})
 	pb.RegisterShippingServiceServer(srv, svc)
 	healthpb.RegisterHealthServer(srv, svc)
-	log.Infof("Shipping Service listening on port %s", port)
+	log.WithField("telemetry.category", "startup").Infof("Shipping Service listening on port %s", port)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(srv)
@@ -107,8 +107,8 @@ func (s *server) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_Watc
 func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
 	ctx, finish := operation(ctx, "shippingservice.GetQuote")
 	defer finish()
-	log.Info("[GetQuote] received request")
-	defer log.Info("[GetQuote] completed request")
+	log.WithContext(ctx).Info("[GetQuote] received request")
+	defer log.WithContext(ctx).Info("[GetQuote] completed request")
 
 	// 1. Generate a quote based on the total number of items to be shipped.
 	quote := CreateQuoteFromCount(0)
@@ -128,8 +128,8 @@ func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQ
 func (s *server) ShipOrder(ctx context.Context, in *pb.ShipOrderRequest) (*pb.ShipOrderResponse, error) {
 	ctx, finish := operation(ctx, "shippingservice.ShipOrder")
 	defer finish()
-	log.Info("[ShipOrder] received request")
-	defer log.Info("[ShipOrder] completed request")
+	log.WithContext(ctx).Info("[ShipOrder] received request")
+	defer log.WithContext(ctx).Info("[ShipOrder] completed request")
 	// 1. Create a Tracking ID
 	baseAddress := fmt.Sprintf("%s, %s, %s", in.Address.StreetAddress, in.Address.City, in.Address.State)
 	id := CreateTrackingId(baseAddress)
@@ -150,7 +150,7 @@ func initProfiling(service, version string) {
 			// ProjectID must be set if not running on GCP.
 			// ProjectID: "my-project",
 		}); err != nil {
-			log.Warnf("failed to start profiler: %+v", err)
+			log.WithField("telemetry.category", "dependency").Warnf("failed to start profiler: %+v", err)
 		} else {
 			log.Info("started Stackdriver profiler")
 			return
@@ -159,5 +159,5 @@ func initProfiling(service, version string) {
 		log.Infof("sleeping %v to retry initializing Stackdriver profiler", d)
 		time.Sleep(d)
 	}
-	log.Warn("could not initialize Stackdriver profiler after retrying, giving up")
+	log.WithField("telemetry.category", "dependency").Warn("could not initialize Stackdriver profiler after retrying, giving up")
 }

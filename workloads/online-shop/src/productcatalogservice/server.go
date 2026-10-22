@@ -68,7 +68,7 @@ func main() {
 	if s := os.Getenv("EXTRA_LATENCY"); s != "" {
 		v, err := time.ParseDuration(s)
 		if err != nil {
-			log.Fatalf("failed to parse EXTRA_LATENCY (%s) as time.Duration: %+v", v, err)
+			log.WithField("telemetry.category", "configuration").Fatalf("failed to parse EXTRA_LATENCY (%s) as time.Duration: %+v", v, err)
 		}
 		extraLatency = v
 		log.Infof("extra latency enabled (duration: %v)", extraLatency)
@@ -95,7 +95,7 @@ func main() {
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
 	}
-	log.Infof("starting grpc server at :%s", port)
+	log.WithField("telemetry.category", "startup").Infof("starting grpc server at :%s", port)
 	run(port)
 	select {}
 }
@@ -103,7 +103,7 @@ func main() {
 func run(port string) string {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		log.Fatal(err)
+		log.WithField("telemetry.category", "startup").Fatal(err)
 	}
 
 	// Propagate trace context
@@ -114,7 +114,7 @@ func run(port string) string {
 	svc := &productCatalog{}
 	err = loadCatalog(context.Background(), &svc.catalog)
 	if err != nil {
-		log.Fatalf("could not parse product catalog: %v", err)
+		log.WithField("telemetry.category", "configuration").Fatalf("could not parse product catalog: %v", err)
 	}
 
 	registerStop(func(ctx context.Context) {
@@ -141,7 +141,7 @@ func initProfiling(service, version string) {
 			// ProjectID must be set if not running on GCP.
 			// ProjectID: "my-project",
 		}); err != nil {
-			log.Warnf("failed to start profiler: %+v", err)
+			log.WithField("telemetry.category", "dependency").Warnf("failed to start profiler: %+v", err)
 		} else {
 			log.Info("started Stackdriver profiler")
 			return
@@ -150,7 +150,7 @@ func initProfiling(service, version string) {
 		log.Infof("sleeping %v to retry initializing Stackdriver profiler", d)
 		time.Sleep(d)
 	}
-	log.Warn("could not initialize Stackdriver profiler after retrying, giving up")
+	log.WithField("telemetry.category", "dependency").Warn("could not initialize Stackdriver profiler after retrying, giving up")
 }
 
 func mustMapEnv(target *string, envKey string) {

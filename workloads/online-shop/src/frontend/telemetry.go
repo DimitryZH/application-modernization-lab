@@ -18,7 +18,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
+
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"net/http"
@@ -125,9 +125,14 @@ func record(ctx context.Context, kind, method string, start time.Time, err error
 	outcome := "ok"
 	if err != nil {
 		outcome = status.Code(err).String()
-		failures.Add(ctx, 1, metric.WithAttributes(attribute.String("kind", kind), attribute.String("operation", method)))
+		if failure, ok := err.(httpFailure); ok {
+			outcome = string(failure)
+		}
 	}
 	attrs := metric.WithAttributes(attribute.String("kind", kind), attribute.String("operation", method), attribute.String("outcome", outcome))
+	if err != nil {
+		failures.Add(ctx, 1, attrs)
+	}
 	requests.Add(ctx, 1, attrs)
 	durations.Record(ctx, time.Since(start).Seconds(), attrs)
 	if err != nil {
@@ -135,7 +140,11 @@ func record(ctx context.Context, kind, method string, start time.Time, err error
 		s.SetAttributes(attribute.String("error.type", outcome))
 		s.SetStatus(otelcodes.Error, outcome)
 	}
-	telemetryLog(ctx, "request.completed", method, outcome)
+	category := "application"
+	if kind == "client" {
+		category = "dependency"
+	}
+	telemetryLogCategory(ctx, "request.completed", method, outcome, category)
 }
 
 type operationState struct{ outcome string }
@@ -163,8 +172,14 @@ func degraded(ctx context.Context, name string) {
 	telemetryLog(ctx, "operation.degraded", name, "degraded")
 }
 func telemetryLog(ctx context.Context, event, op, outcome string) {
+	telemetryLogCategory(ctx, event, op, outcome, "application")
+}
+func telemetryLogCategory(ctx context.Context, event, op, outcome, category string) {
 	sc := trace.SpanContextFromContext(ctx)
-	row := map[string]any{"timestamp": time.Now().UTC().Format(time.RFC3339Nano), "severity": "INFO", "message": event, "event": event, "operation": op, "outcome": outcome, "service.name": telemetryService, "service.namespace": "online-shop", "service.version": envOr("ONLINE_SHOP_VERSION", "development")}
+	row := map[string]any{"timestamp": time.Now().UTC().Format(time.RFC3339Nano), "severity": completionSeverity(outcome), "category": category, "message": event, "event": event, "operation": op, "outcome": outcome, "service.name": telemetryService, "service.namespace": "online-shop", "service.version": envOr("ONLINE_SHOP_VERSION", "development")}
+	if outcome != "ok" && outcome != "miss" {
+		row["error.type"] = outcome
+	}
 	if sc.IsValid() {
 		row["trace_id"] = sc.TraceID().String()
 		row["span_id"] = sc.SpanID().String()
@@ -174,12 +189,53 @@ func telemetryLog(ctx context.Context, event, op, outcome string) {
 	os.Stdout.Write(append(b, '\n'))
 }
 
-// Legacy diagnostics are deliberately reduced to a safe event. Request/business
-// details use telemetryLog; arbitrary exception messages never cross this boundary.
+func completionSeverity(outcome string) string {
+	if outcome == "ok" || outcome == "miss" {
+		return "INFO"
+	}
+	if outcome == "degraded" {
+		return "WARN"
+	}
+	return "ERROR"
+}
+
+// Only explicit bounded categories cross the legacy logging boundary. Never serialize
+// messages, exceptions or arbitrary fields. WithContext retains request correlation.
 type safeFormatter struct{}
 
 func (safeFormatter) Format(e *logrus.Entry) ([]byte, error) {
-	b, err := json.Marshal(map[string]any{"timestamp": e.Time.UTC().Format(time.RFC3339Nano), "severity": e.Level.String(), "message": "application.diagnostic", "service.name": telemetryService})
+	category, _ := e.Data["telemetry.category"].(string)
+	switch category {
+	case "startup", "configuration", "dependency", "application":
+	default:
+		category = "application"
+	}
+	severity := strings.ToUpper(e.Level.String())
+	if severity == "WARNING" {
+		severity = "WARN"
+	}
+	if severity == "PANIC" {
+		severity = "FATAL"
+	}
+	outcome := "ok"
+	if e.Level <= logrus.ErrorLevel {
+		outcome = category + "_failure"
+	} else if e.Level == logrus.WarnLevel {
+		outcome = "warning"
+	}
+	row := map[string]any{"timestamp": e.Time.UTC().Format(time.RFC3339Nano), "severity": severity, "category": category, "event": category + ".diagnostic", "message": category + ".diagnostic", "outcome": outcome, "service.name": telemetryService, "service.namespace": "online-shop", "service.version": envOr("ONLINE_SHOP_VERSION", "development")}
+	if outcome != "ok" {
+		row["error.type"] = outcome
+	}
+	if e.Context != nil {
+		sc := trace.SpanContextFromContext(e.Context)
+		if sc.IsValid() {
+			row["trace_id"] = sc.TraceID().String()
+			row["span_id"] = sc.SpanID().String()
+			row["trace_flags"] = int(sc.TraceFlags())
+		}
+	}
+	b, err := json.Marshal(row)
 	return append(b, '\n'), err
 }
 
@@ -260,7 +316,7 @@ func httpTelemetry(next http.Handler) http.Handler {
 		}
 		var err error
 		if rec.status >= 500 {
-			err = status.Error(codes.Internal, "http failure")
+			err = httpFailure("http_5xx")
 		}
 		s.SetAttributes(attribute.Int("http.response.status_code", rec.status), attribute.String("http.route", route))
 		record(ctx, "server", method+" "+route, start, err)
@@ -287,7 +343,18 @@ func telemetryHTTP(ctx context.Context, req *http.Request, dependency string) (*
 	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
 	start := time.Now()
 	resp, err := (&http.Client{Timeout: 5 * time.Second}).Do(req)
-	record(ctx, "client", dependency, start, err)
+	accountingErr := err
+	if err != nil {
+		accountingErr = httpFailure("transport_error")
+	} else if resp != nil {
+		s.SetAttributes(attribute.Int("http.response.status_code", resp.StatusCode))
+		if resp.StatusCode >= 500 {
+			accountingErr = httpFailure("http_5xx")
+		} else if resp.StatusCode >= 400 {
+			accountingErr = httpFailure("http_4xx")
+		}
+	}
+	record(ctx, "client", dependency, start, accountingErr)
 	return resp, err
 }
 
@@ -316,3 +383,8 @@ func safeMethod(method string) string {
 		return "OTHER"
 	}
 }
+
+// Client 4xx/5xx fail the operation; server 4xx is an expected rejection.
+type httpFailure string
+
+func (e httpFailure) Error() string { return string(e) }

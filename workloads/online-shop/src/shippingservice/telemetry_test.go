@@ -71,3 +71,25 @@ func TestDisableOverridesEnable(t *testing.T) {
 		t.Fatal("disable ignored")
 	}
 }
+
+func TestDiagnosticSeverityCategoryContext(t *testing.T) {
+	sc := trace.NewSpanContext(trace.SpanContextConfig{TraceID: trace.TraceID{1}, SpanID: trace.SpanID{2}})
+	for _, level := range []logrus.Level{logrus.WarnLevel, logrus.ErrorLevel, logrus.FatalLevel} {
+		row, err := (safeFormatter{}).Format(&logrus.Entry{Time: time.Now(), Level: level, Context: trace.ContextWithSpanContext(context.Background(), sc), Message: "private-canary", Data: logrus.Fields{"telemetry.category": "dependency", "error": "private-canary"}})
+		if err != nil || strings.Contains(string(row), "private-canary") {
+			t.Fatal(string(row), err)
+		}
+		var parsed map[string]any
+		json.Unmarshal(row, &parsed)
+		want := "WARN"
+		if level == logrus.ErrorLevel {
+			want = "ERROR"
+		}
+		if level == logrus.FatalLevel {
+			want = "FATAL"
+		}
+		if parsed["severity"] != want || parsed["category"] != "dependency" || parsed["span_id"] != sc.SpanID().String() || parsed["error.type"] == nil {
+			t.Fatal(parsed)
+		}
+	}
+}
