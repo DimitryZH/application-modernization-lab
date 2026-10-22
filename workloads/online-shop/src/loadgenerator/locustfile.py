@@ -34,12 +34,12 @@ def shutdown_telemetry(**kwargs):
     telemetry.shutdown()
 
 
-def request(l, method, path, *args, **kwargs):
+def request(l, method, path, data=None, **kwargs):
     route = "/product/{id}" if path.startswith("/product/") else path
     with telemetry.operation(method + " " + route, SpanKind.CLIENT) as span:
         headers = dict(kwargs.pop("headers", {}))
         propagate.inject(headers)
-        response = l.client.request(method, path, *args, headers=headers, **kwargs)
+        response = l.client.request(method, path, data=data, name=route, headers=headers, **kwargs)
         span.set_attribute("http.response.status_code", response.status_code)
         if response.status_code >= 400 or response.status_code == 0:
             span.set_status(telemetry.Status(telemetry.StatusCode.ERROR, "http failed"))

@@ -39,6 +39,16 @@ class TelemetryTests(unittest.TestCase):
                 json.loads(line)["trace_id"], "0123456789abcdef0123456789abcdef"
             )
 
+    def test_post_payload_is_data_not_locust_request_name(self):
+        os.environ["LOCUST_SKIP_MONKEY_PATCH"] = "1"
+        import locustfile
+        class Client:
+            def request(self, method, path, **kwargs):
+                assert kwargs["data"] == {"quantity": 2}
+                assert kwargs["name"] == "/cart"
+                return type("Response", (), {"status_code": 200})()
+        locustfile.request(type("User", (), {"client": Client()})(), "POST", "/cart", {"quantity": 2})
+
     def test_diagnostic_redaction(self):
         import logging
 

@@ -4,6 +4,7 @@ const {
   context,
   trace,
   propagation,
+  ROOT_CONTEXT,
   SpanKind,
   SpanStatusCode,
 } = require("@opentelemetry/api");
@@ -145,7 +146,7 @@ const getter = {
 };
 function unary(method, handler) {
   return function (call, callback) {
-    const parent = propagation.extract(context.active(), call.metadata, getter);
+    const parent = propagation.extract(ROOT_CONTEXT, call.metadata, getter);
     tracer.startActiveSpan(
       method,
       { kind: SpanKind.SERVER },

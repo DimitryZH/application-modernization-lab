@@ -59,7 +59,7 @@ namespace cartservice.cartstore
                 }
                 await Telemetry.Cache("write",()=>_cache.SetAsync(userId, cart.ToByteArray()));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
@@ -74,7 +74,7 @@ namespace cartservice.cartstore
                 var cart = new Hipstershop.Cart();
                 await Telemetry.Cache("write",()=>_cache.SetAsync(userId, cart.ToByteArray()));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
@@ -97,7 +97,7 @@ namespace cartservice.cartstore
                 // We decided to return empty cart in cases when user wasn't in the cache before
                 return new Hipstershop.Cart();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }

@@ -160,7 +160,9 @@ public final class Telemetry {
             + operation
             + "\",\"outcome\":\""
             + outcome
-            + "\",\"service.name\":\"adservice\",\"service.namespace\":\"online-shop\",\"trace_id\":\""
+            + "\",\"service.name\":\"adservice\",\"service.namespace\":\"online-shop\",\"service.version\":\""
+            + env("ONLINE_SHOP_VERSION", "development").replaceAll("[^a-zA-Z0-9._+-]", "_")
+            + "\",\"trace_id\":\""
             + sc.getTraceId()
             + "\",\"span_id\":\""
             + sc.getSpanId()

@@ -5,6 +5,7 @@ import functools
 import json
 import logging
 import os
+import grpc
 import signal
 import sys
 import time
@@ -177,10 +178,10 @@ def operation(name, kind=SpanKind.INTERNAL, parent=None):
     ) as span:
         try:
             yield span
-        except BaseException:
-            outcome = "error"
+        except BaseException as error:
+            outcome = error.code().name if isinstance(error, grpc.RpcError) else "operation_failed"
             span.set_status(Status(StatusCode.ERROR, "operation failed"))
-            span.set_attribute("error.type", "operation_failed")
+            span.set_attribute("error.type", outcome)
             raise
         finally:
             meter = metrics.get_meter("online-shop." + SERVICE)
@@ -206,7 +207,7 @@ def rpc(name):
     def decorate(handler):
         @functools.wraps(handler)
         def wrapped(self, request, context):
-            parent = propagate.extract(dict(context.invocation_metadata()))
+            parent = propagate.extract(dict(context.invocation_metadata()), context=otel_context.Context())
             with operation(name, SpanKind.SERVER, parent) as span:
                 with operation(SERVICE + "." + name.rsplit("/", 1)[-1]):
                     result = handler(self, request, context)

@@ -93,7 +93,7 @@ namespace cartservice.cartstore
                 });
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw new RpcException(
                 new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
@@ -129,7 +129,7 @@ namespace cartservice.cartstore
                     return cart;
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(
                     new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
@@ -154,7 +154,7 @@ namespace cartservice.cartstore
                     });
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(
                     new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
