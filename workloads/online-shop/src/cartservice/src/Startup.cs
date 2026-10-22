@@ -26,6 +26,7 @@ namespace cartservice
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            Telemetry.Configure(services);
             string redisAddress = Configuration["REDIS_ADDR"];
             string spannerProjectId = Configuration["SPANNER_PROJECT"];
             string spannerConnectionString = Configuration["SPANNER_CONNECTION_STRING"];
@@ -45,18 +46,18 @@ namespace cartservice
             }
             else if (!string.IsNullOrEmpty(alloyDBConnectionString))
             {
-                Console.WriteLine("Creating AlloyDB cart store");
+                Telemetry.Log("storage.selected","storage.alloydb");
                 services.AddSingleton<ICartStore, AlloyDBCartStore>();
             }
             else
             {
-                Console.WriteLine("Redis cache host(hostname+port) was not specified. Starting a cart service using in memory store");
+                Telemetry.Log("storage.selected","storage.memory");
                 services.AddDistributedMemoryCache();
                 services.AddSingleton<ICartStore, RedisCartStore>();
             }
 
 
-            services.AddGrpc();
+            services.AddGrpc(options=>options.Interceptors.Add<TelemetryInterceptor>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,0 +1,379 @@
+services:
+  frontend:
+    image: online-shop-21-frontend:local
+    build:
+      context: ../../src/frontend
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: frontend
+      PORT: '8080'
+      PRODUCT_CATALOG_SERVICE_ADDR: faults:50051
+      CURRENCY_SERVICE_ADDR: faults:50051
+      CART_SERVICE_ADDR: faults:50051
+      RECOMMENDATION_SERVICE_ADDR: faults:50051
+      SHIPPING_SERVICE_ADDR: faults:50051
+      CHECKOUT_SERVICE_ADDR: faults:50051
+      AD_SERVICE_ADDR: faults:50051
+      SHOPPING_ASSISTANT_SERVICE_ADDR: faults:8081
+      PACKAGING_SERVICE_URL: http://faults:8081
+      ENABLE_ASSISTANT: 'false'
+      ENV_PLATFORM: local
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    ports:
+    - 127.0.0.1:${FRONTEND_PORT:-18080}:8080
+  checkoutservice:
+    image: online-shop-21-checkoutservice:local
+    build:
+      context: ../../src/checkoutservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: checkoutservice
+      PORT: '5050'
+      PRODUCT_CATALOG_SERVICE_ADDR: faults:50051
+      CURRENCY_SERVICE_ADDR: faults:50051
+      CART_SERVICE_ADDR: faults:50051
+      SHIPPING_SERVICE_ADDR: faults:50051
+      PAYMENT_SERVICE_ADDR: faults:50051
+      EMAIL_SERVICE_ADDR: faults:50051
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  productcatalogservice:
+    image: online-shop-21-productcatalogservice:local
+    build:
+      context: ../../src/productcatalogservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: productcatalogservice
+      PORT: '3550'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  shippingservice:
+    image: online-shop-21-shippingservice:local
+    build:
+      context: ../../src/shippingservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: shippingservice
+      PORT: '50051'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  cartservice:
+    image: online-shop-21-cartservice:local
+    build:
+      context: ../../src/cartservice/src
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: cartservice
+      PORT: '7070'
+      REDIS_ADDR: redis-cart:6379
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  currencyservice:
+    image: online-shop-21-currencyservice:local
+    build:
+      context: ../../src/currencyservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: currencyservice
+      PORT: '7000'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  paymentservice:
+    image: online-shop-21-paymentservice:local
+    build:
+      context: ../../src/paymentservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: paymentservice
+      PORT: '50051'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  emailservice:
+    image: online-shop-21-emailservice:local
+    build:
+      context: ../../src/emailservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: emailservice
+      PORT: '8080'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  recommendationservice:
+    image: online-shop-21-recommendationservice:local
+    build:
+      context: ../../src/recommendationservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: recommendationservice
+      PORT: '8080'
+      PRODUCT_CATALOG_SERVICE_ADDR: faults:50051
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  adservice:
+    image: online-shop-21-adservice:local
+    build:
+      context: ../../src/adservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: adservice
+      PORT: '9555'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  loadgenerator:
+    image: online-shop-21-loadgenerator:local
+    build:
+      context: ../../src/loadgenerator
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-validation
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-http://collector:4317}
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_INSECURE: 'true'
+      OTEL_TRACES_SAMPLER_ARG: ${SAMPLE_RATIO:-1}
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_BSP_MAX_QUEUE_SIZE: '512'
+      OTEL_BSP_EXPORT_TIMEOUT: '2000'
+      OTEL_METRIC_EXPORT_INTERVAL: '1000'
+      OTEL_EXPORTER_OTLP_TIMEOUT: '2000'
+      OTEL_SERVICE_NAME: loadgenerator
+      FRONTEND_ADDR: frontend:8080
+      USERS: '2'
+      RATE: '1'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    profiles:
+    - load
+  redis-cart:
+    image: redis:7.4.8-alpine
+    command:
+    - redis-server
+    - --save
+    - ''
+    - --appendonly
+    - 'no'
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    user: ${COLLECTOR_UID:-1000}:${COLLECTOR_GID:-1000}
+    command:
+    - --config=/etc/otelcol/config.yaml
+    volumes:
+    - ./collector.yaml:/etc/otelcol/config.yaml:ro
+    - ${EVIDENCE_DIR:-./output}/logs:/logs:ro
+    - ${EVIDENCE_DIR:-./output}/telemetry:/telemetry
+    stop_grace_period: 10s
+  probe:
+    build:
+      context: .
+      dockerfile: Dockerfile.probe
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    image: online-shop-21-probe:local
+    profiles:
+    - tools
+    volumes:
+    - ../../protos:/protos:ro
+    - ${EVIDENCE_DIR:-./output}:/evidence
+    environment:
+      PYTHONUNBUFFERED: '1'
+    entrypoint:
+    - python
+    - /validation/scenarios.py
+  faults:
+    image: online-shop-21-probe:local
+    build:
+      context: .
+      dockerfile: Dockerfile.probe
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    entrypoint:
+    - python
+    - /validation/faults.py

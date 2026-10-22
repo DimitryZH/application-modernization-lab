@@ -1,0 +1,406 @@
+{
+  "validation_date": "2026-10-22",
+  "reviewed_base": "d7005e04e132cc5b914f956e9d6beccfb14f4873",
+  "application_revision": "469621fd011626f6ce1e7269034aee525d4fb183",
+  "initial_evidence": "evidence-summary-initial.json",
+  "images": {
+    "source": "469621fd011626f6ce1e7269034aee525d4fb183-dirty.365c21c43d8a",
+    "images": [
+      {
+        "service": "adservice",
+        "tag": "online-shop-21-adservice:local",
+        "id": "sha256:0a0f833c22e16d42ca4ddffe25134826fbc1b45ef54aa74ea063592d884b020d",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "cartservice",
+        "tag": "online-shop-21-cartservice:local",
+        "id": "sha256:e47b0447c05348be35c6513e7875686537e1cbf4bf6eded56592d3b82fb1da81",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "checkoutservice",
+        "tag": "online-shop-21-checkoutservice:local",
+        "id": "sha256:f7cc07bfdd079d386c0f5c22b772937daef0302fbe4d3ee0e4735c7fbb74e219",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "currencyservice",
+        "tag": "online-shop-21-currencyservice:local",
+        "id": "sha256:384ec3c931a156a3c26f6cae506e6e6c4a241c50291667db83554dae4b39decd",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "emailservice",
+        "tag": "online-shop-21-emailservice:local",
+        "id": "sha256:9dc3f120f5c0349ef61fd417431cdf0a980abc8ce785007e7f0f0a38b4188e69",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "frontend",
+        "tag": "online-shop-21-frontend:local",
+        "id": "sha256:515e267e6b3a7f6087cd3bbe8361264276e83575ec47863f7e860a41f11530a9",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "loadgenerator",
+        "tag": "online-shop-21-loadgenerator:local",
+        "id": "sha256:62bf404b1aa85be22a8363462c69b9565918cdbd23c0958978748e264736ddb4",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "paymentservice",
+        "tag": "online-shop-21-paymentservice:local",
+        "id": "sha256:6648a2600f364f1f0b9d13304ee198049f639e79f434be4f5d019aeb3d802d95",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "productcatalogservice",
+        "tag": "online-shop-21-productcatalogservice:local",
+        "id": "sha256:2453eb5d77b1fe748f2b8299b478dce17646c99e49e61e06892c83bc3912e4d1",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "recommendationservice",
+        "tag": "online-shop-21-recommendationservice:local",
+        "id": "sha256:95266fd9fe24e0a22fc3ddc4438135cbbe36ece9dbdf8474c489077ac9080c69",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "shippingservice",
+        "tag": "online-shop-21-shippingservice:local",
+        "id": "sha256:9989d4f60240a0e505af5923ae4f126c217809a316b67fd9758b24c8d84fd0ba",
+        "platform": "linux/amd64"
+      }
+    ]
+  },
+  "acceptance": {
+    "project": "online-shop-21-7c2cc4e2",
+    "checks": [
+      "full",
+      "disabled",
+      "unavailable",
+      "refused",
+      "redis"
+    ],
+    "status": "passed"
+  },
+  "telemetry": {
+    "red_counter_value_and_attribute_agreement": true,
+    "log_timestamp_and_severity_mapping": true,
+    "spans": 2573,
+    "correlated_log_records": 3181,
+    "trace_services": [
+      "adservice",
+      "cartservice",
+      "checkoutservice",
+      "currencyservice",
+      "emailservice",
+      "frontend",
+      "loadgenerator",
+      "paymentservice",
+      "productcatalogservice",
+      "recommendationservice",
+      "shippingservice"
+    ],
+    "metric_services": [
+      "adservice",
+      "cartservice",
+      "checkoutservice",
+      "currencyservice",
+      "emailservice",
+      "frontend",
+      "loadgenerator",
+      "paymentservice",
+      "productcatalogservice",
+      "recommendationservice",
+      "shippingservice"
+    ],
+    "correlated_log_services": [
+      "adservice",
+      "cartservice",
+      "checkoutservice",
+      "currencyservice",
+      "emailservice",
+      "frontend",
+      "loadgenerator",
+      "paymentservice",
+      "productcatalogservice",
+      "recommendationservice",
+      "shippingservice"
+    ],
+    "metric_names": [
+      "online_shop.business.operations",
+      "online_shop.transport.duration",
+      "online_shop.transport.errors",
+      "online_shop.transport.requests"
+    ],
+    "checks": [
+      "full",
+      "direct RPC coverage",
+      "payment-failure",
+      "shipping-failure",
+      "email-failure",
+      "cart-clear-failure",
+      "ad timeout fallback",
+      "recommendation fallback",
+      "deterministic error RPCs",
+      "deadline",
+      "20 concurrent requests",
+      "optional outbound HTTP propagation"
+    ]
+  },
+  "cleanup": {
+    "exit_code": 0,
+    "remaining_containers": ""
+  },
+  "shutdown": {
+    "shutdown-disabled": {
+      "seconds": 3.011409099912271,
+      "services": {
+        "adservice": {
+          "exit_code": 143,
+          "oom_killed": false
+        },
+        "cartservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "checkoutservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "currencyservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "emailservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "frontend": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "paymentservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "productcatalogservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "recommendationservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "shippingservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        }
+      }
+    },
+    "shutdown-redis": {
+      "seconds": 14.059967799927108,
+      "services": {
+        "adservice": {
+          "exit_code": 143,
+          "oom_killed": false
+        },
+        "cartservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "checkoutservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "currencyservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "emailservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "frontend": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "paymentservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "productcatalogservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "recommendationservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "shippingservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        }
+      }
+    },
+    "shutdown-refused": {
+      "seconds": 5.016859199968167,
+      "services": {
+        "adservice": {
+          "exit_code": 143,
+          "oom_killed": false
+        },
+        "cartservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "checkoutservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "currencyservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "emailservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "frontend": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "paymentservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "productcatalogservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "recommendationservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "shippingservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        }
+      }
+    },
+    "shutdown-unavailable": {
+      "seconds": 5.777660800027661,
+      "services": {
+        "adservice": {
+          "exit_code": 143,
+          "oom_killed": false
+        },
+        "cartservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "checkoutservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "currencyservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "emailservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "frontend": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "paymentservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "productcatalogservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "recommendationservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        },
+        "shippingservice": {
+          "exit_code": 0,
+          "oom_killed": false
+        }
+      }
+    }
+  },
+  "unit_checks": [
+    {
+      "check": "frontend",
+      "exit_code": 0,
+      "seconds": 6.37
+    },
+    {
+      "check": "checkoutservice",
+      "exit_code": 0,
+      "seconds": 3.17
+    },
+    {
+      "check": "productcatalogservice",
+      "exit_code": 0,
+      "seconds": 6.58
+    },
+    {
+      "check": "shippingservice",
+      "exit_code": 0,
+      "seconds": 4.6
+    },
+    {
+      "check": "currencyservice",
+      "exit_code": 0,
+      "seconds": 2.78
+    },
+    {
+      "check": "currencyservice-enabled-startup",
+      "exit_code": 0,
+      "seconds": 1.66
+    },
+    {
+      "check": "paymentservice",
+      "exit_code": 0,
+      "seconds": 2.93
+    },
+    {
+      "check": "paymentservice-enabled-startup",
+      "exit_code": 0,
+      "seconds": 2.16
+    },
+    {
+      "check": "emailservice",
+      "exit_code": 0,
+      "seconds": 3.33
+    },
+    {
+      "check": "recommendationservice",
+      "exit_code": 0,
+      "seconds": 4.56
+    },
+    {
+      "check": "loadgenerator",
+      "exit_code": 0,
+      "seconds": 5.31
+    },
+    {
+      "check": "cartservice",
+      "exit_code": 0,
+      "seconds": 26.23
+    },
+    {
+      "check": "adservice",
+      "exit_code": 0,
+      "seconds": 47.48
+    }
+  ]
+}

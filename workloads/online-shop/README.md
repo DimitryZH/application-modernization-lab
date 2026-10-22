@@ -62,3 +62,7 @@ Redis carts are ephemeral and reset with the Pod's storage. Load generation is e
 ## Follow-up after merge
 
 Container Platform must separately update its AML discovery/source-location links in `inventories/online-shop-sre-dev-v1.json` (`sources.aml-baseline`, `sources.aml-manifests`) and `docs/baseline.md` to the merged AML commit and this folder's README/manifests. Preserve historical evidence and existing image traceability; do not relabel the current images as builds from this path. The baseline candidate's historical upstream reference remains historical evidence. No Container Platform files are changed here.
+
+## Explicit telemetry
+
+See [TELEMETRY.md](TELEMETRY.md) for the source instrumentation contract and [local validation](validation/otel/README.md) for isolated source builds and machine-checkable evidence. Historical published-image records above remain unchanged.

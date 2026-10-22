@@ -4,7 +4,7 @@
   "description": "A gRPC currency conversion microservice",
   "repository": "https://github.com/GoogleCloudPlatform/microservices-demo",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test telemetry.test.js"
   },
   "license": "Apache-2.0",
   "dependencies": {
@@ -14,14 +14,16 @@
     "@grpc/proto-loader": "0.8.0",
     "async": "3.2.6",
     "google-protobuf": "4.0.0",
-    "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/exporter-otlp-grpc": "0.26.0",
-    "@opentelemetry/instrumentation-grpc": "0.208.0",
-    "@opentelemetry/resources": "2.2.0",
-    "@opentelemetry/semantic-conventions": "1.38.0",
-    "@opentelemetry/sdk-trace-base": "2.2.0",
-    "@opentelemetry/sdk-node": "0.208.0",
     "pino": "10.1.0",
-    "xml2js": "0.6.2"
+    "xml2js": "0.6.2",
+    "@opentelemetry/api": "1.9.0",
+    "@opentelemetry/core": "2.2.0",
+    "@opentelemetry/resources": "2.2.0",
+    "@opentelemetry/context-async-hooks": "2.2.0",
+    "@opentelemetry/sdk-trace-node": "2.2.0",
+    "@opentelemetry/sdk-trace-base": "2.2.0",
+    "@opentelemetry/sdk-metrics": "2.2.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "0.208.0",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "0.208.0"
   }
 }

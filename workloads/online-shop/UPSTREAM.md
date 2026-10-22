@@ -30,3 +30,7 @@ No remaining ordinary page-title or greeting text uses the former product brandi
 ## License
 
 The imported snapshot is distributed under the upstream [Apache License 2.0](LICENSE). Original copyright headers, generated-code notices, Gradle wrapper license header and the frontend Google LLC attribution/source link are retained. No additional `LICENSE*` or `NOTICE*` files exist inside the selected upstream component trees or shared protocol tree. This is not a dependency-license audit; dependency packages and future build artifacts may carry additional obligations. The repository root license does not replace the imported upstream license.
+
+## Issue #21 instrumentation changes
+
+Local source now owns manual OpenTelemetry initialization, transport/business spans, metrics and safe correlated stdout records. Existing instrumentor registration is replaced, checkout and optional HTTP context propagation are corrected, and dependency/build compatibility changes are documented in [TELEMETRY.md](TELEMETRY.md). Protocol and package identifiers remain unchanged. Existing image mappings are not relabeled as builds of this implementation.

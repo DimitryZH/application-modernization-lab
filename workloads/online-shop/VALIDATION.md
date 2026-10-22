@@ -22,3 +22,10 @@ Retained naming is classified in [UPSTREAM.md](UPSTREAM.md): protocol/module/pac
 These are local structural checks, not full Kubernetes OpenAPI/schema or admission validation. A standalone Kubernetes schema validator and its schema set were not available; no cluster or Kubernetes command was used. Build recipes and local inputs were inspected, but package resolution, regeneration, compilation, image builds, application startup, browser rendering, runtime behavior, compatibility and security scanning were not tested. Existing upstream tests were not run.
 
 No Docker images or layers were pulled, built, retagged or pushed. Registry availability and upstream digest matches are inherited from the pinned Container Platform observation record, not newly observed registry claims. Source imports and manifest structure do not establish reproducible builds, authenticated provenance, production readiness or release approval. All historical source/build gaps remain open.
+
+
+## Manual telemetry implementation — issue #21
+
+The October 18 record above describes the original import and remains historical. The subsequent implementation built and ran all eleven application images locally, including the original trimmed/self-contained/single-file cartservice release artifact. See [telemetry acceptance results](validation/otel/RESULTS.md), [reproduction instructions](validation/otel/README.md), and the [instrumentation contract](TELEMETRY.md) for the new evidence and its limits.
+
+This validation uses an isolated Docker Compose harness for the canonical workload. It does not migrate the workload to Aspire, alter the canonical Kubernetes deployment, publish images, or assert that historical published images contain these source changes.

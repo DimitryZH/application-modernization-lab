@@ -39,7 +39,7 @@ namespace cartservice.cartstore
             if (!string.IsNullOrEmpty(spannerConnectionString)) {
                 builder.DataSource = spannerConnectionString;
                 databaseString = builder.ToString();
-                Console.WriteLine($"Spanner connection string: ${databaseString}");
+                Telemetry.Log("storage.diagnostic","storage");
                 return;
             }
             if (string.IsNullOrEmpty(spannerInstanceId))
@@ -49,13 +49,13 @@ namespace cartservice.cartstore
             builder.DataSource =
                 $"projects/{spannerProjectId}/instances/{spannerInstanceId}/databases/{spannerDatabaseId}";
             databaseString = builder.ToString();
-            Console.WriteLine($"Built Spanner connection string: '{databaseString}'");
+            Telemetry.Log("storage.diagnostic","storage");
         }
 
 
         public async Task AddItemAsync(string userId, string productId, int quantity)
         {
-            Console.WriteLine($"AddItemAsync for {userId} called");
+            Telemetry.Log("storage.diagnostic","storage");
             try
             {
                 using SpannerConnection spannerConnection = new(databaseString);
@@ -96,17 +96,17 @@ namespace cartservice.cartstore
                     });
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(
-                    new Status(StatusCode.FailedPrecondition, $"Can't access cart storage at {databaseString}. {ex}"));
+                    new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
         }
 
 
         public async Task<Hipstershop.Cart> GetCartAsync(string userId)
         {
-            Console.WriteLine($"GetCartAsync called for userId={userId}");
+            Telemetry.Log("storage.diagnostic","storage");
             Hipstershop.Cart cart = new();
             try
             {
@@ -136,17 +136,17 @@ namespace cartservice.cartstore
 
                 return cart;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(
-                    new Status(StatusCode.FailedPrecondition, $"Can't access cart storage at {databaseString}. {ex}"));
+                    new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
         }
 
 
         public async Task EmptyCartAsync(string userId)
         {
-            Console.WriteLine($"EmptyCartAsync called for userId={userId}");
+            Telemetry.Log("storage.diagnostic","storage");
 
             try
             {
@@ -164,10 +164,10 @@ namespace cartservice.cartstore
                 });
             }
 
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new RpcException(
-                    new Status(StatusCode.FailedPrecondition, $"Can't access cart storage at {databaseString}. {ex}"));
+                    new Status(StatusCode.FailedPrecondition, "Cannot access cart storage"));
             }
         }
 

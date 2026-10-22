@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -47,11 +48,15 @@ func isPackagingServiceConfigured() bool {
 	return packagingServiceUrl != ""
 }
 
-func httpGetPackagingInfo(productId string) (*PackagingInfo, error) {
+func httpGetPackagingInfo(ctx context.Context, productId string) (*PackagingInfo, error) {
 	// Make the GET request
 	url := packagingServiceUrl + "/" + productId
-	fmt.Println("Requesting packaging info from URL: ", url)
-	resp, err := http.Get(url)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := telemetryHTTP(ctx, req, "packaging")
 	if err != nil {
 		return nil, err
 	}

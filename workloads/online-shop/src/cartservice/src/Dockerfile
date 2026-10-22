@@ -31,6 +31,10 @@ RUN dotnet publish cartservice.csproj \
 # https://mcr.microsoft.com/product/dotnet/runtime-deps
 FROM mcr.microsoft.com/dotnet/runtime-deps:9.0.0-noble-chiseled@sha256:5cc893809e2d2869e1a98c1eecc4c6ff6978d53bc3e5342014eff28a058867a4
 
+ARG SOURCE_REVISION=development
+LABEL org.opencontainers.image.revision=$SOURCE_REVISION
+ENV ONLINE_SHOP_VERSION=$SOURCE_REVISION
+
 WORKDIR /app
 COPY --from=builder /cartservice .
 EXPOSE 7070

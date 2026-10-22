@@ -14,62 +14,31 @@
  * limitations under the License.
  */
 
-'use strict';
+"use strict";
 
-const logger = require('./logger')
+const telemetry = require("./telemetry");
+const logger = telemetry.logger;
 
 if (process.env.DISABLE_PROFILER) {
-  logger.info("Profiler disabled.")
+  logger.info("Profiler disabled.");
 } else {
-  logger.info("Profiler enabled.")
-  require('@google-cloud/profiler').start({
+  logger.info("Profiler enabled.");
+  require("@google-cloud/profiler").start({
     serviceContext: {
-      service: 'paymentservice',
-      version: '1.0.0'
-    }
+      service: "paymentservice",
+      version: "1.0.0",
+    },
   });
 }
 
+const path = require("path");
+const HipsterShopServer = require("./server");
 
-if (process.env.ENABLE_TRACING == "1") {
-  logger.info("Tracing enabled.")
-
-  const { resourceFromAttributes } = require('@opentelemetry/resources');
-
-  const { ATTR_SERVICE_NAME }= require('@opentelemetry/semantic-conventions');
-
-  const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
-  const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-  const opentelemetry = require('@opentelemetry/sdk-node');
-
-  const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-grpc');
-
-  const collectorUrl = process.env.COLLECTOR_SERVICE_ADDR;
-  const traceExporter = new OTLPTraceExporter({url: collectorUrl});
-
-  const sdk = new opentelemetry.NodeSDK({
-    resource: resourceFromAttributes({
-      [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'paymentservice',
-    }),
-    traceExporter: traceExporter,
-  });
-
-  registerInstrumentations({
-    instrumentations: [new GrpcInstrumentation()]
-  });
-
-  sdk.start()
-} else {
-  logger.info("Tracing disabled.")
-}
-
-
-const path = require('path');
-const HipsterShopServer = require('./server');
-
-const PORT = process.env['PORT'];
-const PROTO_PATH = path.join(__dirname, '/proto/');
+const PORT = process.env["PORT"];
+const PROTO_PATH = path.join(__dirname, "/proto/");
 
 const server = new HipsterShopServer(PROTO_PATH, PORT);
 
 server.listen();
+
+telemetry.stoppers.push((done) => server.server.tryShutdown(done));

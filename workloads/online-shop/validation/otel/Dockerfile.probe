@@ -1,0 +1,4 @@
+FROM python:3.12-slim
+RUN pip install --no-cache-dir grpcio==1.76.0 grpcio-tools==1.76.0 requests==2.32.4
+WORKDIR /validation
+COPY scenarios.py faults.py ./
