@@ -35,6 +35,7 @@ def load(root):
     metric_services = set()
     logs = []
     names = set()
+    measurements = {}
     for doc in documents(root / "telemetry/traces.jsonl"):
         for resource in doc.get("resourceSpans", []):
             service = attrs(resource["resource"].get("attributes", [])).get(
@@ -62,6 +63,30 @@ def load(root):
                     if points:
                         metric_services.add(service)
                     for point in points:
+                        if metric["name"].startswith("online_shop.transport."):
+                            labels = attrs(point.get("attributes", []))
+                            assert set(labels) == {"operation", "kind", "outcome"}, (
+                                service,
+                                metric["name"],
+                                labels,
+                            )
+                            assert labels["kind"] in {
+                                "server",
+                                "client",
+                                "internal",
+                            }, labels
+                            key = (
+                                service,
+                                metric["name"],
+                                tuple(sorted(labels.items())),
+                            )
+                            value = int(
+                                point.get(
+                                    "asInt",
+                                    point.get("asDouble", point.get("count", 0)),
+                                )
+                            )
+                            measurements[key] = max(measurements.get(key, 0), value)
                         assert set(attrs(point.get("attributes", []))) <= {
                             "operation",
                             "kind",
@@ -83,6 +108,32 @@ def load(root):
                                 5,
                                 10,
                             ]
+    checked = 0
+    for (service, name, labels), value in measurements.items():
+        if name != "online_shop.transport.requests":
+            continue
+        assert value > 0, (service, labels, "empty counter")
+        duration = measurements.get(
+            (service, "online_shop.transport.duration", labels), 0
+        )
+        errors = measurements.get((service, "online_shop.transport.errors", labels), 0)
+        failed = dict(labels)["outcome"] not in ("ok", "miss")
+        assert duration == value, (
+            "duration/request count",
+            service,
+            labels,
+            value,
+            duration,
+        )
+        assert errors == (value if failed else 0), (
+            "error/request count",
+            service,
+            labels,
+            value,
+            errors,
+        )
+        checked += 1
+    assert checked >= len(SERVICES), "missing actual RED measurements"
     for doc in documents(root / "telemetry/logs.jsonl"):
         for resource in doc.get("resourceLogs", []):
             service = attrs(resource["resource"].get("attributes", [])).get(
@@ -90,6 +141,34 @@ def load(root):
             )
             for scope in resource.get("scopeLogs", []):
                 for log in scope.get("logRecords", []):
+                    fields = attrs(log.get("attributes", []))
+                    severity = {
+                        "TRACE": 1,
+                        "DEBUG": 5,
+                        "INFO": 9,
+                        "WARN": 13,
+                        "ERROR": 17,
+                        "FATAL": 21,
+                    }
+                    assert log.get("severityNumber") == severity[fields["severity"]], (
+                        "severity mapping",
+                        service,
+                        log,
+                    )
+                    from datetime import datetime
+
+                    assert log.get("severityText") == fields["severity"], ("severity text mapping", service, log)
+                    expected = (
+                        datetime.fromisoformat(
+                            fields["timestamp"].replace("Z", "+00:00")
+                        ).timestamp()
+                        * 1e9
+                    )
+                    assert abs(int(log.get("timeUnixNano", 0)) - expected) < 2048, (
+                        "timestamp mapping",
+                        service,
+                        log,
+                    )
                     logs.append(dict(log, service=service))
     return spans, metric_services, logs, names
 
@@ -239,6 +318,8 @@ def validate(root):
             for value in forbidden:
                 assert value not in text, ("sensitive content", path.name, value)
     result = {
+        "red_counter_value_and_attribute_agreement": True,
+        "log_timestamp_and_severity_mapping": True,
         "spans": len(spans),
         "correlated_log_records": sum(
             (l.get("traceId"), l.get("spanId")) in by_id for l in logs
