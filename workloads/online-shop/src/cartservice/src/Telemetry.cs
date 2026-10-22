@@ -49,7 +49,7 @@ public static class Telemetry
         var tags = new TagList { { "kind", kind }, { "operation", operation }, { "outcome", outcome } };
         Requests.Add(1, tags); Duration.Record(Stopwatch.GetElapsedTime(start).TotalSeconds, tags);
         if (outcome != "ok" && outcome != "miss") { Errors.Add(1, tags); Activity.Current?.SetStatus(ActivityStatusCode.Error, "operation failed"); Activity.Current?.SetTag("error.type", outcome); }
-        Log("operation.completed", operation, outcome);
+        Log("operation.completed", operation, outcome, category: kind == "client" ? "dependency" : "application");
     }
     public static async Task<T> Cache<T>(string operation, Func<Task<T>> action)
     {
@@ -62,12 +62,19 @@ public static class Telemetry
     }
     public static Task Cache(string operation, Func<Task> action) => Cache(operation, async () => { await action(); return true; });
     public static void Count(string operation, string outcome) => Business.Add(1, new TagList { { "operation", operation }, { "outcome", outcome } });
+    public static void Diagnostic(string category, LogLevel level)
+    {
+        if (category is not ("startup" or "configuration" or "dependency" or "application")) category = "application";
+        string severity = level switch { LogLevel.Trace => "TRACE", LogLevel.Debug => "DEBUG", LogLevel.Information => "INFO", LogLevel.Warning => "WARN", LogLevel.Critical => "FATAL", _ => "ERROR" };
+        string outcome = level >= LogLevel.Error ? category + "_failure" : level == LogLevel.Warning ? "warning" : "ok";
+        Log(category + ".diagnostic", category, outcome, severity, category);
+    }
     // Utf8JsonWriter uses no reflection metadata and survives full trimming.
-    public static void Log(string name, string operation, string outcome = "ok")
+    public static void Log(string name, string operation, string outcome = "ok", string severity = null, string category = "application")
     {
         using var buffer = new MemoryStream(); using (var w = new Utf8JsonWriter(buffer))
         {
-            w.WriteStartObject(); w.WriteString("timestamp", DateTimeOffset.UtcNow); w.WriteString("severity", "INFO"); w.WriteString("message", name); w.WriteString("event", name); w.WriteString("operation", operation); w.WriteString("outcome", outcome);
+            w.WriteStartObject(); w.WriteString("timestamp", DateTimeOffset.UtcNow); w.WriteString("severity", severity ?? (outcome is "ok" or "miss" ? "INFO" : "ERROR")); w.WriteString("category", category); if (outcome != "ok" && outcome != "miss") w.WriteString("error.type", outcome); w.WriteString("message", name); w.WriteString("event", name); w.WriteString("operation", operation); w.WriteString("outcome", outcome);
             w.WriteString("service.name", "cartservice"); w.WriteString("service.namespace", "online-shop"); w.WriteString("service.version", Environment.GetEnvironmentVariable("ONLINE_SHOP_VERSION") ?? "development");
             if (Activity.Current is Activity a) { w.WriteString("trace_id", a.TraceId.ToHexString()); w.WriteString("span_id", a.SpanId.ToHexString()); w.WriteNumber("trace_flags", (int)a.ActivityTraceFlags); }
             w.WriteEndObject();
@@ -92,12 +99,14 @@ public sealed class TelemetryInterceptor : Interceptor
 }
 public sealed class SafeLoggerProvider : ILoggerProvider
 {
-    public ILogger CreateLogger(string categoryName) => new SafeLogger();
+    public ILogger CreateLogger(string categoryName) => new SafeLogger(categoryName);
     public void Dispose() { }
     private sealed class SafeLogger : ILogger
     {
+        private readonly string category;
+        public SafeLogger(string name) { category = name.StartsWith("Microsoft.Hosting") || name.StartsWith("Microsoft.AspNetCore.Hosting") ? "startup" : name.StartsWith("Microsoft.Extensions.Configuration") || name.StartsWith("Microsoft.Extensions.Options") ? "configuration" : name.StartsWith("Microsoft.Extensions.Caching") || name.StartsWith("StackExchange.Redis") ? "dependency" : "application"; }
         public IDisposable BeginScope<TState>(TState state) => null;
-        public bool IsEnabled(LogLevel level) => level >= LogLevel.Warning;
-        public void Log<TState>(LogLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) { if (IsEnabled(level)) Telemetry.Log("application.diagnostic", "diagnostic"); }
+        public bool IsEnabled(LogLevel level) => level >= LogLevel.Information && level != LogLevel.None;
+        public void Log<TState>(LogLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) { if (IsEnabled(level)) Telemetry.Diagnostic(category, level); }
     }
 }

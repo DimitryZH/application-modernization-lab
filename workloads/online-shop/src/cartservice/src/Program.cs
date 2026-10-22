@@ -17,7 +17,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using cartservice;
 
-CreateHostBuilder(args).Build().Run();
+try { CreateHostBuilder(args).Build().Run(); }
+catch (System.Exception) { Telemetry.Diagnostic("startup", Microsoft.Extensions.Logging.LogLevel.Critical); System.Environment.ExitCode = 1; }
 
 static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
