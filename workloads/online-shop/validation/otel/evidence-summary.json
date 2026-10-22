@@ -1,78 +1,81 @@
 {
   "validation_date": "2026-10-22",
+  "reviewed_base": "d7005e04e132cc5b914f956e9d6beccfb14f4873",
+  "application_revision": "469621fd011626f6ce1e7269034aee525d4fb183",
+  "initial_evidence": "evidence-summary-initial.json",
   "images": {
-    "source": "318cd6c035c680c7845502298ef0f8b21203eae0-dirty.641b7f99fbec",
+    "source": "469621fd011626f6ce1e7269034aee525d4fb183-dirty.365c21c43d8a",
     "images": [
       {
         "service": "adservice",
         "tag": "online-shop-21-adservice:local",
-        "id": "sha256:edaf5a8a868ce9318fbafdbd87e87b9a2178e2fd46b117da6867c7c367109707",
+        "id": "sha256:0a0f833c22e16d42ca4ddffe25134826fbc1b45ef54aa74ea063592d884b020d",
         "platform": "linux/amd64"
       },
       {
         "service": "cartservice",
         "tag": "online-shop-21-cartservice:local",
-        "id": "sha256:f6d349bc0216ba99ff156d7e0054858c3ed87297212a135b3f095b3a35b4d31a",
+        "id": "sha256:e47b0447c05348be35c6513e7875686537e1cbf4bf6eded56592d3b82fb1da81",
         "platform": "linux/amd64"
       },
       {
         "service": "checkoutservice",
         "tag": "online-shop-21-checkoutservice:local",
-        "id": "sha256:44be4b8ab9bf337e512a3dfffdaf7e97da83daff3c5760752f42c2e4b9a1ffc1",
+        "id": "sha256:f7cc07bfdd079d386c0f5c22b772937daef0302fbe4d3ee0e4735c7fbb74e219",
         "platform": "linux/amd64"
       },
       {
         "service": "currencyservice",
         "tag": "online-shop-21-currencyservice:local",
-        "id": "sha256:773ccedbd635742531a4a660354edc9c73558eb61cac8c1c6fff027a5344ccfb",
+        "id": "sha256:384ec3c931a156a3c26f6cae506e6e6c4a241c50291667db83554dae4b39decd",
         "platform": "linux/amd64"
       },
       {
         "service": "emailservice",
         "tag": "online-shop-21-emailservice:local",
-        "id": "sha256:5937c0f83c0aae589dfd835118b95acfee642f9062b7d3cdb8bd3e49aa4d5de1",
+        "id": "sha256:9dc3f120f5c0349ef61fd417431cdf0a980abc8ce785007e7f0f0a38b4188e69",
         "platform": "linux/amd64"
       },
       {
         "service": "frontend",
         "tag": "online-shop-21-frontend:local",
-        "id": "sha256:ad36eb4820bd71fa74123b499369df5ee015221bc571c1d340fbaa37a055b688",
+        "id": "sha256:515e267e6b3a7f6087cd3bbe8361264276e83575ec47863f7e860a41f11530a9",
         "platform": "linux/amd64"
       },
       {
         "service": "loadgenerator",
         "tag": "online-shop-21-loadgenerator:local",
-        "id": "sha256:4289edf95e399eb2cab020343c9cb461fddce3507fe509fcc6e5bb3ce29634c9",
+        "id": "sha256:62bf404b1aa85be22a8363462c69b9565918cdbd23c0958978748e264736ddb4",
         "platform": "linux/amd64"
       },
       {
         "service": "paymentservice",
         "tag": "online-shop-21-paymentservice:local",
-        "id": "sha256:90bc7bb8d8936254e05aa31ea0f98149b301742a5b17db0401656e04acc20483",
+        "id": "sha256:6648a2600f364f1f0b9d13304ee198049f639e79f434be4f5d019aeb3d802d95",
         "platform": "linux/amd64"
       },
       {
         "service": "productcatalogservice",
         "tag": "online-shop-21-productcatalogservice:local",
-        "id": "sha256:851798fbe758b9a0c573f7626f98fb3a4a23d7d7f9f8d628ae7cf5da6230c82c",
+        "id": "sha256:2453eb5d77b1fe748f2b8299b478dce17646c99e49e61e06892c83bc3912e4d1",
         "platform": "linux/amd64"
       },
       {
         "service": "recommendationservice",
         "tag": "online-shop-21-recommendationservice:local",
-        "id": "sha256:51547ec0480972ab523ee9de2a984a3e5e3b16cc1f22f642593d9b8f4fe32643",
+        "id": "sha256:95266fd9fe24e0a22fc3ddc4438135cbbe36ece9dbdf8474c489077ac9080c69",
         "platform": "linux/amd64"
       },
       {
         "service": "shippingservice",
         "tag": "online-shop-21-shippingservice:local",
-        "id": "sha256:29e115cb0c6a9faa6d98bdfd6cc8e5500c03dfdfcadad46f12b627a86c01ac81",
+        "id": "sha256:9989d4f60240a0e505af5923ae4f126c217809a316b67fd9758b24c8d84fd0ba",
         "platform": "linux/amd64"
       }
     ]
   },
   "acceptance": {
-    "project": "online-shop-21-caacb376",
+    "project": "online-shop-21-7c2cc4e2",
     "checks": [
       "full",
       "disabled",
@@ -83,8 +86,10 @@
     "status": "passed"
   },
   "telemetry": {
-    "spans": 2270,
-    "correlated_log_records": 2520,
+    "red_counter_value_and_attribute_agreement": true,
+    "log_timestamp_and_severity_mapping": true,
+    "spans": 2573,
+    "correlated_log_records": 3181,
     "trace_services": [
       "adservice",
       "cartservice",
@@ -151,7 +156,7 @@
   },
   "shutdown": {
     "shutdown-disabled": {
-      "seconds": 4.453340400010347,
+      "seconds": 3.011409099912271,
       "services": {
         "adservice": {
           "exit_code": 143,
@@ -196,7 +201,7 @@
       }
     },
     "shutdown-redis": {
-      "seconds": 14.00081710005179,
+      "seconds": 14.059967799927108,
       "services": {
         "adservice": {
           "exit_code": 143,
@@ -241,7 +246,7 @@
       }
     },
     "shutdown-refused": {
-      "seconds": 5.2473563000094146,
+      "seconds": 5.016859199968167,
       "services": {
         "adservice": {
           "exit_code": 143,
@@ -286,7 +291,7 @@
       }
     },
     "shutdown-unavailable": {
-      "seconds": 7.5677506000502035,
+      "seconds": 5.777660800027661,
       "services": {
         "adservice": {
           "exit_code": 143,
@@ -335,67 +340,67 @@
     {
       "check": "frontend",
       "exit_code": 0,
-      "seconds": 14.81
+      "seconds": 6.37
     },
     {
       "check": "checkoutservice",
       "exit_code": 0,
-      "seconds": 7.36
+      "seconds": 3.17
     },
     {
       "check": "productcatalogservice",
       "exit_code": 0,
-      "seconds": 11.83
+      "seconds": 6.58
     },
     {
       "check": "shippingservice",
       "exit_code": 0,
-      "seconds": 6.43
+      "seconds": 4.6
     },
     {
       "check": "currencyservice",
       "exit_code": 0,
-      "seconds": 3.05
+      "seconds": 2.78
     },
     {
       "check": "currencyservice-enabled-startup",
       "exit_code": 0,
-      "seconds": 2.21
+      "seconds": 1.66
     },
     {
       "check": "paymentservice",
       "exit_code": 0,
-      "seconds": 4.03
+      "seconds": 2.93
     },
     {
       "check": "paymentservice-enabled-startup",
       "exit_code": 0,
-      "seconds": 1.95
+      "seconds": 2.16
     },
     {
       "check": "emailservice",
       "exit_code": 0,
-      "seconds": 3.29
+      "seconds": 3.33
     },
     {
       "check": "recommendationservice",
       "exit_code": 0,
-      "seconds": 2.79
+      "seconds": 4.56
     },
     {
       "check": "loadgenerator",
       "exit_code": 0,
-      "seconds": 9.85
+      "seconds": 5.31
     },
     {
       "check": "cartservice",
       "exit_code": 0,
-      "seconds": 79.47
+      "seconds": 26.23
     },
     {
       "check": "adservice",
       "exit_code": 0,
-      "seconds": 8.67
+      "seconds": 47.48
     }
   ]
 }
