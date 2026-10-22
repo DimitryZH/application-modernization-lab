@@ -38,19 +38,23 @@ func (p *productCatalog) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Hea
 	return status.Errorf(codes.Unimplemented, "health check via Watch not implemented")
 }
 
-func (p *productCatalog) ListProducts(context.Context, *pb.Empty) (*pb.ListProductsResponse, error) {
+func (p *productCatalog) ListProducts(ctx context.Context, _ *pb.Empty) (*pb.ListProductsResponse, error) {
+	ctx, finish := operation(ctx, "productcatalogservice.ListProducts")
+	defer finish()
 	time.Sleep(extraLatency)
 
-	return &pb.ListProductsResponse{Products: p.parseCatalog()}, nil
+	return &pb.ListProductsResponse{Products: p.parseCatalog(ctx)}, nil
 }
 
 func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.Product, error) {
+	ctx, finish := operation(ctx, "productcatalogservice.GetProduct")
+	defer finish()
 	time.Sleep(extraLatency)
 
 	var found *pb.Product
-	for i := 0; i < len(p.parseCatalog()); i++ {
-		if req.Id == p.parseCatalog()[i].Id {
-			found = p.parseCatalog()[i]
+	for i := 0; i < len(p.parseCatalog(ctx)); i++ {
+		if req.Id == p.parseCatalog(ctx)[i].Id {
+			found = p.parseCatalog(ctx)[i]
 		}
 	}
 
@@ -61,10 +65,12 @@ func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductReque
 }
 
 func (p *productCatalog) SearchProducts(ctx context.Context, req *pb.SearchProductsRequest) (*pb.SearchProductsResponse, error) {
+	ctx, finish := operation(ctx, "productcatalogservice.SearchProducts")
+	defer finish()
 	time.Sleep(extraLatency)
 
 	var ps []*pb.Product
-	for _, product := range p.parseCatalog() {
+	for _, product := range p.parseCatalog(ctx) {
 		if strings.Contains(strings.ToLower(product.Name), strings.ToLower(req.Query)) ||
 			strings.Contains(strings.ToLower(product.Description), strings.ToLower(req.Query)) {
 			ps = append(ps, product)
@@ -74,9 +80,9 @@ func (p *productCatalog) SearchProducts(ctx context.Context, req *pb.SearchProdu
 	return &pb.SearchProductsResponse{Results: ps}, nil
 }
 
-func (p *productCatalog) parseCatalog() []*pb.Product {
+func (p *productCatalog) parseCatalog(ctx context.Context) []*pb.Product {
 	if reloadCatalog || len(p.catalog.Products) == 0 {
-		err := loadCatalog(&p.catalog)
+		err := loadCatalog(ctx, &p.catalog)
 		if err != nil {
 			return []*pb.Product{}
 		}

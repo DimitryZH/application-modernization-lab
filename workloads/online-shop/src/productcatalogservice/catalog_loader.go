@@ -30,12 +30,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func loadCatalog(catalog *pb.ListProductsResponse) error {
+func loadCatalog(ctx context.Context, catalog *pb.ListProductsResponse) error {
+	_, finish := operation(ctx, "catalog.load")
+	defer finish()
 	catalogMutex.Lock()
 	defer catalogMutex.Unlock()
 
 	if os.Getenv("ALLOYDB_CLUSTER_NAME") != "" {
-		return loadCatalogFromAlloyDB(catalog)
+		return loadCatalogFromAlloyDB(ctx, catalog)
 	}
 
 	return loadCatalogFromLocalFile(catalog)
@@ -59,8 +61,7 @@ func loadCatalogFromLocalFile(catalog *pb.ListProductsResponse) error {
 	return nil
 }
 
-func getSecretPayload(project, secret, version string) (string, error) {
-	ctx := context.Background()
+func getSecretPayload(ctx context.Context, project, secret, version string) (string, error) {
 	client, err := secretmanager.NewClient(ctx)
 	if err != nil {
 		log.Warnf("failed to create SecretManager client: %v", err)
@@ -82,7 +83,7 @@ func getSecretPayload(project, secret, version string) (string, error) {
 	return string(result.Payload.Data), nil
 }
 
-func loadCatalogFromAlloyDB(catalog *pb.ListProductsResponse) error {
+func loadCatalogFromAlloyDB(ctx context.Context, catalog *pb.ListProductsResponse) error {
 	log.Info("loading catalog from AlloyDB...")
 
 	projectID := os.Getenv("PROJECT_ID")
@@ -93,12 +94,12 @@ func loadCatalogFromAlloyDB(catalog *pb.ListProductsResponse) error {
 	pgTableName := os.Getenv("ALLOYDB_TABLE_NAME")
 	pgSecretName := os.Getenv("ALLOYDB_SECRET_NAME")
 
-	pgPassword, err := getSecretPayload(projectID, pgSecretName, "latest")
+	pgPassword, err := getSecretPayload(ctx, projectID, pgSecretName, "latest")
 	if err != nil {
 		return err
 	}
 
-	dialer, err := alloydbconn.NewDialer(context.Background())
+	dialer, err := alloydbconn.NewDialer(ctx)
 	if err != nil {
 		log.Warnf("failed to set-up dialer connection: %v", err)
 		return err
@@ -122,7 +123,7 @@ func loadCatalogFromAlloyDB(catalog *pb.ListProductsResponse) error {
 		return dialer.Dial(ctx, pgInstanceURI)
 	}
 
-	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		log.Warnf("failed to set-up pgx pool: %v", err)
 		return err
@@ -130,7 +131,7 @@ func loadCatalogFromAlloyDB(catalog *pb.ListProductsResponse) error {
 	defer pool.Close()
 
 	query := "SELECT id, name, description, picture, price_usd_currency_code, price_usd_units, price_usd_nanos, categories FROM " + pgTableName
-	rows, err := pool.Query(context.Background(), query)
+	rows, err := pool.Query(ctx, query)
 	if err != nil {
 		log.Warnf("failed to query database: %v", err)
 		return err

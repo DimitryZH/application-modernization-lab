@@ -32,12 +32,6 @@ import (
 	pb "github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/genproto"
 	money "github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/money"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
-
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/propagation"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 const (
@@ -50,14 +44,7 @@ var log *logrus.Logger
 func init() {
 	log = logrus.New()
 	log.Level = logrus.DebugLevel
-	log.Formatter = &logrus.JSONFormatter{
-		FieldMap: logrus.FieldMap{
-			logrus.FieldKeyTime:  "timestamp",
-			logrus.FieldKeyLevel: "severity",
-			logrus.FieldKeyMsg:   "message",
-		},
-		TimestampFormat: time.RFC3339Nano,
-	}
+	log.Formatter = safeFormatter{}
 	log.Out = os.Stdout
 }
 
@@ -84,15 +71,9 @@ type checkoutService struct {
 }
 
 func main() {
+	initTelemetry()
+	log.Formatter = safeFormatter{}
 	ctx := context.Background()
-	if os.Getenv("ENABLE_TRACING") == "1" {
-		log.Info("Tracing enabled.")
-		initTracing()
-
-	} else {
-		log.Info("Tracing disabled.")
-	}
-
 	if os.Getenv("ENABLE_PROFILER") == "1" {
 		log.Info("Profiling enabled.")
 		go initProfiling("checkoutservice", "1.0.0")
@@ -130,49 +111,31 @@ func main() {
 	var srv *grpc.Server
 
 	// Propagate trace context always
-	otel.SetTextMapPropagator(
-		propagation.NewCompositeTextMapPropagator(
-			propagation.TraceContext{}, propagation.Baggage{}))
 	srv = grpc.NewServer(
-		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+		grpc.UnaryInterceptor(unaryServer),
 	)
 
+	registerStop(func(ctx context.Context) {
+		done := make(chan struct{})
+		go func() { srv.GracefulStop(); close(done) }()
+		select {
+		case <-done:
+		case <-ctx.Done():
+			srv.Stop()
+		}
+	})
 	pb.RegisterCheckoutServiceServer(srv, svc)
 	healthpb.RegisterHealthServer(srv, svc)
 	log.Infof("starting to listen on tcp: %q", lis.Addr().String())
 	err = srv.Serve(lis)
-	log.Fatal(err)
+	if err != nil {
+		log.Fatal(err)
+	}
+	select {}
 }
 
 func initStats() {
 	//TODO(arbrown) Implement OpenTelemetry stats
-}
-
-func initTracing() {
-	var (
-		collectorAddr string
-		collectorConn *grpc.ClientConn
-	)
-
-	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, time.Second*3)
-	defer cancel()
-
-	mustMapEnv(&collectorAddr, "COLLECTOR_SERVICE_ADDR")
-	mustConnGRPC(ctx, &collectorConn, collectorAddr)
-
-	exporter, err := otlptracegrpc.New(
-		ctx,
-		otlptracegrpc.WithGRPCConn(collectorConn))
-	if err != nil {
-		log.Warnf("warn: Failed to create trace exporter: %v", err)
-	}
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exporter),
-		sdktrace.WithSampler(sdktrace.AlwaysSample()))
-	otel.SetTracerProvider(tp)
-
 }
 
 func initProfiling(service, version string) {
@@ -211,8 +174,7 @@ func mustConnGRPC(ctx context.Context, conn **grpc.ClientConn, addr string) {
 	defer cancel()
 	*conn, err = grpc.DialContext(ctx, addr,
 		grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
+		grpc.WithUnaryInterceptor(unaryClient))
 	if err != nil {
 		panic(errors.Wrapf(err, "grpc: failed to connect %s", addr))
 	}
@@ -227,6 +189,8 @@ func (cs *checkoutService) Watch(req *healthpb.HealthCheckRequest, ws healthpb.H
 }
 
 func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error) {
+	ctx, finish := operation(ctx, "checkoutservice.PlaceOrder")
+	defer finish()
 	log.Infof("[PlaceOrder] user_id=%q user_currency=%q", req.UserId, req.UserCurrency)
 
 	orderID, err := uuid.NewUUID()
@@ -259,7 +223,9 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 		return nil, status.Errorf(codes.Unavailable, "shipping error: %+v", err)
 	}
 
-	_ = cs.emptyUserCart(ctx, req.UserId)
+	if err := cs.emptyUserCart(ctx, req.UserId); err != nil {
+		degraded(ctx, "cart_clear.failed")
+	}
 
 	orderResult := &pb.OrderResult{
 		OrderId:            orderID.String(),
@@ -270,6 +236,7 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 	}
 
 	if err := cs.sendOrderConfirmation(ctx, req.Email, orderResult); err != nil {
+		degraded(ctx, "confirmation.failed")
 		log.Warnf("failed to send order confirmation to %q: %+v", req.Email, err)
 	} else {
 		log.Infof("order confirmation email sent to %q", req.Email)
@@ -285,6 +252,8 @@ type orderPrep struct {
 }
 
 func (cs *checkoutService) prepareOrderItemsAndShippingQuoteFromCart(ctx context.Context, userID, userCurrency string, address *pb.Address) (orderPrep, error) {
+	ctx, finish := operation(ctx, "checkoutservice.prepareOrderItemsAndShippingQuoteFromCart")
+	defer finish()
 	var out orderPrep
 	cartItems, err := cs.getUserCart(ctx, userID)
 	if err != nil {
@@ -356,7 +325,7 @@ func (cs *checkoutService) prepOrderItems(ctx context.Context, items []*pb.CartI
 }
 
 func (cs *checkoutService) convertCurrency(ctx context.Context, from *pb.Money, toCurrency string) (*pb.Money, error) {
-	result, err := pb.NewCurrencyServiceClient(cs.currencySvcConn).Convert(context.TODO(), &pb.CurrencyConversionRequest{
+	result, err := pb.NewCurrencyServiceClient(cs.currencySvcConn).Convert(ctx, &pb.CurrencyConversionRequest{
 		From:   from,
 		ToCode: toCurrency})
 	if err != nil {
