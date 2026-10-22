@@ -1,0 +1,72 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+  filelog:
+    include:
+    - /logs/*.jsonl
+    start_at: beginning
+    operators:
+    - type: json_parser
+      parse_to: attributes
+      on_error: send_quiet
+      trace:
+        trace_id:
+          parse_from: attributes.trace_id
+        span_id:
+          parse_from: attributes.span_id
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 192
+    spike_limit_mib: 32
+  transform/logs:
+    error_mode: ignore
+    log_statements:
+    - context: log
+      statements:
+      - set(body, attributes["message"])
+  batch:
+    timeout: 1s
+    send_batch_size: 128
+  groupbyattrs/services:
+    keys:
+    - service.name
+    - service.namespace
+    - service.version
+exporters:
+  file/traces:
+    path: /telemetry/traces.jsonl
+  file/metrics:
+    path: /telemetry/metrics.jsonl
+  file/logs:
+    path: /telemetry/logs.jsonl
+service:
+  pipelines:
+    traces:
+      receivers:
+      - otlp
+      processors:
+      - memory_limiter
+      - batch
+      exporters:
+      - file/traces
+    metrics:
+      receivers:
+      - otlp
+      processors:
+      - memory_limiter
+      - batch
+      exporters:
+      - file/metrics
+    logs:
+      receivers:
+      - filelog
+      processors:
+      - memory_limiter
+      - groupbyattrs/services
+      - transform/logs
+      - batch
+      exporters:
+      - file/logs
