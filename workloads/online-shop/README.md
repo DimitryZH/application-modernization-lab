@@ -39,6 +39,11 @@ The baseline observed exact upstream artifact digest matches for all **11 applic
 
 ## Build inputs
 
+The versioned [source-to-build contract and consumer interface](BUILDING.md)
+cover all eleven builds, deterministic selected-revision plans, shared/generated
+inputs and clean-source evidence. The [portable runtime handoff](RUNTIME.md)
+documents application settings and runtime-specific telemetry behavior.
+
 Each component's build context and Dockerfile are explicit in the mapping. Contexts are `src/<component>`, except cartservice, whose context is `src/cartservice/src`. Preserve this layout: protocol regeneration scripts reference `../../protos` from their service directories.
 
 Included inputs comprise Go modules and `go.sum` files; Node package manifests and package lockfiles; Python requirement pins and generated bindings; the .NET project, local Cart protocol and tests; Java Gradle configuration, wrapper scripts, wrapper JAR and properties; product and currency data; frontend templates, styles, scripts, icons, images and fonts; email templates; Docker ignore files and protocol generation scripts. Existing upstream tests are preserved but were not run.

@@ -1,0 +1,711 @@
+{
+  "contractVersion": 1,
+  "repository": "https://github.com/DimitryZH/application-modernization-lab",
+  "workloadPath": "workloads/online-shop",
+  "pathBase": "All paths are workload-relative; COPY paths are context-relative.",
+  "components": [
+    {
+      "id": "adservice",
+      "role": "application-service",
+      "sourcePath": "src/adservice",
+      "buildContext": "src/adservice",
+      "dockerfile": "src/adservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "eclipse-temurin:21@sha256:b5fc642f67dbbd1c4ce811388801cb8480aaca8aa9e56fd6dcda362cfea113f1",
+        "eclipse-temurin:25-jre-alpine@sha256:bf9c91071c4f90afebb31d735f111735975d6fe2b668a82339f8204202203621"
+      ],
+      "dependencyFiles": [
+        "src/adservice/build.gradle",
+        "src/adservice/settings.gradle",
+        "src/adservice/gradlew",
+        "src/adservice/gradle/wrapper/gradle-wrapper.jar",
+        "src/adservice/gradle/wrapper/gradle-wrapper.properties"
+      ],
+      "assets": [],
+      "generatedInputs": {
+        "status": "generated inside Docker build from tracked local protocols",
+        "paths": [
+          "src/main/proto/demo.proto"
+        ]
+      },
+      "regeneration": {
+        "script": "src/adservice/genproto.sh",
+        "workingDirectory": "src/adservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: eclipse-temurin:21@sha256:b5fc642f67dbbd1c4ce811388801cb8480aaca8aa9e56fd6dcda362cfea113f1, eclipse-temurin:25-jre-alpine@sha256:bf9c91071c4f90afebb31d735f111735975d6fe2b668a82339f8204202203621",
+        "services.gradle.org Gradle 8.14.3; Gradle plugin portal; Maven Central (mavenLocal also configured); protoc 4.33.1 and grpc-java generator 1.76.0"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "No Gradle dependency lock/verification metadata or wrapper distribution checksum; Maven local is empty in clean builder"
+      ]
+    },
+    {
+      "id": "cartservice",
+      "role": "application-service",
+      "sourcePath": "src/cartservice",
+      "buildContext": "src/cartservice/src",
+      "dockerfile": "src/cartservice/src/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "mcr.microsoft.com/dotnet/sdk:9.0.100-noble@sha256:bd0365368f46274500ebb086f491703052b8ce23e3d52d3233a23b2020730057",
+        "mcr.microsoft.com/dotnet/runtime-deps:9.0.0-noble-chiseled@sha256:5cc893809e2d2869e1a98c1eecc4c6ff6978d53bc3e5342014eff28a058867a4"
+      ],
+      "dependencyFiles": [
+        "src/cartservice/src/cartservice.csproj"
+      ],
+      "assets": [],
+      "generatedInputs": {
+        "status": "generated inside Docker build from tracked local protocols",
+        "paths": [
+          "protos/Cart.proto"
+        ]
+      },
+      "regeneration": {
+        "script": null,
+        "workingDirectory": "src/cartservice",
+        "sourceInputs": [],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: mcr.microsoft.com/dotnet/sdk:9.0.100-noble@sha256:bd0365368f46274500ebb086f491703052b8ce23e3d52d3233a23b2020730057, mcr.microsoft.com/dotnet/runtime-deps:9.0.0-noble-chiseled@sha256:5cc893809e2d2869e1a98c1eecc4c6ff6978d53bc3e5342014eff28a058867a4",
+        "NuGet restore and linux-x64 runtime packs"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "No packages.lock.json; transitive NuGet resolution not fully locked"
+      ]
+    },
+    {
+      "id": "checkoutservice",
+      "role": "application-service",
+      "sourcePath": "src/checkoutservice",
+      "buildContext": "src/checkoutservice",
+      "dockerfile": "src/checkoutservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SKAFFOLD_GO_GCFLAGS": {
+          "default": null,
+          "intended": "",
+          "allowedValues": [
+            "",
+            "all=-N -l"
+          ],
+          "purpose": "Optional Skaffold Go debug compiler flags; empty for release"
+        },
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "golang:1.24.3-alpine",
+        "scratch"
+      ],
+      "dependencyFiles": [
+        "src/checkoutservice/go.mod",
+        "src/checkoutservice/go.sum"
+      ],
+      "assets": [],
+      "generatedInputs": {
+        "status": "tracked bindings; no host generation",
+        "paths": [
+          "genproto/"
+        ]
+      },
+      "regeneration": {
+        "script": "src/checkoutservice/genproto.sh",
+        "workingDirectory": "src/checkoutservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: golang:1.24.3-alpine, scratch",
+        "Go module proxy/checksum database via go mod download"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "go.sum verifies selected modules; toolchain/base image tag remains mutable"
+      ]
+    },
+    {
+      "id": "currencyservice",
+      "role": "application-service",
+      "sourcePath": "src/currencyservice",
+      "buildContext": "src/currencyservice",
+      "dockerfile": "src/currencyservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "node:20.17.0-alpine",
+        "node:20.17.0-alpine"
+      ],
+      "dependencyFiles": [
+        "src/currencyservice/package.json",
+        "src/currencyservice/package-lock.json"
+      ],
+      "assets": [
+        "src/currencyservice/data/currency_conversion.json"
+      ],
+      "generatedInputs": {
+        "status": "tracked local protocols, loaded dynamically",
+        "paths": [
+          "proto/"
+        ]
+      },
+      "regeneration": {
+        "script": "src/currencyservice/genproto.sh",
+        "workingDirectory": "src/currencyservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: node:20.17.0-alpine, node:20.17.0-alpine",
+        "Alpine apk: python3, make, g++; npm registry via npm ci --omit=dev (including native profiler addon)"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "npm lock includes integrity; OS packages and native compilation remain external"
+      ]
+    },
+    {
+      "id": "emailservice",
+      "role": "application-service",
+      "sourcePath": "src/emailservice",
+      "buildContext": "src/emailservice",
+      "dockerfile": "src/emailservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2",
+        "base",
+        "base"
+      ],
+      "dependencyFiles": [
+        "src/emailservice/requirements.txt",
+        "src/emailservice/requirements.in"
+      ],
+      "assets": [
+        "src/emailservice/templates/confirmation.html"
+      ],
+      "generatedInputs": {
+        "status": "tracked bindings; no host generation",
+        "paths": [
+          "demo_pb2.py",
+          "demo_pb2_grpc.py"
+        ]
+      },
+      "regeneration": {
+        "script": "src/emailservice/genproto.sh",
+        "workingDirectory": "src/emailservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2, base, base",
+        "PyPI via pip install -r requirements.txt",
+        "Debian apt repositories: g++ and dependencies"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "requirements.txt pins versions but lacks hashes; requirements.in is regeneration-only"
+      ]
+    },
+    {
+      "id": "frontend",
+      "role": "application-service",
+      "sourcePath": "src/frontend",
+      "buildContext": "src/frontend",
+      "dockerfile": "src/frontend/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SKAFFOLD_GO_GCFLAGS": {
+          "default": null,
+          "intended": "",
+          "allowedValues": [
+            "",
+            "all=-N -l"
+          ],
+          "purpose": "Optional Skaffold Go debug compiler flags; empty for release"
+        },
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "golang:1.24.3-alpine",
+        "scratch"
+      ],
+      "dependencyFiles": [
+        "src/frontend/go.mod",
+        "src/frontend/go.sum"
+      ],
+      "assets": [
+        "src/frontend/templates/ad.html",
+        "src/frontend/templates/assistant.html",
+        "src/frontend/templates/cart.html",
+        "src/frontend/templates/error.html",
+        "src/frontend/templates/footer.html",
+        "src/frontend/templates/header.html",
+        "src/frontend/templates/home.html",
+        "src/frontend/templates/order.html",
+        "src/frontend/templates/product.html",
+        "src/frontend/templates/recommendations.html",
+        "src/frontend/static/favicon-cymbal.ico",
+        "src/frontend/static/favicon.ico",
+        "src/frontend/static/icons/Cymbal_NavLogo.svg",
+        "src/frontend/static/icons/Hipster_Advert2.svg",
+        "src/frontend/static/icons/Hipster_CartIcon.svg",
+        "src/frontend/static/icons/Hipster_CheckOutIcon.svg",
+        "src/frontend/static/icons/Hipster_CurrencyIcon.svg",
+        "src/frontend/static/icons/Hipster_DownArrow.svg",
+        "src/frontend/static/icons/Hipster_FacebookIcon.svg",
+        "src/frontend/static/icons/Hipster_GooglePlayIcon.svg",
+        "src/frontend/static/icons/Hipster_HelpIcon.svg",
+        "src/frontend/static/icons/Hipster_HeroLogo.svg",
+        "src/frontend/static/icons/Hipster_HeroLogoMaroon.svg",
+        "src/frontend/static/icons/Hipster_InstagramIcon.svg",
+        "src/frontend/static/icons/Hipster_KitchenwareOffer.svg",
+        "src/frontend/static/icons/Hipster_NavLogo.svg",
+        "src/frontend/static/icons/Hipster_PinterestIcon.svg",
+        "src/frontend/static/icons/Hipster_ProfileIcon.svg",
+        "src/frontend/static/icons/Hipster_SearchIcon.svg",
+        "src/frontend/static/icons/Hipster_TwitterIcon.svg",
+        "src/frontend/static/icons/Hipster_UpDownControl.svg",
+        "src/frontend/static/icons/Hipster_WandIcon.svg",
+        "src/frontend/static/icons/Hipster_YoutubeIcon.svg",
+        "src/frontend/static/images/Advert2BannerImage.png",
+        "src/frontend/static/images/AdvertBannerImage.png",
+        "src/frontend/static/images/credits.txt",
+        "src/frontend/static/images/folded-clothes-on-white-chair-wide.jpg",
+        "src/frontend/static/images/folded-clothes-on-white-chair.jpg",
+        "src/frontend/static/images/HeroBannerImage.png",
+        "src/frontend/static/images/HeroBannerImage2.png",
+        "src/frontend/static/images/VRHeadsets.png",
+        "src/frontend/static/img/products/bamboo-glass-jar.jpg",
+        "src/frontend/static/img/products/candle-holder.jpg",
+        "src/frontend/static/img/products/hairdryer.jpg",
+        "src/frontend/static/img/products/loafers.jpg",
+        "src/frontend/static/img/products/mug.jpg",
+        "src/frontend/static/img/products/salt-and-pepper-shakers.jpg",
+        "src/frontend/static/img/products/sunglasses.jpg",
+        "src/frontend/static/img/products/tank-top.jpg",
+        "src/frontend/static/img/products/watch.jpg",
+        "src/frontend/static/styles/bot.css",
+        "src/frontend/static/styles/cart.css",
+        "src/frontend/static/styles/order.css",
+        "src/frontend/static/styles/styles.css"
+      ],
+      "generatedInputs": {
+        "status": "tracked bindings; no host generation",
+        "paths": [
+          "genproto/"
+        ]
+      },
+      "regeneration": {
+        "script": "src/frontend/genproto.sh",
+        "workingDirectory": "src/frontend",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: golang:1.24.3-alpine, scratch",
+        "Go module proxy/checksum database via go mod download"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "go.sum verifies selected modules; toolchain/base image tag remains mutable"
+      ]
+    },
+    {
+      "id": "loadgenerator",
+      "role": "auxiliary",
+      "sourcePath": "src/loadgenerator",
+      "buildContext": "src/loadgenerator",
+      "dockerfile": "src/loadgenerator/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "python:3.12.6-slim@sha256:ad48727987b259854d52241fac3bc633574364867b8e20aec305e6e7f4028b26",
+        "base",
+        "base"
+      ],
+      "dependencyFiles": [
+        "src/loadgenerator/requirements.txt",
+        "src/loadgenerator/requirements.in"
+      ],
+      "assets": [],
+      "generatedInputs": {
+        "status": "none",
+        "paths": []
+      },
+      "regeneration": {
+        "script": null,
+        "workingDirectory": "src/loadgenerator",
+        "sourceInputs": [],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: python:3.12.6-slim@sha256:ad48727987b259854d52241fac3bc633574364867b8e20aec305e6e7f4028b26, base, base",
+        "PyPI via pip install -r requirements.txt"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "requirements.txt pins versions but lacks hashes; requirements.in is regeneration-only"
+      ]
+    },
+    {
+      "id": "paymentservice",
+      "role": "application-service",
+      "sourcePath": "src/paymentservice",
+      "buildContext": "src/paymentservice",
+      "dockerfile": "src/paymentservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "node:20.17.0-alpine",
+        "node:20.17.0-alpine"
+      ],
+      "dependencyFiles": [
+        "src/paymentservice/package.json",
+        "src/paymentservice/package-lock.json"
+      ],
+      "assets": [],
+      "generatedInputs": {
+        "status": "tracked local protocols, loaded dynamically",
+        "paths": [
+          "proto/"
+        ]
+      },
+      "regeneration": {
+        "script": "src/paymentservice/genproto.sh",
+        "workingDirectory": "src/paymentservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: node:20.17.0-alpine, node:20.17.0-alpine",
+        "Alpine apk: python3, make, g++; npm registry via npm ci --omit=dev (including native profiler addon)"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "npm lock includes integrity; OS packages and native compilation remain external"
+      ]
+    },
+    {
+      "id": "productcatalogservice",
+      "role": "application-service",
+      "sourcePath": "src/productcatalogservice",
+      "buildContext": "src/productcatalogservice",
+      "dockerfile": "src/productcatalogservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SKAFFOLD_GO_GCFLAGS": {
+          "default": null,
+          "intended": "",
+          "allowedValues": [
+            "",
+            "all=-N -l"
+          ],
+          "purpose": "Optional Skaffold Go debug compiler flags; empty for release"
+        },
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "golang:1.24.3-alpine",
+        "scratch"
+      ],
+      "dependencyFiles": [
+        "src/productcatalogservice/go.mod",
+        "src/productcatalogservice/go.sum"
+      ],
+      "assets": [
+        "src/productcatalogservice/products.json"
+      ],
+      "generatedInputs": {
+        "status": "tracked bindings; no host generation",
+        "paths": [
+          "genproto/"
+        ]
+      },
+      "regeneration": {
+        "script": "src/productcatalogservice/genproto.sh",
+        "workingDirectory": "src/productcatalogservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: golang:1.24.3-alpine, scratch",
+        "Go module proxy/checksum database via go mod download"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "go.sum verifies selected modules; toolchain/base image tag remains mutable"
+      ]
+    },
+    {
+      "id": "recommendationservice",
+      "role": "application-service",
+      "sourcePath": "src/recommendationservice",
+      "buildContext": "src/recommendationservice",
+      "dockerfile": "src/recommendationservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2",
+        "base",
+        "base"
+      ],
+      "dependencyFiles": [
+        "src/recommendationservice/requirements.txt",
+        "src/recommendationservice/requirements.in"
+      ],
+      "assets": [],
+      "generatedInputs": {
+        "status": "tracked bindings; no host generation",
+        "paths": [
+          "demo_pb2.py",
+          "demo_pb2_grpc.py"
+        ]
+      },
+      "regeneration": {
+        "script": "src/recommendationservice/genproto.sh",
+        "workingDirectory": "src/recommendationservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2, base, base",
+        "PyPI via pip install -r requirements.txt",
+        "Debian apt repositories: g++ and dependencies"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "requirements.txt pins versions but lacks hashes; requirements.in is regeneration-only"
+      ]
+    },
+    {
+      "id": "shippingservice",
+      "role": "application-service",
+      "sourcePath": "src/shippingservice",
+      "buildContext": "src/shippingservice",
+      "dockerfile": "src/shippingservice/Dockerfile",
+      "target": null,
+      "platforms": [
+        "linux/amd64"
+      ],
+      "preparation": [],
+      "buildArguments": {
+        "SKAFFOLD_GO_GCFLAGS": {
+          "default": null,
+          "intended": "",
+          "allowedValues": [
+            "",
+            "all=-N -l"
+          ],
+          "purpose": "Optional Skaffold Go debug compiler flags; empty for release"
+        },
+        "SOURCE_REVISION": {
+          "default": "development",
+          "intended": "$SOURCE_REVISION",
+          "allowedValues": [
+            "$SOURCE_REVISION"
+          ],
+          "purpose": "OCI revision label and ONLINE_SHOP_VERSION"
+        }
+      },
+      "ordinaryBuildRequiresRegeneration": false,
+      "fromImages": [
+        "golang:1.24.3-alpine",
+        "scratch"
+      ],
+      "dependencyFiles": [
+        "src/shippingservice/go.mod",
+        "src/shippingservice/go.sum"
+      ],
+      "assets": [],
+      "generatedInputs": {
+        "status": "tracked bindings; no host generation",
+        "paths": [
+          "genproto/"
+        ]
+      },
+      "regeneration": {
+        "script": "src/shippingservice/genproto.sh",
+        "workingDirectory": "src/shippingservice",
+        "sourceInputs": [
+          "protos/demo.proto",
+          "protos/grpc/health/v1/health.proto"
+        ],
+        "tools": "See BUILDING.md regeneration matrix; versions not uniformly pinned"
+      },
+      "externalDownloads": [
+        "Base images: golang:1.24.3-alpine, scratch",
+        "Go module proxy/checksum database via go mod download"
+      ],
+      "limitations": [
+        "No byte-identical reproducibility guarantee; base tags without digest and OS repositories are mutable.",
+        "go.sum verifies selected modules; toolchain/base image tag remains mutable"
+      ]
+    }
+  ]
+}
