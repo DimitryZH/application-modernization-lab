@@ -343,6 +343,9 @@ services:
     - redis-data:/data
     cpus: 0.125
     mem_limit: 256m
+    logging:
+      driver: json-file
+      options: {max-size: 5m, max-file: '2'}
     stop_grace_period: 15s
     healthcheck:
       test: [CMD, redis-cli, ping]
@@ -394,6 +397,7 @@ services:
       dockerfile: Dockerfile.probe
       args:
         SOURCE_REVISION: ${SOURCE_REVISION:-development}
+        TOOLING_REVISION: ${TOOLING_REVISION:-development}
     entrypoint:
     - python
     - /validation/faults.py

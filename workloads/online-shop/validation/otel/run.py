@@ -40,6 +40,9 @@ env = dict(
         cwd=HERE.parents[3],
     ).strip(),
 )
+env["TOOLING_REVISION"] = subprocess.check_output(
+    ["git", "rev-parse", "HEAD"], text=True, cwd=HERE.parents[3]
+).strip()
 input_paths = subprocess.check_output(
     [
         "git",

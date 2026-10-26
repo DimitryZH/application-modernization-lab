@@ -40,6 +40,7 @@ def main():
     def command(args, timeout=90, checked=True):
         if checked:
             assert time.monotonic() < deadline, "overall 15-minute deadline"
+            timeout = min(timeout, max(.1, deadline - time.monotonic()))
         result = subprocess.run(args, env=env, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
         with (root / "commands.log").open("a", encoding="utf-8") as output:
             output.write(" ".join(args[:8]) + "\n" + result.stdout + "\n")
@@ -67,11 +68,12 @@ def main():
             time.sleep(.5)
         raise AssertionError("Redis readiness deadline")
 
-    def capture(service, target):
+    def capture(service, target, since=None):
         container = compose("ps", "-a", "-q", service).strip()
-        # Follow across process restarts on the same Redis container.
-        output = (root / target).open("w", encoding="utf-8")
-        p = subprocess.Popen(["docker", "logs", "--follow", container], stdout=output, stderr=subprocess.STDOUT)
+        # Docker log followers exit on stop. Reattach after restart without replay.
+        output = (root / target).open("a", encoding="utf-8")
+        args = ["docker", "logs", "--follow"] + (["--since", str(since // 1_000_000_000)] if since else [])
+        p = subprocess.Popen(args + [container], stdout=output, stderr=subprocess.STDOUT)
         captures.append((p, output))
 
     def checkpoint(name):
@@ -132,6 +134,7 @@ def main():
         outage["restored_ns"] = time.time_ns()
         compose("start", "redis-cart")
         wait_redis()
+        capture("redis-cart", "logs/redis.log", outage["restored_ns"])
         assert redis("EXISTS", "restart-marker") == "0"
         assert compose("exec", "-T", "redis-cart", "cat", "/data/storage-marker").strip() == "synthetic"
         recovery_start = time.monotonic()
@@ -147,6 +150,7 @@ def main():
         prepare_data(compose, docker, project)
         compose("start", "redis-cart")
         wait_redis()
+        capture("redis-cart", "logs/redis.log")
         assert compose("exec", "-T", "redis-cart", "sh", "-c", "test ! -e /data/storage-marker && echo absent").strip() == "absent"
         assert redis("DBSIZE") == "0"
         checkpoint("full container/storage replacement resets state")

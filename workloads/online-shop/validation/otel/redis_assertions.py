@@ -30,6 +30,7 @@ def validate(root, instance, outage=None):
     for name in ["redis.uptime", "redis.memory.used", "redis.commands.processed", "redis.clients.connected", "redis.keyspace.hits", "redis.keyspace.misses"]:
         assert values.get(name) and max(values[name]) > 0, ("missing/nonpositive actual Redis metric", name)
     server_logs = []
+    startup_times = []
     for identity, log in logs:
         if identity.get("service.name") != "redis-cart":
             continue
@@ -38,12 +39,15 @@ def validate(root, instance, outage=None):
         assert not log.get("traceId") and not log.get("spanId"), "native Redis log must not invent trace context"
         assert int(log.get("timeUnixNano", 0)) > 0
         server_logs.append(log.get("body", {}).get("stringValue", ""))
+        if "Ready to accept connections" in server_logs[-1]:
+            startup_times.append(int(log["timeUnixNano"]))
     assert any("Ready to accept connections" in body for body in server_logs), "missing parsed startup stdout"
     assert any("bye bye" in body for body in server_logs), "missing parsed graceful shutdown stdout"
     assert not any(identity.get("service.name") == "redis-cart" for identity, _ in spans), "invented Redis spans"
     if outage:
         assert not any(outage["stopped_ns"] + 3e9 < t < outage["restored_ns"] - 1e9 for t in sample_times), "Redis metrics continued during outage"
         assert any(t > outage["restored_ns"] for t in sample_times), "Redis metrics did not recover"
+        assert any(t > outage["restored_ns"] for t in startup_times), "missing Redis recovery stdout"
     by_id = {(s["traceId"], s["spanId"]): s for identity, s in spans if identity.get("service.name") == "cartservice"}
     for mode in ["healthy", "outage", "recovered"]:
         for call in json.loads((root / ("cart-" + mode + ".json")).read_text())["calls"]:
