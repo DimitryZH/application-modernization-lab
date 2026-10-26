@@ -62,7 +62,31 @@ class HTTP(BaseHTTPRequestHandler):
 
     def do_POST(self):
         global mode
-        body = self.rfile.read(int(self.headers.get("Content-Length", "0")))
+        # Go forwards r.Body with chunked encoding. Consume it before replying;
+        # unread request bytes can reset the connection and fabricate a transport error.
+        self.connection.settimeout(5)
+        if self.headers.get("Transfer-Encoding", "").lower() == "chunked":
+            chunks = []
+            total = 0
+            while True:
+                size = int(self.rfile.readline(128).split(b";", 1)[0].strip(), 16)
+                total += size
+                if total > 16384:
+                    self.send_error(413)
+                    return
+                if size == 0:
+                    # This fixture does not accept trailers.
+                    assert self.rfile.readline(2) == b"\r\n"
+                    break
+                chunks.append(self.rfile.read(size))
+                assert self.rfile.read(2) == b"\r\n"
+            body = b"".join(chunks)
+        else:
+            size = int(self.headers.get("Content-Length", "0"))
+            if size > 16384:
+                self.send_error(413)
+                return
+            body = self.rfile.read(size)
         if self.path == "/mode":
             with lock:
                 mode = json.loads(body or "{}")

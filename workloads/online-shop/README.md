@@ -66,3 +66,10 @@ Container Platform must separately update its AML discovery/source-location link
 ## Explicit telemetry
 
 See [TELEMETRY.md](TELEMETRY.md) for the source instrumentation contract and [local validation](validation/otel/README.md) for isolated source builds and machine-checkable evidence. Historical published-image records above remain unchanged.
+
+## Redis runtime validation
+
+See [REDIS.md](REDIS.md) and [redis.runtime.json](redis.runtime.json) for the
+standalone ephemeral-cache contract, shared image mapping, security/storage,
+Redis server telemetry, validation commands and downstream ownership.
+RDB and AOF are explicitly disabled: Redis process restart also resets carts.

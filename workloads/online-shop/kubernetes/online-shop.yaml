@@ -463,6 +463,9 @@ metadata:
   labels:
     app: redis-cart
 spec:
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: redis-cart
@@ -476,6 +479,7 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
+      terminationGracePeriodSeconds: 15
       containers:
       - name: redis
         securityContext:
@@ -486,6 +490,7 @@ spec:
           privileged: false
           readOnlyRootFilesystem: true
         image: docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:81be8a1f52db5f99fe3de0bbbd2efce827f51ce409155a95e9bdbac8c2721ba6
+        command: [redis-server, --save, '', --appendonly, 'no']
         ports:
         - containerPort: 6379
         readinessProbe:

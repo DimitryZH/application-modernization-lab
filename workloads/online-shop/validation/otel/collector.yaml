@@ -1,4 +1,34 @@
 receivers:
+  redis:
+    endpoint: redis-cart:6379
+    collection_interval: 1s
+    timeout: 1s
+    resource_attributes:
+      server.address:
+        enabled: true
+      server.port:
+        enabled: true
+  filelog/redis:
+    include: [/logs/redis.log]
+    start_at: beginning
+    operators:
+    - type: regex_parser
+      if: 'body matches "^[0-9]+:[A-Z] "'
+      regex: '^(?P<pid>\d+):(?P<role>[A-Z]) (?P<timestamp>\d+ \w+ \d+ \d+:\d+:\d+\.\d+) (?P<level>[.*#-]) (?P<message>.*)$'
+      timestamp:
+        parse_from: attributes.timestamp
+        layout_type: gotime
+        layout: '02 Jan 2006 15:04:05.000'
+    - type: regex_parser
+      if: 'body matches "^[0-9]+:signal-handler"'
+      regex: '^\d+:signal-handler \((?P<timestamp>\d+)\) (?P<message>.*)$'
+      timestamp:
+        parse_from: attributes.timestamp
+        layout_type: epoch
+        layout: s
+    - type: move
+      from: attributes.message
+      to: body
   otlp:
     protocols:
       grpc:
@@ -23,6 +53,12 @@ receivers:
         span_id:
           parse_from: attributes.span_id
 processors:
+  resource/redis:
+    attributes:
+    - {key: service.name, value: redis-cart, action: upsert}
+    - {key: service.namespace, value: online-shop, action: upsert}
+    - {key: service.instance.id, value: '${env:REDIS_INSTANCE}', action: upsert}
+    - {key: deployment.environment.name, value: local-validation, action: upsert}
   memory_limiter:
     check_interval: 1s
     limit_mib: 192
@@ -50,6 +86,14 @@ exporters:
     path: /telemetry/logs.jsonl
 service:
   pipelines:
+    metrics/redis:
+      receivers: [redis]
+      processors: [memory_limiter, resource/redis, batch]
+      exporters: [file/metrics]
+    logs/redis:
+      receivers: [filelog/redis]
+      processors: [memory_limiter, resource/redis, batch]
+      exporters: [file/logs]
     traces:
       receivers:
       - otlp

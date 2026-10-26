@@ -49,6 +49,8 @@ def load(root):
             service = attrs(resource["resource"].get("attributes", [])).get(
                 "service.name"
             )
+            if service == "redis-cart":
+                continue  # Infrastructure assertions live in redis_assertions.py.
             for scope in resource.get("scopeMetrics", []):
                 for metric in scope.get("metrics", []):
                     names.add(metric["name"])
@@ -139,6 +141,8 @@ def load(root):
             service = attrs(resource["resource"].get("attributes", [])).get(
                 "service.name"
             )
+            if service == "redis-cart":
+                continue  # Native server logs have no application trace context.
             for scope in resource.get("scopeLogs", []):
                 for log in scope.get("logRecords", []):
                     fields = attrs(log.get("attributes", []))
