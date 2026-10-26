@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "component": "redis-cart",
+  "imageMapping": "images.lock.json",
+  "configDigest": "sha256:aa189b5a1954929c393585e6dc5717a75b18f75a931df8bdcc00a3d3bd546be6",
+  "platform": "linux/amd64",
+  "replicas": 1,
+  "updateStrategy": "Recreate",
+  "port": 6379,
+  "user": "1000:1000",
+  "readOnlyRoot": true,
+  "dataPath": "/data",
+  "command": ["redis-server", "--save", "", "--appendonly", "no"],
+  "shutdownSeconds": 15,
+  "resources": {
+    "requests": {"cpu": "70m", "memory": "200Mi"},
+    "limits": {"cpu": "125m", "memory": "256Mi"}
+  }
+}

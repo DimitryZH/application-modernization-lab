@@ -3,6 +3,7 @@
 import hashlib
 import argparse, json, os, pathlib, socket, subprocess, sys, threading, time, uuid
 from assertions import validate, SERVICES
+from redis_contract import check as check_redis, prepare_data, no_application_export
 
 HERE = pathlib.Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
@@ -30,6 +31,7 @@ env = dict(
     os.environ,
     EVIDENCE_DIR=str(root),
     FRONTEND_PORT=str(port),
+    REDIS_INSTANCE=project,
     COLLECTOR_UID=str(os.getuid() if hasattr(os, "getuid") else 1000),
     COLLECTOR_GID=str(os.getgid() if hasattr(os, "getgid") else 1000),
     SOURCE_REVISION=subprocess.check_output(
@@ -96,6 +98,12 @@ def capture(service):
     processes.append(process)
 
     def consume():
+        if service == "redis-cart":
+            with (root / "logs" / "redis.log").open("a", encoding="utf-8") as raw:
+                for line in process.stdout:
+                    raw.write(line)
+                    raw.flush()
+            return
         with (root / "raw" / f"{service}.txt").open("a", encoding="utf-8") as raw, (
             root / "logs" / f"{service}.jsonl"
         ).open("a", encoding="utf-8") as parsed:
@@ -138,6 +146,7 @@ def stop_capture():
 
 
 try:
+    check_redis(json.loads(compose("config", "--format", "json").stdout))
     if not args.skip_build:
         compose("--profile", "load", "--profile", "tools", "build", timeout=1800)
     image_records = []
@@ -180,8 +189,14 @@ try:
             if mode == "unavailable"
             else "http://127.0.0.1:1" if mode == "refused" else "http://collector:4317"
         )
+        prepare_data(
+            lambda *cmd: compose(*cmd).stdout,
+            lambda *cmd: subprocess.run(["docker", *cmd], check=True, timeout=60),
+            project,
+        )
         compose("up", "-d", "--no-build")
         if mode == "full":
+            capture("redis-cart")
             for svc in sorted(SERVICES - {"loadgenerator"}):
                 capture(svc)
             scenario(mode)
@@ -215,6 +230,7 @@ try:
                     )
 
             time.sleep(3)
+            compose("stop", "-t", "15", "redis-cart")
             stop_capture()
             time.sleep(3)
             compose("stop", "collector")
@@ -226,13 +242,7 @@ try:
         else:
             scenario(mode)
             time.sleep(3)
-            for signal in ["traces", "metrics"]:
-                path = phase_root / "telemetry" / (signal + ".jsonl")
-                assert not path.exists() or path.stat().st_size == 0, (
-                    "unexpected export",
-                    mode,
-                    signal,
-                )
+            no_application_export(phase_root)
         if mode != "full":
             started = time.monotonic()
             compose("stop", "-t", "15", *sorted(SERVICES - {"loadgenerator"}))
@@ -262,13 +272,7 @@ try:
             )
             if mode in ("disabled", "unavailable", "refused"):
                 time.sleep(3)
-                for signal in ["traces", "metrics"]:
-                    path = phase_root / "telemetry" / (signal + ".jsonl")
-                    assert not path.exists() or path.stat().st_size == 0, (
-                        "unexpected final export",
-                        mode,
-                        signal,
-                    )
+                no_application_export(phase_root)
         states = compose("ps", "-a", "--format", "json").stdout
         (root / f"containers-{mode}.json").write_text(states)
         compose(

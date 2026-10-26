@@ -1,5 +1,14 @@
 # Isolated Online Shop telemetry validation
 
+Current Redis selection is the exact mirror manifest in `images.lock.json`.
+See [Redis contract](../../REDIS.md) and [current Redis evidence](REDIS-RESULTS.md).
+Run `python workloads/online-shop/validation/otel/run_redis.py` from a clean commit
+for focused Redis/security/cart recovery/server telemetry acceptance.
+Historical `RESULTS.md` and `evidence-summary*.json` used the official
+`redis:7.4.8-alpine`; they remain unchanged. Infrastructure metrics can exist
+when application SDK export is disabled; application assertions filter by
+resource identity rather than requiring every metrics file to be empty.
+
 Prerequisites: Docker Engine with Linux amd64 containers, Docker Compose v2, Python 3 on the host, Git, package-registry network access, and enough memory/disk for eleven source builds. No host Go, Java, Node, Python application dependencies or .NET SDK is required.
 
 From the repository root:

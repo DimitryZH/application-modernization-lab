@@ -333,7 +333,22 @@ services:
     profiles:
     - load
   redis-cart:
-    image: redis:7.4.8-alpine
+    image: docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:81be8a1f52db5f99fe3de0bbbd2efce827f51ce409155a95e9bdbac8c2721ba6
+    platform: linux/amd64
+    user: '1000:1000'
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    volumes:
+    - redis-data:/data
+    cpus: 0.125
+    mem_limit: 256m
+    stop_grace_period: 15s
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 2s
+      retries: 15
     command:
     - redis-server
     - --save
@@ -343,6 +358,8 @@ services:
   collector:
     image: otel/opentelemetry-collector-contrib:0.123.0
     user: ${COLLECTOR_UID:-1000}:${COLLECTOR_GID:-1000}
+    environment:
+      REDIS_INSTANCE: ${REDIS_INSTANCE:-local-validation}
     command:
     - --config=/etc/otelcol/config.yaml
     volumes:
@@ -356,10 +373,13 @@ services:
       dockerfile: Dockerfile.probe
       args:
         SOURCE_REVISION: ${SOURCE_REVISION:-development}
+        TOOLING_REVISION: ${TOOLING_REVISION:-development}
     image: online-shop-21-probe:local
     profiles:
     - tools
     volumes:
+    - ../../redis.runtime.json:/contract/redis.runtime.json:ro
+    - ../../kubernetes/online-shop.yaml:/contract/online-shop.yaml:ro
     - ../../protos:/protos:ro
     - ${EVIDENCE_DIR:-./output}:/evidence
     environment:
@@ -377,3 +397,5 @@ services:
     entrypoint:
     - python
     - /validation/faults.py
+volumes:
+  redis-data:
