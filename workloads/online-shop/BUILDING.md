@@ -42,7 +42,12 @@ inputs are outputs of the declared build, not host inputs. Dockerfile and ignore
 files remain build-control inputs even when Docker excludes them from COPY.
 The implementation supports current COPY/ignore syntax, rejects ADD, complex new
 ignore rules and unsupported COPY flags, and requires a deliberate update when
-those semantics change. Symlinks, submodules and LFS pointers within consumed
+those semantics change. COPY/ADD/FROM/ARG recognition accepts mixed instruction
+case and leading whitespace. COPY `--from` must identify an earlier internal
+stage by name or zero-based index; external images, named contexts, current/future
+stages and additional flags are rejected. Multiline input instructions, heredocs,
+ONBUILD and nondefault escape directives require explicit planner support.
+Symlinks, submodules and LFS pointers within consumed
 inputs are rejected. The current workload contains none; there are no hidden
 parent-context inputs. Build-time platform-generated Docker ARGs are Docker's
 own interface, not undeclared application configuration.

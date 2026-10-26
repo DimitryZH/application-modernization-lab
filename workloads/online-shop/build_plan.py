@@ -87,6 +87,42 @@ def ignored(name, rules):
     return False
 
 
+def input_instructions(text):
+    """Recognize v1 input instructions without parsing shell bodies or continuations."""
+    continued = False
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith('#'):
+            if re.match(r'#\s*escape\s*=', line, re.I) and line.split('=', 1)[1].strip() != '\\':
+                raise ValueError('unsupported Dockerfile escape directive')
+            continue
+        if continued:
+            continued = line.endswith('\\')
+            continue
+        match = re.fullmatch(r'([a-zA-Z]+)(?:\s+(.*))?', line)
+        if not match:
+            raise ValueError('unsupported Dockerfile instruction syntax')
+        instruction, value = match[1].upper(), match[2] or ''
+        if '<<' in value:
+            raise ValueError('Dockerfile heredocs require explicit planner support')
+        if instruction in ('FROM', 'ARG', 'COPY', 'ADD', 'ONBUILD'):
+            if value.endswith('\\'):
+                raise ValueError('unsupported multiline ' + instruction + ' syntax')
+            yield instruction, value
+        else:
+            continued = value.endswith('\\')
+
+
+def copy_tokens(value):
+    if not value or '$' in value or '\\' in value or value.startswith('--'):
+        raise ValueError('unsupported COPY syntax')
+    tokens = json.loads(value) if value.startswith('[') else shlex.split(value)
+    if not isinstance(tokens, list) or len(tokens) < 2 or any(
+            not isinstance(t, str) or not t or t.startswith('--') for t in tokens):
+        raise ValueError('COPY requires supported sources and a destination')
+    return tokens
+
+
 def inventory(source, component):
     context = component['buildContext']
     dockerfile = component['dockerfile']
@@ -104,17 +140,46 @@ def inventory(source, component):
             if not ignored(relative, rules):
                 files[relative] = source.read(name)
     copies, consumed = [], set()
-    for line in text.splitlines():
-        if not re.match(r'^(COPY|ADD)\s', line):
+    args, bases, stages = {}, [], []
+    for instruction, value in input_instructions(text):
+        if instruction == 'FROM':
+            match = re.fullmatch(r'([^\s$]+)(?:\s+AS\s+([a-zA-Z][a-zA-Z0-9_.-]*))?', value, re.I)
+            if not match or match[1].startswith('--'):
+                raise ValueError('unsupported FROM syntax')
+            name = match[2].lower() if match[2] else None
+            if name and name in stages:
+                raise ValueError('duplicate internal stage name: ' + name)
+            bases.append(match[1])
+            stages.append(name)
             continue
-        if line.startswith('ADD '):
+        if instruction == 'ARG':
+            match = re.fullmatch(r'([a-zA-Z_][a-zA-Z_0-9]*)(?:=([^\s$]+))?', value)
+            if not match:
+                raise ValueError('unsupported ARG syntax')
+            args[match[1]] = match[2] or None
+            continue
+        if instruction == 'ONBUILD':
+            raise ValueError('ONBUILD requires explicit planner support')
+        if instruction == 'ADD':
             raise ValueError('ADD requires explicit planner support')
-        value = line[5:]
+        if not stages:
+            raise ValueError('COPY requires a declared build stage')
         if value.startswith('--from='):
+            match = re.fullmatch(r'--from=([^\s]+)\s+(.+)', value)
+            if not match:
+                raise ValueError('unsupported COPY --from syntax')
+            reference, value = match.groups()
+            # Only completed earlier stages are internal inputs. Unknown names
+            # must not become implicit external images or named build contexts.
+            if reference.isascii() and reference.isdecimal():
+                internal = int(reference) < len(stages) - 1
+            else:
+                internal = reference.lower() in stages[:-1]
+            if not internal:
+                raise ValueError('COPY --from must reference an earlier internal stage: ' + reference)
+            copy_tokens(value)  # Validate syntax/flags even for internal copies.
             continue
-        if value.startswith('--') or '$' in value or value.endswith('\\'):
-            raise ValueError('unsupported COPY syntax')
-        tokens = json.loads(value) if value.startswith('[') else shlex.split(value)
+        tokens = copy_tokens(value)
         for item in tokens[:-1]:
             item = item.removeprefix('./')
             if item != '.':
@@ -125,13 +190,9 @@ def inventory(source, component):
                 raise ValueError('missing COPY input: ' + item)
             consumed.update(matches)
             copies.append(item)
-    args = {}
-    for name, default in re.findall(r'^ARG ([A-Z_][A-Z_0-9]*)(?:=([^\n]*))?$', text, re.M):
-        args[name] = default or None
     declared = component['buildArguments']
     if args != {k: v['default'] for k, v in declared.items()}:
         raise ValueError('Dockerfile ARG drift: ' + component['id'])
-    bases = re.findall(r'^FROM (\S+)', text, re.M)
     if bases != component['fromImages']:
         raise ValueError('base image drift: ' + component['id'])
     result = []

@@ -1,7 +1,9 @@
 """Behavior tests against a real workload snapshot in a disposable Git repository."""
 import importlib.util
 import json
+import hashlib
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -129,6 +131,88 @@ class ContractTests(unittest.TestCase):
         for value in ('../secret', '/absolute', 'C:/outside', 'src/../secret', 'src\\file'):
             with self.subTest(value=value), self.assertRaises(ValueError): bp.path(value)
         with self.assertRaises(ValueError): bp.ignored('file', ['!file'])
+
+    def snapshot_inventory(self, transform, extra=None):
+        """Inventory a committed variant with a context not covered by COPY dot."""
+        component = next(c for c in json.loads(self.original)['components'] if c['id'] == 'loadgenerator')
+        name = bp.WORKLOAD + '/' + component['dockerfile']
+        original = bp.git(self.repo, 'show', self.revision + ':' + name)
+        file = self.repo / name
+        extra_file = self.repo / bp.WORKLOAD / component['buildContext'] / 'extra.txt'
+        try:
+            file.write_text(transform(original.decode()), encoding='utf-8', newline='\n')
+            if extra is not None:
+                extra_file.write_bytes(extra)
+            revision = self.commit()
+            return bp.inventory(bp.Source(self.repo, revision), component)
+        finally:
+            file.write_bytes(original)
+            extra_file.unlink(missing_ok=True)
+
+    def test_copy_case_and_indentation(self):
+        for instruction in ('copy', 'CoPy', '  COPY', '\t cOpY'):
+            with self.subTest(instruction=instruction):
+                result = self.snapshot_inventory(lambda text: text + '\n' + instruction + ' extra.txt /extra.txt\n', b'extra input\n')
+                expected = {'path': 'src/loadgenerator/extra.txt', 'sha256': hashlib.sha256(b'extra input\n').hexdigest()}
+                self.assertIn(expected, result['inputs'])
+                self.assertIn('extra.txt', result['copySources'])
+
+    def test_missing_copy_case_and_indentation(self):
+        for instruction in ('copy', 'CoPy', '  COPY', '\t cOpY'):
+            with self.subTest(instruction=instruction), self.assertRaisesRegex(ValueError, 'missing COPY input'):
+                self.snapshot_inventory(lambda text: text + '\n' + instruction + ' missing.txt /missing.txt\n')
+
+    def test_add_case_and_indentation_rejected(self):
+        for instruction in ('add', 'AdD', '  ADD', '\t aDd'):
+            with self.subTest(instruction=instruction), self.assertRaisesRegex(ValueError, 'ADD requires'):
+                self.snapshot_inventory(lambda text: text + '\n' + instruction + ' extra.txt /extra.txt\n', b'extra')
+
+    def test_from_and_arg_case_and_indentation(self):
+        result = self.snapshot_inventory(lambda text: re.sub(r'^(FROM|ARG) ', lambda m: '  ' + m[1].lower() + '\t', text, flags=re.M).replace(' AS ', ' aS '))
+        self.assertTrue(result['inputs'])
+        with self.assertRaisesRegex(ValueError, 'ARG drift'):
+            self.snapshot_inventory(lambda text: text + '\n  aRg UNDECLARED=value\n')
+        with self.assertRaisesRegex(ValueError, 'base image drift'):
+            self.snapshot_inventory(lambda text: text + '\n  fRoM undeclared:image\n')
+
+    def test_internal_named_and_numeric_copies(self):
+        baseline = self.snapshot_inventory(lambda text: text)
+        for reference in ('base', 'builder', '0', '1'):
+            with self.subTest(reference=reference):
+                result = self.snapshot_inventory(lambda text: text + '\n  cOpY --from=' + reference + ' /generated /artifact\n')
+                self.assertEqual(baseline['inputs'], result['inputs'])
+                self.assertEqual(baseline['copySources'], result['copySources'])
+        result = self.snapshot_inventory(lambda text: text.replace('--from=builder /install /usr/local', '--from=1 ["/install", "/usr/local"]'))
+        self.assertEqual(baseline['inputs'], result['inputs'])
+
+    def test_unknown_external_and_invalid_stage_references(self):
+        for reference in ('buidler', 'named-context', 'alpine:3.20', 'docker.io/library/alpine:3.20',
+                          'alpine@sha256:' + 'a'*64, '2', '3', '-1', '$STAGE'):
+            with self.subTest(reference=reference), self.assertRaisesRegex(ValueError, 'earlier internal stage'):
+                self.snapshot_inventory(lambda text: text + '\nCOPY --from=' + reference + ' /file /file\n')
+        with self.assertRaisesRegex(ValueError, 'earlier internal stage'):
+            self.snapshot_inventory(lambda text: text.replace('FROM base AS builder', 'FROM base AS builder\nCOPY --from=builder /file /file'))
+        with self.assertRaisesRegex(ValueError, 'earlier internal stage'):
+            self.snapshot_inventory(lambda text: text.replace('FROM base AS builder', 'FROM base AS builder\nCOPY --from=2 /file /file'))
+
+    def test_unsupported_copy_syntax_cannot_bypass_stage_validation(self):
+        for value in ('--from=builder --chown=1000 /a /b', '--chown=1000 --from=builder /a /b',
+                      '--from=builder --from=base /a /b', '--from=builder',
+                      '--from=builder /a', '--from=builder ["/a", 123]',
+                      '--from=builder /$INPUT /b', '--from=builder <<EOF /b',
+                      '--from=builder /a /b\\\n /c', 'extra.txt /b\\\n /c'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.snapshot_inventory(lambda text: text + '\n  copy ' + value + '\n', b'extra')
+
+    def test_unsupported_from_arg_and_onbuild_syntax(self):
+        for instruction in ('  from --platform=linux/amd64 alpine', '  arg BAD="two words"',
+                            '  onbuild copy extra.txt /extra.txt'):
+            with self.subTest(instruction=instruction), self.assertRaises(ValueError):
+                self.snapshot_inventory(lambda text: text + '\n' + instruction + '\n', b'extra')
+
+    def test_shell_continuation_is_not_a_docker_instruction(self):
+        result = self.snapshot_inventory(lambda text: text + '\nRUN echo \\\n  copy missing.txt /not-a-copy\n')
+        self.assertNotIn('missing.txt', result['copySources'])
 
 
 if __name__ == '__main__': unittest.main()
