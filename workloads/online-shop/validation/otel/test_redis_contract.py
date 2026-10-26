@@ -15,11 +15,17 @@ class DriftTests(unittest.TestCase):
         check(self.model)
 
     def test_reject_runtime_drift(self):
-        for field, value in [("image", "redis:7-alpine"), ("platform", "linux/arm64"), ("command", ["redis-server"]), ("user", "0:0"), ("read_only", False), ("ports", [{"published": "6379"}]), ("volumes", []), ("cap_drop", [])]:
+        for field, value in [("image", "redis:7-alpine"), ("platform", "linux/arm64"), ("command", ["redis-server"]), ("user", "0:0"), ("read_only", False), ("ports", [{"published": "6379"}]), ("volumes", []), ("cap_drop", []), ("security_opt", []), ("deploy", {"replicas": 2})]:
             with self.subTest(field=field), self.assertRaises((AssertionError, IndexError)):
                 model = copy.deepcopy(self.model)
                 model["services"]["redis-cart"][field] = value
                 check(model)
+
+    def test_reject_foreign_storage(self):
+        model = copy.deepcopy(self.model)
+        model["volumes"]["redis-data"] = {"external": True, "name": "existing-application-data"}
+        with self.assertRaises(AssertionError):
+            check(model)
 
     def test_reject_endpoint_drift(self):
         model = copy.deepcopy(self.model)

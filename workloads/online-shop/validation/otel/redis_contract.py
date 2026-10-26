@@ -25,12 +25,16 @@ def check(compose):
     assert service["command"] == contract["command"]
     assert service["user"] == contract["user"] and service["read_only"] is True
     assert service["cap_drop"] == ["ALL"] and not service.get("ports")
+    assert service["security_opt"] == ["no-new-privileges:true"]
+    assert service.get("scale", 1) == 1 and service.get("deploy", {}).get("replicas", 1) == 1
     assert service["stop_grace_period"] == "15s"
     assert int(service["mem_limit"]) == 268435456 and float(service["cpus"]) == .125
     assert service["healthcheck"]["test"] == ["CMD", "redis-cli", "ping"]
     assert len(service["volumes"]) == 1
     assert service["volumes"][0]["target"] == contract["dataPath"]
     assert service["volumes"][0]["type"] == "volume" and not service["volumes"][0].get("read_only")
+    assert service["volumes"][0]["source"] == "redis-data"
+    assert compose["volumes"]["redis-data"] == {"name": compose["name"] + "_redis-data"}, "only project-owned default volumes"
     assert compose["services"]["cartservice"]["environment"]["REDIS_ADDR"] == "redis-cart:6379"
     # Canonical YAML has stable generated layout. Parse with the probe in check-kubernetes.
     return contract, image

@@ -84,7 +84,7 @@ def main():
         assert docker("version", "--format", "{{.Server.Os}}/{{.Server.Arch}} {{.Server.Version}}").startswith("linux/amd64 ")
         assert docker("context", "inspect", "--format", "{{.Endpoints.docker.Host}}").strip().startswith(("npipe:", "unix:")), "local engine required"
         for kind in ["container", "network", "volume"]:
-            assert not docker(kind, "ls", "-q", "--filter", "label=com.docker.compose.project=" + project).strip(), "resource collision"
+            assert not docker(kind, "ls", *(["-a"] if kind == "container" else []), "-q", "--filter", "label=com.docker.compose.project=" + project).strip(), "resource collision"
         contract, image = check(json.loads(compose("config", "--format", "json")))
         docker("pull", "--platform", contract["platform"], image, timeout=180)
         selected = json.loads(docker("image", "inspect", image))[0]
