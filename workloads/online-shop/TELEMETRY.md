@@ -76,3 +76,14 @@ Optional cloud catalog/Spanner/AlloyDB paths remain selectable and are not deplo
 - Docker build caches preserve dependency/compiler work without changing individual service build contexts.
 
 See [validation instructions](validation/otel/README.md) and [implementation evidence](validation/otel/RESULTS.md).
+
+## Redis server collection
+
+[REDIS.md](REDIS.md) defines the current external dependency and its focused
+acceptance path. Collector 0.123.0 collects Redis INFO metrics and parses native
+server stdout with a separate resource identity. Application logical cache CLIENT
+spans remain distinct from Redis command execution; no Redis SERVER spans or
+trace-correlated native server logs are generated. Infrastructure metrics can
+remain present while application SDK export is disabled or unavailable. New
+results live in [Redis evidence](validation/otel/REDIS-RESULTS.md); earlier
+application telemetry evidence retains its original Redis selection and scope.

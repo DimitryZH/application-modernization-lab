@@ -1,0 +1,506 @@
+{
+  "version": 1,
+  "date": "2026-10-26",
+  "accepted_baseline": "1c38ef609ec5f5279a63a7b6466e3ea326fee74c",
+  "aml_acceptance": "passed",
+  "publisher_lineage": "unresolved",
+  "cross_project_canonicalization": "incomplete",
+  "commands": [
+    "python workloads/online-shop/validation/otel/test_redis_contract.py",
+    "python workloads/online-shop/validation/otel/run_redis.py",
+    "python workloads/online-shop/validation/otel/run.py",
+    "python -m compileall -q workloads/online-shop/validation/otel",
+    "git diff --check"
+  ],
+  "focused": {
+    "project": "online-shop-23-f3045eac",
+    "tooling_revision": "68e86e39299c4bd499cdba08648f73b0a8fc6ef2",
+    "application_revision": "469621fd011626f6ce1e7269034aee525d4fb183",
+    "application_inputs_sha256": "1ce24a826167aebd06dc815b68340300a2636394f358a97318c805c7d32c4d32",
+    "redis": {
+      "reference": "docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:81be8a1f52db5f99fe3de0bbbd2efce827f51ce409155a95e9bdbac8c2721ba6",
+      "config_digest": "sha256:aa189b5a1954929c393585e6dc5717a75b18f75a931df8bdcc00a3d3bd546be6",
+      "platform": "linux/amd64",
+      "runtime": {
+        "version": 1,
+        "component": "redis-cart",
+        "imageMapping": "images.lock.json",
+        "configDigest": "sha256:aa189b5a1954929c393585e6dc5717a75b18f75a931df8bdcc00a3d3bd546be6",
+        "platform": "linux/amd64",
+        "replicas": 1,
+        "updateStrategy": "Recreate",
+        "port": 6379,
+        "user": "1000:1000",
+        "readOnlyRoot": true,
+        "dataPath": "/data",
+        "command": [
+          "redis-server",
+          "--save",
+          "",
+          "--appendonly",
+          "no"
+        ],
+        "shutdownSeconds": 15,
+        "resources": {
+          "requests": {
+            "cpu": "70m",
+            "memory": "200Mi"
+          },
+          "limits": {
+            "cpu": "125m",
+            "memory": "256Mi"
+          }
+        }
+      }
+    },
+    "images": {
+      "cartservice": {
+        "id": "sha256:adce7e0a2c272d8508c3a9e8488c029aad766821e727902fcf6eab7964f3923f",
+        "revision_label": "469621fd011626f6ce1e7269034aee525d4fb183.1ce24a826167",
+        "role": "application",
+        "tooling_revision": null
+      },
+      "probe": {
+        "id": "sha256:0aa0f720c6c5048f775be5f2219c5009352600e2e948eb8d970bcef4a2059d05",
+        "revision_label": "469621fd011626f6ce1e7269034aee525d4fb183.1ce24a826167",
+        "role": "validation-tool",
+        "tooling_revision": "68e86e39299c4bd499cdba08648f73b0a8fc6ef2"
+      }
+    },
+    "checks": [
+      "identity/security/strings/hash/expiry/persistence configuration",
+      "cart CRUD and two-session isolation",
+      "bounded Redis failure and same-cartservice reconnection; retained storage loses Redis state",
+      "full container/storage replacement resets state",
+      "Redis metrics/stdout, cache CLIENT parentage/RED/correlated logs, privacy",
+      "cart operations with application telemetry disabled",
+      "cart operations with application telemetry unavailable"
+    ],
+    "redis_shutdown_seconds": 0.8096446000272408,
+    "recovery_seconds_including_probe_start": 2.108007699949667,
+    "signals": {
+      "redis_metric_maxima": {
+        "redis.clients.blocked": 0.0,
+        "redis.clients.connected": 3.0,
+        "redis.clients.max_input_buffer": 20480.0,
+        "redis.clients.max_output_buffer": 20504.0,
+        "redis.commands": 24.0,
+        "redis.commands.processed": 91.0,
+        "redis.connections.received": 14.0,
+        "redis.connections.rejected": 0.0,
+        "redis.cpu.time": 0.197776,
+        "redis.db.avg_ttl": 862.0,
+        "redis.db.expires": 1.0,
+        "redis.db.keys": 3.0,
+        "redis.keys.evicted": 0.0,
+        "redis.keys.expired": 2.0,
+        "redis.keyspace.hits": 10.0,
+        "redis.keyspace.misses": 9.0,
+        "redis.latest_fork": 0.0,
+        "redis.memory.fragmentation_ratio": 9.29,
+        "redis.memory.lua": 32768.0,
+        "redis.memory.peak": 1576200.0,
+        "redis.memory.rss": 9043968.0,
+        "redis.memory.used": 1540944.0,
+        "redis.net.input": 5233.0,
+        "redis.net.output": 165564.0,
+        "redis.rdb.changes_since_last_save": 25.0,
+        "redis.replication.backlog_first_byte_offset": 0.0,
+        "redis.replication.offset": 0.0,
+        "redis.slaves.connected": 0.0,
+        "redis.uptime": 22.0
+      },
+      "redis_log_records": 27,
+      "cache_spans": 35,
+      "cache_parentage_red_and_logs": "passed",
+      "outage_recovery_metrics": "passed",
+      "privacy": "passed"
+    },
+    "cleanup": {
+      "status": "passed",
+      "remaining": {
+        "container": "",
+        "network": "",
+        "volume": ""
+      }
+    },
+    "status": "passed"
+  },
+  "outage_rpc": {
+    "method": "GetCart",
+    "outcome": "FAILED_PRECONDITION",
+    "seconds": 5.944124337999938,
+    "deadline_seconds": 10
+  },
+  "broader": {
+    "project": "online-shop-21-62283fe2",
+    "tooling_revision": "a5200cf7cd1718dd287ad8b55f6a87b683c2eb2c",
+    "source_label": "a5200cf7cd1718dd287ad8b55f6a87b683c2eb2c.365c21c43d8a",
+    "application_inputs_sha256": "365c21c43d8a0b68ca8945e4d3c84e40d36bf81f7ea3bd8976b7b3439d2c0615",
+    "images": [
+      {
+        "service": "adservice",
+        "tag": "online-shop-21-adservice:local",
+        "id": "sha256:d70571067b876d558dd292894f691f1dde323097a246da6b843a6714efc2979d",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "cartservice",
+        "tag": "online-shop-21-cartservice:local",
+        "id": "sha256:6925424fa9646cee22c3d8c26c7a997811c64d8bba56af5407d207bcc19bbd14",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "checkoutservice",
+        "tag": "online-shop-21-checkoutservice:local",
+        "id": "sha256:39728e3dbc4f420493f7b1596a8b9239e80f5d8a00dcea13e49c93bf0e2ee1d7",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "currencyservice",
+        "tag": "online-shop-21-currencyservice:local",
+        "id": "sha256:8a82315facf1b53a735f8c491b251e35350dcab0082ce787ada790cb829213a8",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "emailservice",
+        "tag": "online-shop-21-emailservice:local",
+        "id": "sha256:8c2a7e885fa26ec23f8a80a2d18c6dcab4d95e93d2ba3d4d0f7a9ad6251c2a32",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "frontend",
+        "tag": "online-shop-21-frontend:local",
+        "id": "sha256:757340862a401004d7fed14f311c8d5f45df8ce98174df17a6fdfea6859f9f5c",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "loadgenerator",
+        "tag": "online-shop-21-loadgenerator:local",
+        "id": "sha256:9a30d3545d3aac8b3f4028e1484f978fafb7668a56ed10509a2eb706407fb7ba",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "paymentservice",
+        "tag": "online-shop-21-paymentservice:local",
+        "id": "sha256:b51851fe15a923e467ebfbed40776740661cd0464208b44e8c2b2e0f0b7f7f7e",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "productcatalogservice",
+        "tag": "online-shop-21-productcatalogservice:local",
+        "id": "sha256:09c6c308557bbeb933ca2627ad2406c8ec367a60ab6c1cc9067939c4515fa935",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "recommendationservice",
+        "tag": "online-shop-21-recommendationservice:local",
+        "id": "sha256:fe03b1437736a07289db54adb440a8b0d4bdd5fbef1d833bb1fdd868f0b2964e",
+        "platform": "linux/amd64"
+      },
+      {
+        "service": "shippingservice",
+        "tag": "online-shop-21-shippingservice:local",
+        "id": "sha256:ee84f233fe7ea381e2b4c752dadc896cfb638480aee8471571d2aa67c14b5005",
+        "platform": "linux/amd64"
+      }
+    ],
+    "phases": [
+      "full",
+      "disabled",
+      "unavailable",
+      "refused",
+      "redis"
+    ],
+    "status": "passed",
+    "telemetry": {
+      "red_counter_value_and_attribute_agreement": true,
+      "log_timestamp_and_severity_mapping": true,
+      "spans": 2307,
+      "correlated_log_records": 2864,
+      "trace_services": [
+        "adservice",
+        "cartservice",
+        "checkoutservice",
+        "currencyservice",
+        "emailservice",
+        "frontend",
+        "loadgenerator",
+        "paymentservice",
+        "productcatalogservice",
+        "recommendationservice",
+        "shippingservice"
+      ],
+      "metric_services": [
+        "adservice",
+        "cartservice",
+        "checkoutservice",
+        "currencyservice",
+        "emailservice",
+        "frontend",
+        "loadgenerator",
+        "paymentservice",
+        "productcatalogservice",
+        "recommendationservice",
+        "shippingservice"
+      ],
+      "correlated_log_services": [
+        "adservice",
+        "cartservice",
+        "checkoutservice",
+        "currencyservice",
+        "emailservice",
+        "frontend",
+        "loadgenerator",
+        "paymentservice",
+        "productcatalogservice",
+        "recommendationservice",
+        "shippingservice"
+      ],
+      "metric_names": [
+        "online_shop.business.operations",
+        "online_shop.transport.duration",
+        "online_shop.transport.errors",
+        "online_shop.transport.requests"
+      ],
+      "checks": [
+        "full",
+        "direct RPC coverage",
+        "payment-failure",
+        "shipping-failure",
+        "email-failure",
+        "cart-clear-failure",
+        "ad timeout fallback",
+        "recommendation fallback",
+        "deterministic error RPCs",
+        "deadline",
+        "20 concurrent requests",
+        "optional outbound HTTP propagation"
+      ]
+    },
+    "shutdown": {
+      "disabled": {
+        "seconds": 5.732178600039333,
+        "services": {
+          "adservice": {
+            "exit_code": 143,
+            "oom_killed": false
+          },
+          "cartservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "checkoutservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "currencyservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "emailservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "frontend": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "paymentservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "productcatalogservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "recommendationservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "shippingservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          }
+        }
+      },
+      "unavailable": {
+        "seconds": 5.544279400026426,
+        "services": {
+          "adservice": {
+            "exit_code": 143,
+            "oom_killed": false
+          },
+          "cartservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "checkoutservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "currencyservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "emailservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "frontend": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "paymentservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "productcatalogservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "recommendationservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "shippingservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          }
+        }
+      },
+      "refused": {
+        "seconds": 3.8977520999033004,
+        "services": {
+          "adservice": {
+            "exit_code": 143,
+            "oom_killed": false
+          },
+          "cartservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "checkoutservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "currencyservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "emailservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "frontend": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "paymentservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "productcatalogservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "recommendationservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "shippingservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          }
+        }
+      },
+      "redis": {
+        "seconds": 13.295863699982874,
+        "services": {
+          "adservice": {
+            "exit_code": 143,
+            "oom_killed": false
+          },
+          "cartservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "checkoutservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "currencyservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "emailservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "frontend": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "paymentservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "productcatalogservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "recommendationservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          },
+          "shippingservice": {
+            "exit_code": 0,
+            "oom_killed": false
+          }
+        }
+      }
+    },
+    "cleanup": {
+      "exit_code": 0,
+      "remaining_containers": ""
+    }
+  },
+  "corrected_failed_attempts": [
+    {
+      "project": "online-shop-23-6039a24a",
+      "tooling_revision": "8881411d7a7008cf45824d1bac05e0e431d77a84",
+      "result": "failed Redis native signal-handler timestamp assertion; separate epoch parser added",
+      "cleanup": "passed"
+    },
+    {
+      "project": "online-shop-21-046aeae2",
+      "tooling_revision": "a791b426ac8c4c694186a9bc44ff5ab70fe860c2",
+      "result": "failed optional assistant HTTP fixture; unread chunked body could reset the connection; bounded body consumption added",
+      "cleanup": "passed"
+    }
+  ],
+  "unexecuted": [
+    "Kubernetes deployment/runtime verification",
+    "fresh mirror version/support/license review and publication",
+    "Container Platform eligibility and new candidate",
+    "SRE rendering/deployment/telemetry adoption",
+    "production-scale/soak checks",
+    "unchanged application per-language SDK unit suites were not rerun"
+  ],
+  "retained": "Raw runtime output is ignored; local built images/cache remain; historical published-image lock and prior evidence unchanged.",
+  "independent_cleanup": {
+    "status": "passed",
+    "projects": [
+      "online-shop-23-6039a24a",
+      "online-shop-23-d71e607b",
+      "online-shop-23-3c6f0272",
+      "online-shop-23-f3045eac",
+      "online-shop-21-046aeae2",
+      "online-shop-21-62283fe2"
+    ],
+    "remaining_containers_including_stopped": 0,
+    "remaining_networks": 0,
+    "remaining_volumes": 0,
+    "temporary_proxy_check_container_remaining": 0
+  }
+}

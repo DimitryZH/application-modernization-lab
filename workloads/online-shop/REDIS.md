@@ -108,3 +108,9 @@ Later retirement of mutable tags/old images requires a consumer and rollback
 reference audit first. Frozen experiments and historical evidence are excluded
 from automatic reference replacement. No image publication/deletion, downstream
 repository change or deployment is part of this AML issue.
+
+Existing downstream context: [Container Platform baseline #3](https://github.com/DimitryZH/container-platform/issues/3),
+[runtime smoke #13](https://github.com/DimitryZH/container-platform/issues/13),
+and [SRE staging baseline #11](https://github.com/DimitryZH/sre-platform/issues/11).
+The four handoffs above are requirements for subsequent owner tasks, not claims
+that those tasks have been created, approved or completed.
