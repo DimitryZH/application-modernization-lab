@@ -13,11 +13,19 @@ receivers:
     start_at: beginning
     operators:
     - type: regex_parser
+      if: 'body matches "^[0-9]+:[A-Z] "'
       regex: '^(?P<pid>\d+):(?P<role>[A-Z]) (?P<timestamp>\d+ \w+ \d+ \d+:\d+:\d+\.\d+) (?P<level>[.*#-]) (?P<message>.*)$'
       timestamp:
         parse_from: attributes.timestamp
         layout_type: gotime
         layout: '02 Jan 2006 15:04:05.000'
+    - type: regex_parser
+      if: 'body matches "^[0-9]+:signal-handler"'
+      regex: '^\d+:signal-handler \((?P<timestamp>\d+)\) (?P<message>.*)$'
+      timestamp:
+        parse_from: attributes.timestamp
+        layout_type: epoch
+        layout: s
     - type: move
       from: attributes.message
       to: body

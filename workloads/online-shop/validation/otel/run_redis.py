@@ -33,7 +33,7 @@ def main():
     env.update(EVIDENCE_DIR=str(root), REDIS_INSTANCE=project, COLLECTOR_UID="1000", COLLECTOR_GID="1000", SOURCE_REVISION=app_revision + "." + app_inputs[:12], TOOLING_REVISION=revision)
     base = ["docker", "compose", "-p", project, "-f", str(HERE / "compose.yaml")]
     captures = []
-    threads = []
+    owns_resources = False
     deadline = time.monotonic() + 900
     report = {"project": project, "tooling_revision": revision, "application_revision": app_revision, "application_inputs_sha256": app_inputs, "status": "incomplete", "checks": []}
 
@@ -100,6 +100,7 @@ def main():
                 assert inspected["Config"]["Labels"]["online-shop.validation.revision"] == revision
             assert inspected["Os"] + "/" + inspected["Architecture"] == "linux/amd64"
             report["images"][service] = {"id": inspected["Id"], "revision_label": env["SOURCE_REVISION"], "role": "application" if service == "cartservice" else "validation-tool", "tooling_revision": revision if service == "probe" else None}
+        owns_resources = True
         probe("check-kubernetes", image)
         prepare_data(compose, docker, project)
         compose("up", "-d", "--no-build", "redis-cart", "collector", "cartservice")
@@ -192,8 +193,9 @@ def main():
             output.close()
         cleanup = {"status": "incomplete"}
         try:
-            compose("--profile", "tools", "down", "--volumes", "--remove-orphans", checked=False)
-            remaining = {kind: docker(kind, "ls", "-q", "--filter", "label=com.docker.compose.project=" + project, checked=False).strip() for kind in ["container", "network", "volume"]}
+            if owns_resources:
+                compose("--profile", "tools", "down", "--volumes", "--remove-orphans", checked=False)
+            remaining = {kind: docker(kind, "ls", *(["-a"] if kind == "container" else []), "-q", "--filter", "label=com.docker.compose.project=" + project, checked=False).strip() for kind in ["container", "network", "volume"]} if owns_resources else {}
             assert not any(remaining.values()), "project resources remain"
             cleanup = {"status": "passed", "remaining": remaining}
         finally:
