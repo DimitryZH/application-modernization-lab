@@ -1,5 +1,7 @@
 # Online Shop manual OpenTelemetry
 
+Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/online-shop/` run from the repository root. Markdown links are document-relative.
+
 Issue: [#21](https://github.com/DimitryZH/application-modernization-lab/issues/21).
 
 The ten application services and load generator initialize OpenTelemetry explicitly in source. Handwritten HTTP/gRPC wrappers own transport spans, request counters, error counters, duration histograms and context propagation. Selected handlers own business spans and operation counters. There are no injected agents, bytecode agents, OTel monkey patches or automatic instrumentation bundles. Existing Locust/gevent scheduling remains application runtime behavior.
@@ -75,7 +77,7 @@ Optional cloud catalog/Spanner/AlloyDB paths remain selectable and are not deplo
 - Java start-script outputs are separated because adding tests exposed Gradle's overlapping-output validation. Runtime distribution paths are unchanged.
 - Docker build caches preserve dependency/compiler work without changing individual service build contexts.
 
-See [validation instructions](validation/otel/README.md) and [implementation evidence](validation/otel/RESULTS.md).
+See [validation instructions](../validation/otel/README.md) and [implementation evidence](../validation/otel/RESULTS.md).
 
 ## Redis server collection
 
@@ -85,5 +87,5 @@ server stdout with a separate resource identity. Application logical cache CLIEN
 spans remain distinct from Redis command execution; no Redis SERVER spans or
 trace-correlated native server logs are generated. Infrastructure metrics can
 remain present while application SDK export is disabled or unavailable. New
-results live in [Redis evidence](validation/otel/REDIS-RESULTS.md); earlier
+results live in [Redis evidence](../validation/otel/REDIS-RESULTS.md); earlier
 application telemetry evidence retains its original Redis selection and scope.

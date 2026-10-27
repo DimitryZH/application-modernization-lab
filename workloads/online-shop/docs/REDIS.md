@@ -1,5 +1,7 @@
 # Redis dependency and runtime contract
 
+Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/online-shop/` run from the repository root. Markdown links are document-relative.
+
 `images.lock.json` remains the sole image selection record. The `redis-cart`
 component selects the existing mirror by its linux/amd64 **manifest** digest.
 `redis.runtime.json` references that mapping and adds runtime requirements plus

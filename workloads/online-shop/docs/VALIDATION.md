@@ -24,8 +24,8 @@ These are local structural checks, not full Kubernetes OpenAPI/schema or admissi
 No Docker images or layers were pulled, built, retagged or pushed. Registry availability and upstream digest matches are inherited from the pinned Container Platform observation record, not newly observed registry claims. Source imports and manifest structure do not establish reproducible builds, authenticated provenance, production readiness or release approval. All historical source/build gaps remain open.
 
 
-## Manual telemetry implementation — issue #21
+## Manual telemetry implementation â€” issue #21
 
-The October 18 record above describes the original import and remains historical. The subsequent implementation built and ran all eleven application images locally, including the original trimmed/self-contained/single-file cartservice release artifact. See [telemetry acceptance results](validation/otel/RESULTS.md), [reproduction instructions](validation/otel/README.md), and the [instrumentation contract](TELEMETRY.md) for the new evidence and its limits.
+The October 18 record above describes the original import and remains historical. The subsequent implementation built and ran all eleven application images locally, including the original trimmed/self-contained/single-file cartservice release artifact. See [telemetry acceptance results](../validation/otel/RESULTS.md), [reproduction instructions](../validation/otel/README.md), and the [instrumentation contract](TELEMETRY.md) for the new evidence and its limits.
 
 This validation uses an isolated Docker Compose harness for the canonical workload. It does not migrate the workload to Aspire, alter the canonical Kubernetes deployment, publish images, or assert that historical published images contain these source changes.

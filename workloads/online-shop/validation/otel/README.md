@@ -1,7 +1,7 @@
 # Isolated Online Shop telemetry validation
 
 Current Redis selection is the exact mirror manifest in `images.lock.json`.
-See [Redis contract](../../REDIS.md) and [current Redis evidence](REDIS-RESULTS.md).
+See [Redis contract](../../docs/REDIS.md) and [current Redis evidence](REDIS-RESULTS.md).
 Run `python workloads/online-shop/validation/otel/run_redis.py` from a clean commit
 for focused Redis/security/cart recovery/server telemetry acceptance.
 Historical `RESULTS.md` and `evidence-summary*.json` used the official

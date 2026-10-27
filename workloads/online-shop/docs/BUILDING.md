@@ -1,5 +1,7 @@
 # Source-to-build handoff, contract v1
 
+Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/online-shop/` run from the repository root. Markdown links are document-relative.
+
 `build.contract.json` describes future source builds. `images.lock.json` remains
 the historical published-image authority; its namespace artifacts are not builds
 of this contract. The planner cross-checks component IDs, roles and paths against
@@ -118,7 +120,7 @@ python workloads/online-shop/validation/build/verify.py
 The second command requires an isolated clean checkout with LF bytes, Git history
 containing the historical revision, and Docker Linux/amd64. It uses unique local
 tags, preserves raw logs in ignored output, and never publishes. It may reuse
-BuildKit layers and compiler/dependency caches. See [build evidence](validation/build/RESULTS.md)
+BuildKit layers and compiler/dependency caches. See [build evidence](../validation/build/RESULTS.md)
 for the actual tested commit, results, fingerprint comparison and cleanup.
 See [runtime handoff](RUNTIME.md), [telemetry](TELEMETRY.md) and [Redis](REDIS.md)
 for independent runtime contracts.

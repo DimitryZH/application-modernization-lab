@@ -1,5 +1,7 @@
 # Portable runtime handoff
 
+Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/online-shop/` run from the repository root. Markdown links are document-relative.
+
 These are application requirements, independent of the validation Compose file.
 Use service DNS names appropriate to the consuming platform. RPC endpoints are
 plaintext gRPC `host:port`; HTTP URLs include a scheme. There are no mandatory
@@ -95,7 +97,7 @@ Exporters use short timeouts and bounded trace batches; loss on unavailable
 export is intentional. Shutdown drains/flushed providers within container grace
 periods; allow at least the historically validated 20-second aggregate budget.
 Queues, retries and exact flush behavior differ by SDK. See the historical
-[five-phase acceptance](validation/otel/RESULTS.md) for disabled/refused/stalled
+[five-phase acceptance](../validation/otel/RESULTS.md) for disabled/refused/stalled
 export and normal shutdown results, not a new runtime run for issue #25.
 
 ## External Redis and validation-only resources
@@ -103,7 +105,7 @@ export and normal shutdown results, not a new runtime run for issue #25.
 Redis selection remains `docker.io/dmitryzhuravlev/online-shop-redis-cart` at
 linux/amd64 manifest digest
 `sha256:81be8a1f52db5f99fe3de0bbbd2efce827f51ce409155a95e9bdbac8c2721ba6`.
-Use [redis.runtime.json](redis.runtime.json) and [REDIS.md](REDIS.md) for tested
+Use [redis.runtime.json](../redis.runtime.json) and [REDIS.md](REDIS.md) for tested
 config identity, memory-only persistence, security, collection and cleanup.
 Publisher lineage is unresolved. A fresh mirror, release review and explicit
 Container/SRE downstream adoption remain required; this issue publishes or
@@ -113,3 +115,18 @@ Fault proxies, synthetic optional endpoints, probe/generated-client containers,
 Redis setup helper, Collector JSON/file exporters, full sampling, short test
 intervals and failure-phase overrides belong to the validation harness. They
 are not additional application dependencies or CI source-build inputs.
+
+
+## Kubernetes profile
+
+[kubernetes/online-shop.yaml](../kubernetes/online-shop.yaml) contains 12 Deployments, 11 ClusterIP Services and 11 upstream ServiceAccounts. It preserves upstream selectors, internal DNS names, ports, probes, resource bounds, non-root container security and Redis `emptyDir` storage. It is a portable AML profile with the same component/image membership as `sre-dev-online-shop-v1`, **not a copy of the SRE chart or a claim of configuration/runtime equivalence**. In particular, frontend is a Deployment here; the SRE frontend Rollout belongs to SRE infrastructure.
+
+Adaptations:
+
+- Pin all 12 images to baseline digests and constrain scheduling to `linux/amd64`.
+- Remove the upstream load-generator BusyBox init container, which is absent from the selected SRE baseline. There is no replacement image or startup gate; initial load-generator requests may fail until frontend becomes ready.
+- Remove `frontend-external` LoadBalancer to avoid automatic external exposure and cloud cost. Frontend remains reachable internally through `frontend:80`.
+- Remove Istio-specific probe annotations, disable service-account token automounting, set frontend platform to `local`, and explicitly disable its optional assistant while setting its required address to the disabled loopback sentinel `127.0.0.1:1`. The upstream frontend requires this address even with the feature disabled. Its flag hides the assistant UI; direct assistant API requests remain unsupported and fail against the sentinel. Existing profiler-disabling settings remain.
+- Include no SRE infrastructure, failure-injection workload, assistant service, cloud provisioning, environment credentials, ConfigMaps or secret dependencies.
+
+Redis carts are ephemeral and reset with the Pod's storage. Load generation is enabled at the upstream defaults of 10 users and rate 1, so this profile consumes resources and sends synthetic checkout traffic whenever started. Browser assets retain upstream public CDN/font URLs. Optional backend/cloud code remains in imported sources but is not selected by this profile. No deployment was performed; production exposure, persistence, policy, sizing and runtime compatibility require separate review.

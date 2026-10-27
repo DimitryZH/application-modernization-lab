@@ -11,10 +11,11 @@ obj/
 *.pid
 *.log
 
+experiments/AI
+
 # OS/editor noise
 .DS_Store
 .vscode/.ropeproject/
 
-# AI
-AI/
+
 

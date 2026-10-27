@@ -1,169 +1,64 @@
 # Application Modernization Lab
 
-**AI-agent-driven experiments for migrating multi-service applications from Docker Compose to .NET Aspire.**
+Application Modernization Lab maintains **Online Shop**, a polyglot microservices workload with manual OpenTelemetry instrumentation, explicit build inputs and portable runtime requirements. The canonical application lives in [`workloads/online-shop/`](workloads/online-shop/README.md), separate from the historical modernization experiments.
 
-This repository is a research lab that evaluates how AI coding agents and agent-orchestration workflows can plan, implement, validate, and improve application-modernization work across progressively more complex systems.
+## Application and telemetry
 
-The experiments began with direct Codex-driven migrations and later evaluated OpenClaw/DevClaw role-based orchestration, GitHub-native task state, explicit human review, and operator-approved reusable migration knowledge. The evaluated OpenClaw/DevClaw architecture was not selected as the primary AI Operations Platform orchestrator, while useful governance patterns and successful application-modernization results remain preserved.
+The workload contains ten application services and a synthetic load generator:
 
-## What This Repository Demonstrates
+| Component | Runtime | Responsibility |
+|---|---|---|
+| frontend | Go | Storefront HTTP entry point |
+| checkoutservice | Go | Checkout orchestration |
+| productcatalogservice | Go | Product catalog |
+| shippingservice | Go | Shipping quotes and simulated shipping |
+| cartservice | .NET | Shopping carts backed by Redis |
+| currencyservice | Node.js | Currency conversion |
+| paymentservice | Node.js | Simulated payment processing |
+| emailservice | Python | Dummy email confirmation |
+| recommendationservice | Python | Product recommendations |
+| adservice | Java | Advertisements |
+| loadgenerator | Python / Locust | Synthetic shopping traffic |
 
-- Docker Compose to .NET Aspire migration across increasing levels of complexity;
-- functional-equivalence validation rather than configuration translation alone;
-- preservation of service dependencies, messaging, persistence, health checks, and observability;
-- AI-assisted architecture analysis, implementation, testing, and review;
-- remote agent execution on a controlled Linux DevBox;
-- GitHub-based task orchestration, auditability, and human-in-the-loop approvals;
-- migration patterns that can be promoted into operator-approved reusable skills.
+Redis is an **external runtime dependency**, with no local application source or Dockerfile. The accepted profile uses a standalone ephemeral cache: both Redis process restart and storage replacement lose carts. Image selection and runtime requirements remain in [images.lock.json](workloads/online-shop/images.lock.json) and [redis.runtime.json](workloads/online-shop/redis.runtime.json).
 
-## Experiment Progression
+All eleven source components explicitly initialize OpenTelemetry. Manual transport and business spans provide distributed tracing with W3C context propagation; bounded request/error counters and duration histograms support metrics; JSON stdout logs carry service identity and active trace/span IDs. Cartservice retains the native ASP.NET SERVER Activity and enriches it manually. SDK trace/metric export is opt-in. Log collection and telemetry backends belong to the consuming platform. Redis server metrics and native logs are separate infrastructure signals, without Redis SERVER spans or trace-correlated server logs.
 
-| Experiment | Scope | Agent / Execution Model | Result |
-|---|---|---|---|
-| 01 | Controlled multi-service demo | Codex-assisted migration | PASS |
-| 02 | Browser-constrained open-source migration | Codex in a constrained environment | 6/10 |
-| 03 | Docker Example Voting App | Codex desktop workflow | 8/10 |
-| 04 | Google Cloud DevBox execution validation | Codex on a remote Linux DevBox | PASS - 95/100 |
-| 05 | Full OpenTelemetry Demo / Astronomy Shop migration | Codex on a controlled DevBox | PASS - 94/100 |
-| 06 | Online Boutique modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | PASS - Docker Compose baseline and .NET Aspire migration independently validated; reusable migration skill applied |
-| 07 | Bank of Anthos modernization | OpenClaw + DevClaw + OpenAI GPT-5.5 | PASS - Docker Compose baseline and .NET Aspire migration independently validated; [skill knowledge review](experiments/07-bank-of-anthos/compose-to-aspire-skill-knowledge-review.md) recommends a targeted skill update |
-| 08 | AKS Store Demo modernization | Compose baseline, Aspire migration, and orchestration retrospective | PASS - accepted Compose baseline and successful .NET Aspire migration; [retrospective](experiments/08-aks-store-demo/retrospective.md) separates migration success from OpenClaw/DevClaw primary-orchestrator non-selection |
+## Build inputs and runtime requirements
 
-## Agent-Orchestration Track
+The [source-to-build handoff](workloads/online-shop/docs/BUILDING.md) defines eleven explicit build contexts, Dockerfiles, generated/shared inputs and a versioned consumer interface. [build.contract.json](workloads/online-shop/build.contract.json) and [build_plan.py](workloads/online-shop/build_plan.py) describe selected-revision plans; the planner does not build or publish images. External base images, package repositories and incomplete transitive locking prevent a promise of byte-identical builds.
 
-Experiments 06, 07, and 08 evaluated more than individual coding-agent output. They tested a multi-agent workflow in which:
+The [runtime handoff](workloads/online-shop/docs/RUNTIME.md) specifies service endpoints, configuration, telemetry differences and the portable Kubernetes profile. The profile uses digest-pinned linux/amd64 images and internal Services; it includes no deployment or telemetry infrastructure. Production exposure, persistence, policy and sizing require downstream review.
 
-- **OpenClaw** provides the operator-facing control surface and agent runtime;
-- **DevClaw** manages projects, roles, task state, worker sessions, and review state;
-- **OpenAI GPT-5.5** performs reasoning within architect and engineering sessions;
-- **GitHub Issues, labels, comments, branches, and pull requests** provide durable workflow state and an auditable evidence trail;
-- the **human operator** approves architecture, implementation, merge, and reusable knowledge promotion.
+**Instrumented sources and historical published images are distinct.** Existing Docker Hub images are copies of upstream artifacts, not builds of these adapted sources; they do not establish that local branding or manual instrumentation is deployed. Local source-build acceptance is separate evidence. New publication, image-reference adoption and cross-project integration remain downstream work. Historical provenance gaps and Redis publisher lineage remain unresolved; no release approval is implied.
 
-```mermaid
-flowchart LR
-    Human[Human Operator]
-    UI[OpenClaw Control UI]
-    DevClaw[DevClaw Orchestrator]
-    Agents[Role-based Agent Sessions]
-    Workspace[Controlled DevBox Workspace]
-    GitHub[GitHub Issues, Labels, Comments and PRs]
-    Skill[Operator-Approved Workspace Skill]
+## Documentation and validation
 
-    Human --> UI
-    UI --> DevClaw
-    DevClaw --> Agents
-    Agents --> Workspace
-    Agents --> GitHub
-    GitHub --> Human
-    Human -. approval .-> DevClaw
-    GitHub -. validated evidence .-> Skill
-    Human -. explicit apply .-> Skill
-```
+| Document | Scope |
+|---|---|
+| [Build inputs](workloads/online-shop/docs/BUILDING.md) | Consumer interface, dependency limits and regeneration matrix |
+| [Runtime requirements](workloads/online-shop/docs/RUNTIME.md) | Endpoints, settings, runtime differences and Kubernetes profile |
+| [Manual OpenTelemetry](workloads/online-shop/docs/TELEMETRY.md) | Traces, metrics, correlated logs, privacy and lifecycle |
+| [Redis](workloads/online-shop/docs/REDIS.md) | Ephemeral cache, security, server collection and downstream handoff |
+| [Upstream and image origins](workloads/online-shop/docs/UPSTREAM.md) | Import record, attribution and historical image provenance |
+| [Static validation](workloads/online-shop/docs/VALIDATION.md) | Original import checks and their limits |
+| [Build acceptance results](workloads/online-shop/validation/build/RESULTS.md) | Recorded clean-source builds of all eleven components |
+| [Telemetry validation instructions](workloads/online-shop/validation/otel/README.md) / [results](workloads/online-shop/validation/otel/RESULTS.md) | Isolated source-build harness and recorded signal/lifecycle checks |
+| [Redis acceptance results](workloads/online-shop/validation/otel/REDIS-RESULTS.md) | Recorded cache, outage/recovery, storage and collection checks |
 
-This design separates AI reasoning from execution policy. Agents can investigate and propose changes, but workflow transitions and higher-impact actions remain bounded by explicit operator decisions.
+Results describe their recorded revisions and execution conditions, not a new validation run or deployment. Frozen evidence retains historical document paths. Bare `BUILDING.md` references in the unchanged machine contract refer to the [document now under docs/](workloads/online-shop/docs/BUILDING.md).
 
-The historical experiments preserved useful governance patterns: GitHub-native auditability, role separation, architecture-first planning, immutable baselines, validation-first delivery, and explicit human approval gates. Those patterns survive independently of the worker runtime.
+## Platform responsibilities
 
-The final Experiment 08 retrospective records the bounded orchestration conclusion: the evaluated OpenClaw/DevClaw worker architecture was not selected as the primary AI Operations Platform orchestration foundation. OpenClaw/DevClaw is not rejected in all roles, OpenClaw may remain an optional communication gateway or interactive runtime subject to separate validation, and the successful Experiment 06, 07, and 08 application-modernization outcomes remain valid.
+| Repository | Responsibility |
+|---|---|
+| [Application Modernization Lab](https://github.com/DimitryZH/application-modernization-lab) | Application sources, instrumentation and build/runtime contracts |
+| [CI Build Platform](https://github.com/DimitryZH/ci-build-platform) | Build execution and image publication with actual revision/run evidence |
+| [Container Platform](https://github.com/DimitryZH/container-platform) | Release composition, artifact validation and eligibility review |
+| [SRE Platform](https://github.com/DimitryZH/sre-platform) | Deployment and telemetry infrastructure |
 
-## Highlight: Experiment 05
+These are ownership boundaries and handoff requirements. Planned integration and downstream adoption are not completed by AML's local acceptance. Detailed image records and follow-ups remain in the [upstream record](workloads/online-shop/docs/UPSTREAM.md#sources-images-and-future-builds) and [Redis handoff](workloads/online-shop/docs/REDIS.md#downstream-handoff).
 
-Experiment 05 migrated the full OpenTelemetry Demo, also known as Astronomy Shop, from Docker Compose to .NET Aspire.
+## Modernization experiments
 
-### Migration Scope
-
-- 29 services represented in Aspire;
-- Kafka messaging preserved;
-- OpenTelemetry Collector preserved;
-- Jaeger, Prometheus, Grafana, and OpenSearch preserved;
-- application and observability topology retained;
-- functional and operational validation performed on the complete environment.
-
-### Validation Summary
-
-```text
-29/29 services migrated
-No unresolved MIGRATION_FAILURE
-Final score: 94/100
-```
-
-The validation covered:
-
-- storefront and checkout workflows;
-- Kafka producer and consumer paths;
-- distributed tracing;
-- metrics and logging pipelines;
-- observability dashboards and backends;
-- service topology and runtime behavior.
-
-## Key Findings
-
-### AI agents can perform meaningful modernization work
-
-The experiments show that AI-assisted workflows can migrate realistic multi-service applications when the task includes architecture analysis, implementation, verification, and evidence-based review.
-
-### Functional equivalence matters more than syntax conversion
-
-A successful migration must preserve runtime behavior, dependencies, state, health semantics, messaging, and operational visibility, not merely recreate service declarations in another format.
-
-### Observability and messaging can be preserved
-
-Complex OpenTelemetry and Kafka-based systems can be represented in Aspire without discarding their original operational model.
-
-### Controlled remote execution improves reliability
-
-A dedicated Linux DevBox provides a more reproducible environment than browser-constrained execution and supports stronger validation, credential boundaries, and runtime inspection.
-
-### Agent orchestration adds governance
-
-The OpenClaw/DevClaw track tested whether role separation, GitHub-native workflow state, and human approvals can make agent-driven modernization safer, more reviewable, and easier to reuse across projects. The retained governance patterns remain useful even though the evaluated OpenClaw/DevClaw architecture was not selected as the primary AI Operations Platform orchestrator.
-
-## Repository Structure
-
-```text
-.
-|-- AGENTS.md
-|-- experiments/
-|   |-- 01-controlled-demo/
-|   |-- 02-open-source-voting-app/
-|   |-- 03-codex-desktop-voting-app/
-|   |-- 04-google-cloud-devbox/
-|   |-- 05-opentelemetry-demo/
-|   |-- 06-online-boutique/
-|   |-- 07-bank-of-anthos/
-|   `-- 08-aks-store-demo/
-|-- LICENSE
-`-- README.md
-```
-
-Each experiment contains its own source material, Aspire implementation, validation evidence, and conclusions.
-
-## Recommended Reading
-
-1. Experiment 05 final assessment;
-2. Experiment 05 equivalence review;
-3. Experiment 04 DevBox validation;
-4. Experiment 03 Voting App migration;
-5. Experiment 06 Online Boutique migration and validation results;
-6. Experiment 07 Bank of Anthos skill knowledge review;
-7. Experiment 08 AKS Store Demo retrospective.
-
-## Technical Value
-
-This lab demonstrates practical experience in:
-
-- .NET Aspire and distributed application orchestration;
-- Docker Compose modernization;
-- polyglot microservice systems;
-- OpenTelemetry, Prometheus, Grafana, Jaeger, and OpenSearch;
-- Kafka, PostgreSQL, Redis, and containerized dependencies;
-- AI coding agents and multi-agent orchestration;
-- human-in-the-loop workflow design;
-- cloud-hosted agent execution;
-- validation-driven engineering and technical documentation.
-
-## Conclusion
-
-Application Modernization Lab documents the evolution from small AI-assisted migrations to controlled, auditable workflows for complex application modernization.
-
-The central question is no longer only whether an AI agent can generate an Aspire AppHost. The broader experiment evaluates whether specialized agents and replaceable execution models can preserve system behavior, produce reviewable evidence, and improve future migrations through operator-approved knowledge reuse.
+The separate [modernization experiments](experiments/README.md) preserve Docker Compose to .NET Aspire migrations, results and historical AI/agent-orchestration research.
