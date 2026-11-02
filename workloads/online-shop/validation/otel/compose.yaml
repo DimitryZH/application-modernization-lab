@@ -333,7 +333,7 @@ services:
     profiles:
     - load
   redis-cart:
-    image: docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:81be8a1f52db5f99fe3de0bbbd2efce827f51ce409155a95e9bdbac8c2721ba6
+    image: docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9
     platform: linux/amd64
     user: '1000:1000'
     read_only: true

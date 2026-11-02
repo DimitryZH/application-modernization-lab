@@ -3,7 +3,30 @@ import copy
 import json
 import subprocess
 import unittest
-from redis_contract import HERE, check
+from redis_contract import HERE, WORKLOAD, check, check_source
+
+
+class SourceTests(unittest.TestCase):
+    def setUp(self):
+        self.contract = json.loads((WORKLOAD / "redis.runtime.json").read_text())
+        mapping = json.loads((WORKLOAD / "images.lock.json").read_text())
+        self.image = next(c["image"] for c in mapping["components"] if c["id"] == "redis-cart")
+        self.source = json.loads((WORKLOAD / self.contract["sourceContract"]).read_text())
+
+    def test_matching_official_canonical_and_runtime_references(self):
+        check_source(self.contract, self.image, self.source)
+        text = (WORKLOAD / "kubernetes/online-shop.yaml").read_text()
+        self.assertIn(self.image["repository"] + "@" + self.image["digest"], text)
+        self.assertEqual(self.source["publicationStatus"], "pending")
+
+    def test_reject_reference_and_version_drift(self):
+        for change in (lambda s:s["upstream"].update(repository="docker.io/other/redis"),
+                       lambda s:s["canonical"].update(manifestDigest="sha256:" + "0"*64),
+                       lambda s:s["upstream"].update(configDigest="sha256:" + "0"*64),
+                       lambda s:s.update(platform="linux/arm64"), lambda s:s.update(redisVersion="7.4.8"),
+                       lambda s:s.update(version=True)):
+            source = copy.deepcopy(self.source);change(source)
+            with self.assertRaises(AssertionError):check_source(self.contract, self.image, source)
 
 
 class DriftTests(unittest.TestCase):

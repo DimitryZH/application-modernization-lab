@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "scope": "Redis dependency source/reference preparation for SDP #100",
+  "observed_date": "2026-11-02",
+  "selection": {
+    "repository": "docker.io/library/redis",
+    "selector": "7.4.12-alpine3.21",
+    "indexDigest": "sha256:8da19c7399dca900c6822a1cf30f9d2285585e2c4b457ff4095b0f4500054d3f",
+    "manifestDigest": "sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9",
+    "configDigest": "sha256:98c6ca8f397f86e469be752c3e7ed5eb8b17f2479840cb69a2e413037038e9f4"
+  },
+  "canonical_reference": "docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9",
+  "official_source": {
+    "repository": "https://github.com/redis/docker-library-redis",
+    "revision": "786872f8c248c1f0990f93244cbcb3949329016d",
+    "directory": "alpine",
+    "filesSha256": {
+      "alpine/Dockerfile": "sha256:4e97a743bef79aaf917f7ca3334f4284a86fda09b8406b69f0f85adcb55ae5b2",
+      "alpine/docker-entrypoint.sh": "sha256:f8122ddc0eb2ae6ca7762725999f08b2ee7a6975da54e9061feee88f6d4ab2bb"
+    }
+  },
+  "read_only_upstream_checks": {
+    "index_platform_config": "passed",
+    "all_layer_hashes_and_sizes": 7,
+    "index_bound_provenance_source_subject": "observed and digest checked; unsigned registry provenance, not a publisher signature",
+    "entrypoint_matches_pinned_source": true
+  },
+  "local_validation": {
+    "source_and_compose_contract_tests": 6,
+    "build_planner_tests": 21,
+    "failures": 0,
+    "local_links_checked": 8,
+    "diff_check": "passed"
+  },
+  "compatibility": {
+    "settings": "unchanged: UID/GID1000, read-only root, writable /data, singleton Recreate, 6379, no RDB/AOF, 15s shutdown",
+    "cartservice": "application source/package versions unchanged; hash/expiry semantics unchanged in Redis 7.4 line",
+    "binary_files_and_entrypoint": "world-executable server/CLI; non-root entrypoint skips root ownership changes",
+    "real_redis_cart_runtime": "pending; local Docker engine unavailable",
+    "real_telemetry": "pending"
+  },
+  "publication": "pending; no upload/signing/deployment performed",
+  "existing_image": "retained; previous immutable reference stored in mapping",
+  "implementation_hashes": {
+    "images.lock.json": "sha256:6e5ccb029dc0aaa2c9fa8322139b406b814865a7e31b06df0103b0b8d8539f0c",
+    "redis.source-v2.json": "sha256:050c315a444a936eacc31da9b5409810f3be8bfd1a986fcd0faae16d0653c37a",
+    "redis.runtime.json": "sha256:12324ccfae81d46eaead0f17f7fa2453e9b293fd647382252b60bcd2a0e41682",
+    "kubernetes/online-shop.yaml": "sha256:2f02fc2f04463274453e7cb20ae27d49506b7971ea00750e0099e99566d418ed",
+    "validation/otel/compose.yaml": "sha256:89410b7df52760fb05913345e715521542b926996f66e32fe9e3ef50a743a749",
+    "validation/otel/redis_contract.py": "sha256:43a799cb8f878c0f2b787d96b35b0542de7cce51fdcdb50deff9218a5dfffc5d",
+    "validation/otel/test_redis_contract.py": "sha256:59288a4751c362de623a0a5d088a11f8469a4e07f8aac226a880feff20afe1b6",
+    "validation/otel/redis_probe.py": "sha256:e8ac4943aa7d77ebe254a2035426c53c7f8d81c8bd5982d3448ec5d5da125b67",
+    "validation/otel/redis_assertions.py": "sha256:d1ac11c4490cea501c5345d44f57913d74e8dea252d90a3260f2d33c6f107f08",
+    "docs/REDIS.md": "sha256:34f85b14ac6112324b42f4715b04d2c8cfa3574b761b5c72d4a898b99c33a95a",
+    "docs/RUNTIME.md": "sha256:406f094da6a50ad1752d9ad66b6a50fb1acf801eb3e1874c50066ced1a4aa303"
+  }
+}

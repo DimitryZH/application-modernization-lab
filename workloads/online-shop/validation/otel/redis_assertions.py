@@ -1,6 +1,7 @@
 """Assert real Redis server signals separately from application SDK signals."""
 import json
 from assertions import attrs, documents
+from redis_contract import dependency
 
 
 def resources(root, signal, group, entries):
@@ -22,7 +23,7 @@ def validate(root, instance, outage=None):
             continue
         for key, expected in {"service.namespace": "online-shop", "service.instance.id": instance, "deployment.environment.name": "local-validation"}.items():
             assert identity.get(key) == expected, ("Redis metric identity", key)
-        assert identity.get("redis.version") == "7.4.8"
+        assert identity.get("redis.version") == dependency()[0]["redisVersion"]
         for field in ["gauge", "sum"]:
             for point in metric.get(field, {}).get("dataPoints", []):
                 values.setdefault(metric["name"], []).append(float(point.get("asInt", point.get("asDouble", 0))))
