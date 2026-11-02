@@ -13,7 +13,25 @@ def dependency():
     image = next(c["image"] for c in mapping["components"] if c["id"] == contract["component"])
     assert image["kind"] == "manifest"
     assert image["platforms"] == [contract["platform"]] == [mapping["platform"]]
+    source = json.loads((WORKLOAD / contract["sourceContract"]).read_text())
+    check_source(contract, image, source)
     return contract, image["repository"] + "@" + image["digest"]
+
+
+def check_source(contract, image, source):
+    """Local consistency only; publication and publisher verification are separate."""
+    assert type(contract["version"]) is int and contract["version"] == 2
+    assert type(source["version"]) is int and source["version"] == 2
+    assert contract["sourceContract"] == "redis.source-v2.json"
+    assert source["component"] == contract["component"] == "redis-cart"
+    assert source["platform"] == contract["platform"] == "linux/amd64"
+    assert source["redisVersion"] == contract["redisVersion"] == "7.4.12"
+    assert source["upstream"]["repository"] == "docker.io/library/redis"
+    assert source["upstream"]["selector"] == "7.4.12-alpine3.21"
+    assert image["repository"] == source["canonical"]["repository"] == "docker.io/dmitryzhuravlev/online-shop-redis-cart"
+    assert image["digest"] == source["canonical"]["manifestDigest"] == source["upstream"]["manifestDigest"]
+    assert contract["configDigest"] == source["upstream"]["configDigest"]
+    assert source["canonical"]["copyMode"] == "preserve-selected-platform-manifest"
 
 
 def check(compose):

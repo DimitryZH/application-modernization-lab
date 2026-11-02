@@ -47,7 +47,8 @@ def primitives():
     key = "PrivacyRedisKey-" + uuid.uuid4().hex
     with Redis() as r:
         assert r.command("PING") == b"PONG"
-        assert b"redis_version:7.4.8" in r.command("INFO", "server")
+        version = json.loads(pathlib.Path("/contract/redis.runtime.json").read_text())["redisVersion"]
+        assert ("redis_version:" + version + "\r\n").encode() in r.command("INFO", "server")
         assert r.command("SET", key, "PrivacyRedisValue") == b"OK"
         assert r.command("GET", key) == b"PrivacyRedisValue"
         assert r.command("EXPIRE", key, 1) == 1
@@ -68,7 +69,7 @@ def primitives():
         assert r.command("CONFIG", "GET", "appendonly") == [b"appendonly", b"no"]
         assert r.command("SET", "restart-marker", "synthetic") == b"OK"
     # A regular file distinguishes retained storage from Redis persistence.
-    print(json.dumps({"primitives": "passed", "binary_version": "7.4.8"}))
+    print(json.dumps({"primitives": "passed", "binary_version": version}))
 
 
 def cart(mode):

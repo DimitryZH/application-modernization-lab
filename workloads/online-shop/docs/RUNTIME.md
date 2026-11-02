@@ -104,12 +104,14 @@ export and normal shutdown results, not a new runtime run for issue #25.
 
 Redis selection remains `docker.io/dmitryzhuravlev/online-shop-redis-cart` at
 linux/amd64 manifest digest
-`sha256:81be8a1f52db5f99fe3de0bbbd2efce827f51ce409155a95e9bdbac8c2721ba6`.
+`sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9`.
 Use [redis.runtime.json](../redis.runtime.json) and [REDIS.md](REDIS.md) for tested
 config identity, memory-only persistence, security, collection and cleanup.
-Publisher lineage is unresolved. A fresh mirror, release review and explicit
-Container/SRE downstream adoption remain required; this issue publishes or
-replaces nothing.
+The selected official Redis 7.4.12 source/index/platform/config association is
+recorded in [redis.source-v2.json](../redis.source-v2.json). The canonical mirror
+reference is proposed: publication, independent equality verification, required
+SDP attestation and runtime acceptance remain pending. No publication or deployment
+is claimed by these contract changes.
 
 Fault proxies, synthetic optional endpoints, probe/generated-client containers,
 Redis setup helper, Collector JSON/file exporters, full sampling, short test

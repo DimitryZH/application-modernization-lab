@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "component": "redis-cart",
+  "redisVersion": "7.4.12",
+  "platform": "linux/amd64",
+  "publicationStatus": "pending",
+  "upstream": {
+    "repository": "docker.io/library/redis",
+    "selector": "7.4.12-alpine3.21",
+    "indexDigest": "sha256:8da19c7399dca900c6822a1cf30f9d2285585e2c4b457ff4095b0f4500054d3f",
+    "manifestDigest": "sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9",
+    "configDigest": "sha256:98c6ca8f397f86e469be752c3e7ed5eb8b17f2479840cb69a2e413037038e9f4"
+  },
+  "canonical": {
+    "repository": "docker.io/dmitryzhuravlev/online-shop-redis-cart",
+    "manifestDigest": "sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9",
+    "copyMode": "preserve-selected-platform-manifest",
+    "newTag": "7.4.12-alpine3.21"
+  },
+  "source": {
+    "repository": "https://github.com/redis/docker-library-redis",
+    "revision": "786872f8c248c1f0990f93244cbcb3949329016d",
+    "directory": "alpine",
+    "filesSha256": {
+      "alpine/Dockerfile": "sha256:4e97a743bef79aaf917f7ca3334f4284a86fda09b8406b69f0f85adcb55ae5b2",
+      "alpine/docker-entrypoint.sh": "sha256:f8122ddc0eb2ae6ca7762725999f08b2ee7a6975da54e9061feee88f6d4ab2bb"
+    }
+  },
+  "officialImages": {
+    "repository": "https://github.com/docker-library/official-images",
+    "revision": "72aa61399c17a658738763be8dbbf987880a7b2a",
+    "path": "library/redis",
+    "sha256": "sha256:a4f1354292623327e5d48f282431e08886c3fb3d9374e2c746608326ca34a659"
+  },
+  "provenance": {
+    "attestationManifestDigest": "sha256:e734018a3bc60138d82e1084e231149b53bc8dcd5179c9e84bf21f32e94d5f04",
+    "statementDigest": "sha256:b5e4a0ae9c7c176abe5548d7a7aacbcf409425daef5f10b0bb7af4255b5f0705",
+    "predicateType": "https://slsa.dev/provenance/v0.2",
+    "builderId": "https://github.com/docker-library",
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "buildInvocationId": "yfknsyfxvj00lki3zrdos7mff",
+    "trustBasis": "Docker Official Images metadata and digest-pinned Docker Hub library/redis publication; index-bound unsigned BuildKit provenance, not a verified publisher signature"
+  },
+  "requiredNextChecks": [
+    "Canonical mirror publication and independent equality verification",
+    "SDP approved registry mirror equality verification",
+    "Separate required-attestor signing and occurrence/signature readback",
+    "Isolated Redis/cart runtime and telemetry acceptance"
+  ]
+}
