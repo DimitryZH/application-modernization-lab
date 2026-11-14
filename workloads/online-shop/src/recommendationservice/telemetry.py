@@ -278,14 +278,16 @@ def catalog_call(stub, request, server_context=None):
     with operation("hipstershop.ProductCatalogService/ListProducts", SpanKind.CLIENT):
         carrier = {}
         propagate.inject(carrier)
+        remaining = server_context.time_remaining() if server_context else None
+        # A request without a deadline can expose gRPC's very large finite
+        # infinity sentinel. Passing it back as a timeout overflows in gRPC.
+        # Keep the existing ten-second dependency budget and any shorter caller
+        # deadline, including zero for an already expired request.
+        timeout = 10 if remaining is None else min(10, remaining)
         return stub.ListProducts(
             request,
             metadata=list(carrier.items()),
-            timeout=(
-                server_context.time_remaining()
-                if server_context and server_context.time_remaining() is not None
-                else 10
-            ),
+            timeout=timeout,
         )
 
 

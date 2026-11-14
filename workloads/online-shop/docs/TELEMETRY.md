@@ -89,3 +89,29 @@ trace-correlated native server logs are generated. Infrastructure metrics can
 remain present while application SDK export is disabled or unavailable. New
 results live in [Redis evidence](../validation/otel/REDIS-RESULTS.md); earlier
 application telemetry evidence retains its original Redis selection and scope.
+
+
+## Recommendation dependency deadlines
+
+The recommendation catalog client uses a ten-second maximum dependency budget.
+A shorter caller deadline is propagated unchanged; an expired deadline stays
+expired. Python gRPC can return a very large finite infinity sentinel from
+`ServicerContext.time_remaining()` when the caller supplies no deadline. Passing
+that value directly as a new client timeout causes an immediate
+`DEADLINE_EXCEEDED` with the pinned grpcio 1.84.0, before the catalog handler runs.
+The dependency budget bounds this case without increasing the caller's budget.
+W3C context injection, operation attributes and error accounting are unchanged.
+
+Run the following with the pinned recommendation-service dependencies:
+
+```sh
+python -m unittest discover -s workloads/online-shop/src/recommendationservice -p 'test_*.py'
+```
+
+ The tests use
+real loopback gRPC servers for both an absent and a finite parent deadline, plus
+argument checks for short, expired and very large deadlines. The focused
+[validation record](../validation/otel/RECOMMENDATION-DEADLINE-VALIDATION.json)
+does not establish deployment of the corrected image. Consumers must review a
+new source revision and rebuild, independently verify and attest that artifact
+before deploying it.

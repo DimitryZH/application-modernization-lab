@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "scope": "recommendation catalog dependency deadline forwarding",
+  "grpcio": "1.84.0",
+  "opentelemetry_api_sdk_exporter": "1.38.0",
+  "local_platform": "Windows, Python 3.13, loopback gRPC",
+  "before": {
+    "pinned_source_revision": "89fd1cde8285761cc2a35dfb22d145adb2eed980",
+    "no_parent_deadline": "DEADLINE_EXCEEDED",
+    "downstream_handler_invocations": 0,
+    "finite_parent_deadline": "OK"
+  },
+  "after": {
+    "suite_tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "regressions": [
+      "real no-deadline parent RPC succeeds",
+      "real finite-deadline parent RPC succeeds",
+      "short/expired/None/large timeout arguments preserve bounded dependency budget"
+    ]
+  },
+  "implementation_hashes": {
+    "workloads/online-shop/src/recommendationservice/telemetry.py": "55ea521381dfeb7545132ccb7f127cf34549c02b5c4f5c8c8a95e934ec419f9f",
+    "workloads/online-shop/src/recommendationservice/test_catalog_deadline.py": "563d0590a84633b112dec5907093501febeaba0af06f549dacced04a4d6de3b5"
+  },
+  "limits": [
+    "No corrected image built or deployed.",
+    "Linux Docker engine unavailable; loopback execution used the pinned Windows grpcio wheel.",
+    "No timeout/request/capacity or trusted artifact changes in the running application."
+  ]
+}
