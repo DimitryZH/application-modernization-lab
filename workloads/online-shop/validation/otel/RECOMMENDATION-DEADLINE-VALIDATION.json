@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "scope": "recommendation catalog dependency deadline forwarding",
+  "grpcio": "1.84.0",
+  "opentelemetry_api_sdk_exporter": "1.38.0",
+  "local_platform": "Linux/amd64, Dockerfile Python 3.12 base and full pinned requirements; Windows follow-up",
+  "before": {
+    "pinned_source_revision": "89fd1cde8285761cc2a35dfb22d145adb2eed980",
+    "no_parent_deadline": "DEADLINE_EXCEEDED",
+    "downstream_handler_invocations": 0,
+    "finite_parent_deadline": "OK"
+  },
+  "after": {
+    "suite_tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "regressions": [
+      "real no-deadline parent RPC succeeds",
+      "real finite and short parent deadline RPCs succeed",
+      "expired real server context is rejected without downstream dispatch",
+      "None/large/short timeout budgets and expired abort arguments",
+      "existing telemetry correlation/error accounting regressions"
+    ]
+  },
+  "implementation_hashes": {
+    "workloads/online-shop/src/recommendationservice/telemetry.py": "1cbc0d52a9f715215750b6a1c300cdcf292997f07fe7cd4cfd464abacd4f2100",
+    "workloads/online-shop/src/recommendationservice/test_catalog_deadline.py": "4a97a6436efef17ede63875dc586330da1011c70daedc0f37521db60879d2763"
+  },
+  "limits": [
+    "No corrected application image built or deployed; no healthy live acceptance claim.",
+    "Dependency installation matches the Dockerfile builder commands; tests run in that pinned base with g++ installed, rather than starting the production entry point.",
+    "No timeout/request/capacity or trusted artifact changes in the running application."
+  ],
+  "previous_windows_validation": {
+    "python": "3.13",
+    "tests": 7,
+    "skipped": 0,
+    "limit": "Expired deadline was checked only as a timeout argument; no real expired-context dispatch assertion."
+  },
+  "linux": {
+    "python": "3.12.15 (main, Oct 21 2026, 01:08:20) [GCC 14.2.0]",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "architecture": "amd64",
+    "base_reference": "python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2",
+    "image_id": "sha256:a33c10a97f11005523814c6eee013986119fe41f3122f444518117536675c8e1",
+    "repo_digests": [
+      "python@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2"
+    ],
+    "requirements_sha256": "ae72a74187f56edb566e29f8072242db98b512204a310556f57cb48d32a535a6",
+    "dependencies": {
+      "certifi": "2026.10.19",
+      "cffi": "2.1.1",
+      "charset-normalizer": "3.5.2",
+      "cryptography": "50.0.2",
+      "google-api-core": "2.28.1",
+      "google-api-python-client": "2.201.0",
+      "google-auth": "2.62.0",
+      "google-auth-httplib2": "0.4.4",
+      "google-cloud-profiler": "4.1.0",
+      "googleapis-common-protos": "1.75.5",
+      "grpcio": "1.84.0",
+      "grpcio-health-checking": "1.76.0",
+      "httplib2": "0.32.0",
+      "idna": "3.20",
+      "importlib-metadata": "8.7.1",
+      "opentelemetry-api": "1.38.0",
+      "opentelemetry-exporter-otlp-proto-common": "1.38.0",
+      "opentelemetry-exporter-otlp-proto-grpc": "1.38.0",
+      "opentelemetry-proto": "1.38.0",
+      "opentelemetry-sdk": "1.38.0",
+      "opentelemetry-semantic-conventions": "0.59b0",
+      "proto-plus": "1.29.0",
+      "protobuf": "6.33.6",
+      "pyasn1": "0.6.4",
+      "pyasn1-modules": "0.4.2",
+      "pycparser": "3.12",
+      "pyparsing": "3.3.3",
+      "python-json-logger": "4.0.0",
+      "requests": "2.32.4",
+      "rsa": "4.9.1",
+      "typing-extensions": "4.16.0",
+      "uritemplate": "4.2.0",
+      "urllib3": "2.8.0",
+      "zipp": "4.1.2"
+    },
+    "focused_suite": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "original_source_sha256": "20a976131c523572d837ee5c2312792e273d9b65db262e7c47b9ac9d8f178a18",
+    "original_cases": [
+      {
+        "case": "absent",
+        "remaining_before_helper": 9.223372035060079e+18,
+        "forwarded_timeout": 9.223372035060079e+18,
+        "helper_status": "DEADLINE_EXCEEDED",
+        "helper_details": "Deadline Exceeded",
+        "helper_elapsed_ms": 0.38545999996131286,
+        "caller_status": "DEADLINE_EXCEEDED",
+        "downstream_handler_invocations": 0
+      },
+      {
+        "case": "finite",
+        "remaining_before_helper": 5.008246660232544,
+        "forwarded_timeout": 5.008188009262085,
+        "helper_status": "OK",
+        "helper_elapsed_ms": 2.4219440000479153,
+        "caller_status": "OK",
+        "downstream_handler_invocations": 1
+      }
+    ],
+    "fixed_cases": [
+      {
+        "case": "absent",
+        "remaining_before_helper": 9.223372035060079e+18,
+        "forwarded_timeout": 10,
+        "helper_status": "OK",
+        "helper_elapsed_ms": 2.1836050000274554,
+        "caller_status": "OK",
+        "downstream_handler_invocations": 1
+      },
+      {
+        "case": "finite",
+        "remaining_before_helper": 5.008255481719971,
+        "forwarded_timeout": 5.008187294006348,
+        "helper_status": "OK",
+        "helper_elapsed_ms": 2.248785000006137,
+        "caller_status": "OK",
+        "downstream_handler_invocations": 1
+      },
+      {
+        "case": "short",
+        "remaining_before_helper": 0.24878549575805664,
+        "forwarded_timeout": 0.24871206283569336,
+        "helper_status": "OK",
+        "helper_elapsed_ms": 1.9304540001030546,
+        "caller_status": "OK",
+        "downstream_handler_invocations": 1
+      },
+      {
+        "case": "expired",
+        "caller_status": "DEADLINE_EXCEEDED",
+        "remaining_before_helper": 0,
+        "helper_status": "DEADLINE_EXCEEDED",
+        "helper_elapsed_ms": 0.27435999993485893,
+        "downstream_handler_invocations": 0
+      }
+    ],
+    "isolation": {
+      "mounts": [],
+      "external_network_during_tests": false,
+      "credentials": false,
+      "cleanup": "test containers removed; pre-existing base image retained"
+    }
+  },
+  "linux_expired_case_followup": {
+    "before_explicit_guard": "timeout=0 was forwarded and the catalog handler ran successfully although the caller had already exceeded its deadline.",
+    "change": "Reject remaining<=0 with DEADLINE_EXCEEDED before dispatch.",
+    "after": "Caller and helper DEADLINE_EXCEEDED; downstream handler invocations=0.",
+    "comparison_limit": "The earlier Windows mock asserted timeout=0 only; this does not establish a platform-specific difference."
+  },
+  "windows_followup": {
+    "tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "grpcio": "1.84.0"
+  },
+  "implementation_hash_format": "SHA-256 of UTF-8 source with LF line endings, matching container copies and Git blob contents"
+}
