@@ -1,0 +1,349 @@
+# Local browser review only; not telemetry acceptance or a release manifest.
+# All service identities and runtime environment interfaces remain inherited.
+services:
+  frontend:
+    image: trail-supply-review-frontend:local
+    build:
+      context: ../src/frontend
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: frontend
+      PORT: '8080'
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      CURRENCY_SERVICE_ADDR: currencyservice:7000
+      CART_SERVICE_ADDR: cartservice:7070
+      RECOMMENDATION_SERVICE_ADDR: recommendationservice:8080
+      SHIPPING_SERVICE_ADDR: shippingservice:50051
+      CHECKOUT_SERVICE_ADDR: checkoutservice:5050
+      AD_SERVICE_ADDR: adservice:9555
+      SHOPPING_ASSISTANT_SERVICE_ADDR: 127.0.0.1:1
+      ENABLE_ASSISTANT: 'false'
+      ENV_PLATFORM: local
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    ports:
+    - 127.0.0.1:${FRONTEND_PORT:-18081}:8080
+    platform: linux/amd64
+  checkoutservice:
+    image: trail-supply-review-checkoutservice:local
+    build:
+      context: ../src/checkoutservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: checkoutservice
+      PORT: '5050'
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      CURRENCY_SERVICE_ADDR: currencyservice:7000
+      CART_SERVICE_ADDR: cartservice:7070
+      SHIPPING_SERVICE_ADDR: shippingservice:50051
+      PAYMENT_SERVICE_ADDR: paymentservice:50051
+      EMAIL_SERVICE_ADDR: emailservice:8080
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  productcatalogservice:
+    image: trail-supply-review-productcatalogservice:local
+    build:
+      context: ../src/productcatalogservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: productcatalogservice
+      PORT: '3550'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  shippingservice:
+    image: trail-supply-review-shippingservice:local
+    build:
+      context: ../src/shippingservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: shippingservice
+      PORT: '50051'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  cartservice:
+    image: trail-supply-review-cartservice:local
+    build:
+      context: ../src/cartservice/src
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: cartservice
+      PORT: '7070'
+      REDIS_ADDR: redis-cart:6379
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+    depends_on:
+      redis-cart:
+        condition: service_healthy
+  currencyservice:
+    image: trail-supply-review-currencyservice:local
+    build:
+      context: ../src/currencyservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: currencyservice
+      PORT: '7000'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  paymentservice:
+    image: trail-supply-review-paymentservice:local
+    build:
+      context: ../src/paymentservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: paymentservice
+      PORT: '50051'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  emailservice:
+    image: trail-supply-review-emailservice:local
+    build:
+      context: ../src/emailservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: emailservice
+      PORT: '8080'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  recommendationservice:
+    image: trail-supply-review-recommendationservice:local
+    build:
+      context: ../src/recommendationservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: recommendationservice
+      PORT: '8080'
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  adservice:
+    image: trail-supply-review-adservice:local
+    build:
+      context: ../src/adservice
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: adservice
+      PORT: '9555'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    platform: linux/amd64
+  loadgenerator:
+    image: trail-supply-review-loadgenerator:local
+    build:
+      context: ../src/loadgenerator
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-development}
+    environment:
+      ONLINE_SHOP_TELEMETRY_ENABLED: 'false'
+      ONLINE_SHOP_VERSION: ${SOURCE_REVISION:-development}
+      ONLINE_SHOP_ENVIRONMENT: local-review
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:1
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DISABLE_PROFILER: '1'
+      ENABLE_PROFILER: '0'
+      OTEL_SERVICE_NAME: loadgenerator
+      FRONTEND_ADDR: frontend:8080
+      USERS: '2'
+      RATE: '1'
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    profiles:
+    - load
+    platform: linux/amd64
+    depends_on:
+      frontend:
+        condition: service_started
+  redis-data-init:
+    image: docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9
+    platform: linux/amd64
+    user: 0:0
+    network_mode: none
+    read_only: true
+    cap_drop:
+    - ALL
+    cap_add:
+    - CHOWN
+    security_opt:
+    - no-new-privileges:true
+    entrypoint:
+    - chown
+    command:
+    - 1000:1000
+    - /data
+    volumes:
+    - redis-data:/data
+    restart: 'no'
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+  redis-cart:
+    image: docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9
+    platform: linux/amd64
+    user: 1000:1000
+    read_only: true
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    volumes:
+    - redis-data:/data
+    cpus: 0.125
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '2'
+    stop_grace_period: 15s
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      interval: 2s
+      timeout: 2s
+      retries: 15
+    command:
+    - redis-server
+    - --save
+    - ''
+    - --appendonly
+    - 'no'
+    depends_on:
+      redis-data-init:
+        condition: service_completed_successfully
+volumes:
+  redis-data: null

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "repository": "https://github.com/DimitryZH/application-modernization-lab",
+  "baseline": {
+    "revision": "67b6cd85ae01c698bbf86904d953d5145b7b5820",
+    "workloadPath": "workloads/online-shop"
+  },
+  "upstream": {
+    "repository": "https://github.com/GoogleCloudPlatform/microservices-demo",
+    "revision": "474d0f2eb73d97525234995a40d7781b7923a07d",
+    "version": "v0.10.4"
+  },
+  "preservedTrees": [
+    "src",
+    "protos"
+  ],
+  "inheritedEvidence": {
+    "status": "historical-online-shop-only-not-trail-supply-acceptance",
+    "excludedPaths": [
+      "validation/build/PARSER-REVIEW.md",
+      "validation/build/RESULTS.md",
+      "validation/build/evidence-summary.json",
+      "validation/otel/RECOMMENDATION-DEADLINE-VALIDATION.json",
+      "validation/otel/REDIS-RESULTS.md",
+      "validation/otel/REDIS-SOURCE-VALIDATION.json",
+      "validation/otel/RESULTS.md",
+      "validation/otel/evidence-summary-initial.json",
+      "validation/otel/evidence-summary.json",
+      "validation/otel/redis-evidence-summary.json"
+    ]
+  },
+  "acceptance": {
+    "containerBuilds": "not-run",
+    "runtime": "not-run",
+    "browserReview": "not-run"
+  }
+}
