@@ -18,8 +18,9 @@ are preserved. No new backend, database or frontend framework is introduced.
 - [Runtime](docs/RUNTIME.md), [telemetry](docs/TELEMETRY.md), [Redis](docs/REDIS.md).
 - [Assets](docs/ASSETS.md): owner-provided ChatGPT-generated graphics, exact mapping
   and delivery sizes; no external image/font/CDN dependency.
-- [Validation](docs/VALIDATION.md): static, source-build and browser evidence
-  boundaries. Owner visual acceptance remains pending until explicit review.
+- [Validation](docs/VALIDATION.md) / [current results](validation/STOREFRONT-RESULTS.md):
+  static, source-build, telemetry and browser evidence. Owner visual acceptance
+  remains pending until explicit review.
 
 ## Lineage and compatibility
 

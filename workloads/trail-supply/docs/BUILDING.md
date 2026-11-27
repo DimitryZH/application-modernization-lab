@@ -1,6 +1,6 @@
 # Source-to-build handoff, contract v1
 
-This is inherited technical behavior. Trail Supply has no independent container or runtime acceptance yet; see [source lineage](UPSTREAM.md) and [foundation validation](VALIDATION.md).
+These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [current storefront validation](../validation/STOREFRONT-RESULTS.md) for separately recorded source-build/runtime scope; owner visual acceptance remains pending.
 
 Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/trail-supply/` run from the repository root. Markdown links are document-relative.
 

@@ -1,7 +1,9 @@
 # Trail Supply validation boundaries
 
-[Foundation results](../validation/FOUNDATION-RESULTS.md) records executed static
-checks. Historical Online Shop evidence is linked in [UPSTREAM.md](UPSTREAM.md),
+[Foundation results](../validation/FOUNDATION-RESULTS.md) preserves the earlier static
+checks. [Storefront results](../validation/STOREFRONT-RESULTS.md) and its compact
+machine-readable summary record the actual subsequent source-build, telemetry
+and browser scope. Historical Online Shop evidence is linked in [UPSTREAM.md](UPSTREAM.md),
 not copied or asserted as independent Trail Supply acceptance.
 
 ## Storefront checks
@@ -30,7 +32,7 @@ container engine. Planner tests create a disposable Git repository containing
 only Trail Supply; negative path/contract/COPY/ARG/platform guards remain active.
 The planner reads committed Git objects, not unstaged edits or untracked files.
 
-## Future runtime checks (require an explicitly started Linux engine)
+## Runtime reproduction (requires a running Linux engine)
 
 - `python workloads/trail-supply/validation/build/verify.py`: all eleven source
   builds from a clean LF checkout; rejects undeclared context artifacts and

@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-27",
+  "scope": "Local source-build and storefront review; owner visual acceptance pending. No SDP trust/signing/admission/release/deployment acceptance.",
+  "applicationSourceRevision": "10f570d1e5763ac789db86991abd77a097534375",
+  "reviewProject": "trail-supply-review-6a3e949e",
+  "reviewUrl": "http://127.0.0.1:18081/",
+  "reviewServices": [
+    {
+      "service": "adservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:b661b511db0da011a508e111dcb335fb190c3e506ac6796c0e9a3323364c9030",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "cartservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:0104bc61ff3ab7b290d16f8f14fe0fe8c82096c36edb442426fd460f1466809b",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "checkoutservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:5cc17776cfc4d13fb745d1ffbe0c694472d85b8da8d24251b5d15de1646de4c4",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "currencyservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:3e86dba1a9ff646f6b3a956c4e4a7b0084bed760d6fa6bec42c6023ea5115f6d",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "emailservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:446856278eed57c8b6d875096a2533b22d1167150c2610eb44ee617b77e87410",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "frontend",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:a523e88fc52fa695d06859823b97ffac0b2948c73062d70a94def111b0a38c6e",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "paymentservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:f1c828ab4d2b9ab46e7b9094cbbc474db7c014bb6b5bb834fe1b7f02930c977c",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "productcatalogservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:330f83c755f2caea98482f1adf52aadd2fc57b9dd6b00557cc448f075e8d8275",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "recommendationservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:7c49f871f105442172f80f91689ad3fc8362c10c10014a95d271edfeaee4facb",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    },
+    {
+      "service": "redis-cart",
+      "state": "running",
+      "health": "healthy",
+      "localImageId": "sha256:98c6ca8f397f86e469be752c3e7ed5eb8b17f2479840cb69a2e413037038e9f4",
+      "sourceRevision": null
+    },
+    {
+      "service": "redis-data-init",
+      "state": "exited",
+      "health": null,
+      "localImageId": "sha256:98c6ca8f397f86e469be752c3e7ed5eb8b17f2479840cb69a2e413037038e9f4",
+      "sourceRevision": null
+    },
+    {
+      "service": "shippingservice",
+      "state": "running",
+      "health": null,
+      "localImageId": "sha256:adcefe4ba549648f69dbb39e5dc4ac6e88dcc6e5f2736bfd5bd762a5c3851e3d",
+      "sourceRevision": "10f570d1e5763ac789db86991abd77a097534375"
+    }
+  ],
+  "checks": {
+    "plannerTests": 23,
+    "storefrontConsistencyTests": 4,
+    "localComposeTests": 6,
+    "redisContractTests": 6,
+    "frontendGoSuites": "passed, including real template execution and currency remainder regression",
+    "catalogGoSuites": "passed",
+    "recommendationTelemetryAndDeadlineTests": 10,
+    "emailTelemetryTests": 4,
+    "emailTemplateRender": "passed",
+    "adserviceJavaTests": 2,
+    "telemetryFullPhase": {
+      "status": "passed",
+      "project": "trail-supply-validation-1db38118",
+      "sourceLabel": "10f570d1e5763ac789db86991abd77a097534375.f5c453cfa281",
+      "cleanup": "passed; no remaining containers"
+    },
+    "browser": {
+      "allNineProductPagesAndImages": "passed",
+      "desktopViewport": "1440x1000",
+      "mobileViewport": "390x844",
+      "horizontalOverflow": false,
+      "cartQuantityAndEmptyAction": "passed",
+      "currencyCADAndUSD": "passed",
+      "simulatedCheckoutAndCartClear": "passed",
+      "nativeInvalidEmailValidation": "passed",
+      "missingProductErrorPage": "HTTP 500 retained",
+      "keyboardFocus": "3px solid outline observed",
+      "prefixedProductCartCheckoutAndAnchors": "passed at /trail/",
+      "externalPresentationAssetUrls": [],
+      "consoleWarningsOrErrors": []
+    }
+  },
+  "redisObservation": {
+    "reference": "docker.io/dmitryzhuravlev/online-shop-redis-cart@sha256:1cf73a2f04808e55a8bd2f5706c2aa0ebb0f71938f93deb7af79f48311cd5cb9",
+    "localConfigDigest": "sha256:98c6ca8f397f86e469be752c3e7ed5eb8b17f2479840cb69a2e413037038e9f4",
+    "platform": "linux/amd64",
+    "status": "Exact pinned image pulled and exercised locally; canonical trust contract status unchanged."
+  },
+  "limits": [
+    "Owner visual acceptance remains pending.",
+    "Only full telemetry phase was run; disabled/unavailable/refused/redis phases and strict clean-LF build/verify.py were not run in this stage.",
+    "Manual review disables SDK export and loadgenerator; measured acceptance used a separate project.",
+    "Screenshots/raw logs remain local ignored artifacts, not Git attachments.",
+    "Rendered resource URLs and source checks were inspected; no HAR was captured."
+  ],
+  "screenshots": [
+    "local/output/screenshots/cart-checkout.jpg",
+    "local/output/screenshots/desktop-home.jpg",
+    "local/output/screenshots/mobile-home.jpg",
+    "local/output/screenshots/order-confirmation.jpg",
+    "local/output/screenshots/product-detail.jpg"
+  ]
+}

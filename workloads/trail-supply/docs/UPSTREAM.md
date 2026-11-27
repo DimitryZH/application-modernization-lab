@@ -19,8 +19,8 @@ including existing assets, generated bindings and recommendation deadline tests.
 
 ## Foundation adaptations
 
-Only workload identity/path metadata, build and validation tooling, documentation
-and local Compose orchestration are adapted. `build_plan.py` reads
+The foundation adapted workload identity/path metadata, build and validation
+tooling, documentation and local Compose orchestration. `build_plan.py` reads
 `workloads/trail-supply` at the selected revision. Build contexts and source paths
 remain workload-relative. Test projects, local tags and cache volumes have
 Trail Supply-specific prefixes to avoid colliding with Online Shop tooling.
