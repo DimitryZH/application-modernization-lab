@@ -1,5 +1,10 @@
 # Footer branding refinement — focused validation
 
+Closure update, 2026-11-27: the owner accepted the final footer, design, catalog
+and functionality. The dedicated review stack was then cleaned up. The dated
+running/pending statements below describe the earlier observations; current
+acceptance and cleanup status are in [storefront results](STOREFRONT-RESULTS.md).
+
 The final owner-requested cleanup is recorded below under
 [Shopper-facing footer cleanup](#shopper-facing-footer-cleanup). It supersedes
 the initial visible footer state recorded here; the earlier checks remain historical.

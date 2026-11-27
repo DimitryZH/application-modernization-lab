@@ -1,6 +1,6 @@
 # Online Shop manual OpenTelemetry
 
-These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [current storefront validation](../validation/STOREFRONT-RESULTS.md) for separately recorded source-build/runtime scope; owner visual acceptance remains pending.
+These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [accepted storefront results](../validation/STOREFRONT-RESULTS.md) for tested revisions, owner acceptance and remaining validation limits. Application acceptance does not grant SDP release trust.
 
 Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/trail-supply/` run from the repository root. Markdown links are document-relative.
 

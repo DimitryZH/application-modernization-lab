@@ -43,6 +43,8 @@
       "emailservice"
     ],
     "assetProvenance": "Owner-provided ChatGPT image generation for this demo",
-    "ownerVisualAcceptance": "pending"
+    "ownerVisualAcceptance": "accepted",
+    "ownerAcceptanceDate": "2026-11-27",
+    "acceptanceRecord": "validation/STOREFRONT-RESULTS.md"
   }
 }

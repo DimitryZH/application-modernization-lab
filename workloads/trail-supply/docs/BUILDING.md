@@ -1,6 +1,6 @@
 # Source-to-build handoff, contract v1
 
-These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [current storefront validation](../validation/STOREFRONT-RESULTS.md) for separately recorded source-build/runtime scope; owner visual acceptance remains pending.
+These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [accepted storefront results](../validation/STOREFRONT-RESULTS.md) for tested revisions, owner acceptance and remaining validation limits. Application acceptance does not grant SDP release trust.
 
 Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/trail-supply/` run from the repository root. Markdown links are document-relative.
 
@@ -125,3 +125,49 @@ BuildKit layers and compiler/dependency caches. See [build evidence](https://git
 for inherited Online Shop results only. Trail Supply results must be generated separately.
 See [runtime handoff](RUNTIME.md), [telemetry](TELEMETRY.md) and [Redis](REDIS.md)
 for independent runtime contracts.
+
+## SDP adoption handoff
+
+- Select `workloads/trail-supply`, independently of the preserved
+  `workloads/online-shop`. Application handoff snapshot:
+  `a119501fd36f14d9c80a737d362c8782271a59b8`. The final closure commit changes
+  documentation/acceptance metadata only. For adoption, pin the final owner-merged
+  full SHA and obtain the planner and contract from that same revision; do not
+  treat a local review tag or this snapshot as a trusted release.
+- Use `build_plan.py --revision <full-sha> --components <explicit-ids>` under
+  this workload, with `build.contract.json` and `linux/amd64`. Final review of the
+  snapshot produced eleven components and 198 consumed file entries. Frontend
+  templates/CSS/local assets, catalog `products.json`, adservice catalog ads and
+  email confirmation presentation changed. Other source component behavior is
+  inherited; a new workload adoption still needs independently built/admitted
+  artifacts and must not reuse historical image locks as Trail Supply releases.
+- Preserve service IDs/endpoints/ports, protobufs/generated bindings,
+  `hipstershop` packages, `ONLINE_SHOP_*` configuration, `online-shop` telemetry
+  namespace, W3C propagation, metrics/correlated logs and recommendation deadline
+  handling. Keep existing runtime switches, including BASE_URL, FRONTEND_MESSAGE,
+  CYMBAL_BRANDING, BANNER_COLOR and ENV_PLATFORM. Assistant/packaging backends
+  were not supplied or runtime-accepted. Isolate deployment namespaces/storage
+  when running alongside Online Shop; do not rename operational identities.
+- Redis is external, not a source component. Retain the pinned manifest and
+  [Redis trust/runtime requirements](REDIS.md#sdp-handoff): singleton ephemeral
+  carts, UID/GID 1000:1000, protected writable storage, read-only root and endpoint
+  contract. The exact mirror was pulled/exercised locally; canonical publication,
+  independent equality verification and SDP attestation still require downstream
+  resolution. Do not silently replace the selector or infer trust from local use.
+- Update consumer UI checks to Trail Supply and the same nine IDs with new
+  merchandise/prices/categories (catalog and `validation/storefront_test.py`).
+  For example `0PUK6V6EV0` is Trail Lantern; search is `lantern`. Checkout routes,
+  form names, simulation and cart-clearing behavior remain. Displayed prices round
+  to cents. Footer has internal navigation and a demo disclaimer, with no upstream
+  link or runtime identifiers; legal attribution remains in source/docs. Assets
+  and system fonts are local. BASE_URL `/trail` was browser-checked; loadgenerator
+  still requires root paths. Use isolated sessions/storage for repurposed IDs.
+- Reuse the revision-scoped [application evidence](../validation/STOREFRONT-RESULTS.md)
+  and [footer evidence](../validation/FOOTER-REFINEMENT.md). The owner accepted the
+  application on 2026-11-27. Strict clean-LF verification, the remaining four
+  telemetry phases and focused Redis runtime acceptance were not run for this
+  storefront stage. These limitations are disclosed, not waived release guards.
+
+Future SDP build execution, registry publication, signing, admission, release
+composition and deployment require their own evidence and authorization. No SDP
+repository, infrastructure or trusted release operation was changed here.

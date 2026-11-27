@@ -1,5 +1,11 @@
 # Local Trail Supply browser review
 
+The owner accepted the storefront on 2026-11-27. The dedicated
+`trail-supply-review-6a3e949e` session was subsequently stopped and its synthetic
+volume removed; it no longer serves localhost:18081. Images/caches and unrelated
+projects were preserved. The commands below are for a future explicitly started
+review session; see the [acceptance record](../validation/STOREFRONT-RESULTS.md).
+
 This configuration runs source-built application images in a dedicated Compose
 project until explicitly stopped. It does not start Docker Desktop. The
 storefront and catalog use the owner-approved Trail Supply concept and assets.

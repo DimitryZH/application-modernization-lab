@@ -6,6 +6,13 @@ machine-readable summary record the actual subsequent source-build, telemetry
 and browser scope. Historical Online Shop evidence is linked in [UPSTREAM.md](UPSTREAM.md),
 not copied or asserted as independent Trail Supply acceptance.
 
+The owner accepted the completed application on 2026-11-27. The current
+[acceptance record](../validation/STOREFRONT-RESULTS.md) distinguishes the tested
+source revisions from closure documentation and records review-stack cleanup.
+The [SDP handoff](BUILDING.md#sdp-adoption-handoff) preserves future trusted-release
+requirements. This final documentation pass reuses existing application evidence;
+it does not claim a new full build or comprehensive runtime run.
+
 ## Storefront checks
 
 `python -B workloads/trail-supply/validation/storefront_test.py` checks approved

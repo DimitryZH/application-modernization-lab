@@ -1,6 +1,6 @@
 # Redis dependency and runtime contract
 
-These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [current storefront validation](../validation/STOREFRONT-RESULTS.md) for separately recorded source-build/runtime scope; owner visual acceptance remains pending.
+These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [accepted storefront results](../validation/STOREFRONT-RESULTS.md) for tested revisions, owner acceptance and remaining validation limits. Application acceptance does not grant SDP release trust.
 
 Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/trail-supply/` run from the repository root. Markdown links are document-relative.
 
@@ -94,7 +94,9 @@ cleanup in ignored `validation/otel/output/<project>/redis-result.json`.
 The last command is the broader eleven-service acceptance harness. Do not infer
 a fresh complete run from focused checks. Historical `RESULTS.md` and evidence
 summaries remain unchanged and used the official `redis:7.4.8-alpine` selector.
-See [UPSTREAM.md](UPSTREAM.md) for inherited Redis evidence; no new Trail Supply Redis acceptance has been executed.
+See [UPSTREAM.md](UPSTREAM.md) for inherited Redis evidence and
+[storefront results](../validation/STOREFRONT-RESULTS.md) for the local pinned-image
+observation. No focused Trail Supply Redis runtime acceptance has been executed.
 
 ## SDP handoff
 

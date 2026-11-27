@@ -9,18 +9,24 @@ simulated checkout, confirmation and error states. Currency conversion, product
 IDs, service identities, `online-shop` telemetry namespace and runtime interfaces
 are preserved. No new backend, database or frontend framework is introduced.
 
+The owner accepted the design, catalog, functionality and final footer on
+2026-11-27. Application modernization is complete. The dedicated review stack has
+been cleaned up; localhost:18081 is no longer served by that session. See the
+[acceptance record](validation/STOREFRONT-RESULTS.md) for tested revisions and
+limitations, and the [SDP handoff](docs/BUILDING.md#sdp-adoption-handoff) for future
+consumer adoption. PR #30 awaits owner merge; issue #29 remains open.
+
 ## Build, run and validate
 
-- [Local review](local/README.md): source-built images, a unique Compose project,
-  loopback storefront and explicit cleanup. The owner-review stack stays running.
+- [Local review](local/README.md): reproducible source-built images, a unique
+  Compose project, loopback storefront and explicit cleanup for future sessions.
 - [Build contract](docs/BUILDING.md): eleven workload-local build contexts and the
   selected-revision planner; Redis remains external.
 - [Runtime](docs/RUNTIME.md), [telemetry](docs/TELEMETRY.md), [Redis](docs/REDIS.md).
 - [Assets](docs/ASSETS.md): owner-provided ChatGPT-generated graphics, exact mapping
   and delivery sizes; no external image/font/CDN dependency.
 - [Validation](docs/VALIDATION.md) / [current results](validation/STOREFRONT-RESULTS.md):
-  static, source-build, telemetry and browser evidence. Owner visual acceptance
-  remains pending until explicit review.
+  static, source-build, telemetry and browser evidence, plus owner acceptance.
 
 ## Lineage and compatibility
 

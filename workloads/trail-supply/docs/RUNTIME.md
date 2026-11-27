@@ -1,6 +1,6 @@
 # Portable runtime handoff
 
-These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [current storefront validation](../validation/STOREFRONT-RESULTS.md) for separately recorded source-build/runtime scope; owner visual acceptance remains pending.
+These inherited interfaces remain compatible. See [source lineage](UPSTREAM.md) and [accepted storefront results](../validation/STOREFRONT-RESULTS.md) for tested revisions, owner acceptance and remaining validation limits. Application acceptance does not grant SDP release trust.
 
 Inline file paths are workload-relative unless stated otherwise. Commands retain their original working directory; commands beginning with `workloads/trail-supply/` run from the repository root. Markdown links are document-relative.
 
@@ -133,7 +133,7 @@ Adaptations:
 - Remove Istio-specific probe annotations, disable service-account token automounting, set frontend platform to `local`, and explicitly disable its optional assistant while setting its required address to the disabled loopback sentinel `127.0.0.1:1`. The upstream frontend requires this address even with the feature disabled. Its flag hides the assistant UI; direct assistant API requests remain unsupported and fail against the sentinel. Existing profiler-disabling settings remain.
 - Include no SRE infrastructure, failure-injection workload, assistant service, cloud provisioning, environment credentials, ConfigMaps or secret dependencies.
 
-Redis carts are ephemeral and reset with the Pod's storage. Load generation is enabled at the upstream defaults of 10 users and rate 1, so this profile consumes resources and sends synthetic checkout traffic whenever started. Browser assets retain upstream public CDN/font URLs. Optional backend/cloud code remains in imported sources but is not selected by this profile. No deployment was performed; production exposure, persistence, policy, sizing and runtime compatibility require separate review.
+Redis carts are ephemeral and reset with the Pod's storage. Load generation is enabled at the upstream defaults of 10 users and rate 1, so this profile consumes resources and sends synthetic checkout traffic whenever started. Trail Supply source uses local assets and system fonts; the inherited image-pinned profile is historical and does not deploy that modernized source. Optional backend/cloud code remains in imported sources but is not selected by this profile. No deployment was performed; production exposure, persistence, policy, sizing and runtime compatibility require separate review.
 
 ## Trail Supply catalog compatibility
 

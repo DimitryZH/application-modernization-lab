@@ -5,7 +5,7 @@ Application Modernization Lab maintains two separate polyglot workloads with man
 | Workload | Status |
 |---|---|
 | [Online Shop](workloads/online-shop/README.md) | Preserved accepted application baseline |
-| [Trail Supply](workloads/trail-supply/README.md) | Modernized outdoor storefront; local validation and owner visual review tracked independently |
+| [Trail Supply](workloads/trail-supply/README.md) | Application modernization accepted by owner; SDP trusted release remains downstream |
 
 Trail Supply derives from Online Shop at `67b6cd85ae01c698bbf86904d953d5145b7b5820` using tracked content only. Each workload has its own build planner, contracts and validation tooling. Service identities and the `online-shop` telemetry namespace remain compatible. Historical experiments remain separate and unchanged. The detailed baseline documentation below describes Online Shop; Trail Supply's independent commands and evidence boundaries live in its own README.
 
