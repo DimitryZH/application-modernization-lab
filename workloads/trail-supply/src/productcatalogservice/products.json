@@ -1,0 +1,130 @@
+{
+  "products": [
+    {
+      "id": "OLJCESPC7Z",
+      "name": "Summit 45L Backpack",
+      "description": "A forest-green pack with a roomy main compartment, front pockets and a supportive harness. Pack the essentials and follow your next trail.",
+      "picture": "/static/img/products/summit-45l-backpack.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 129,
+        "nanos": 0
+      },
+      "categories": [
+        "packs"
+      ]
+    },
+    {
+      "id": "66VCHSJNUP",
+      "name": "Alpine 2P Tent",
+      "description": "An olive-green dome tent with a simple, inviting profile. A place to settle in when the trail gives way to the campsite.",
+      "picture": "/static/img/products/alpine-2p-tent.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 249,
+        "nanos": 0
+      },
+      "categories": [
+        "shelter"
+      ]
+    },
+    {
+      "id": "1YMWWN1N4O",
+      "name": "Pathfinder Headlamp",
+      "description": "A compact green-and-black headlamp with an adjustable fabric strap. Keep your hands free as the day turns into evening.",
+      "picture": "/static/img/products/pathfinder-headlamp.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 35,
+        "nanos": 0
+      },
+      "categories": [
+        "lighting"
+      ]
+    },
+    {
+      "id": "L9ECAV7KIM",
+      "name": "Traverse Trekking Poles",
+      "description": "A matching pair of trekking poles with shaped handles and wrist straps. A practical addition to your trail-day kit.",
+      "picture": "/static/img/products/traverse-trekking-poles.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 69,
+        "nanos": 0
+      },
+      "categories": [
+        "hiking"
+      ]
+    },
+    {
+      "id": "2ZYFJ3GM2N",
+      "name": "Basecamp Sleeping Bag",
+      "description": "An olive-green mummy-style sleeping bag with a shaped hood. Roll it out, settle in, and enjoy a quieter kind of evening.",
+      "picture": "/static/img/products/basecamp-sleeping-bag.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 0
+      },
+      "categories": [
+        "sleep"
+      ]
+    },
+    {
+      "id": "0PUK6V6EV0",
+      "name": "Trail Lantern",
+      "description": "A green camp lantern with a carry handle and a warm-looking glow. Bring a little atmosphere to your campsite table.",
+      "picture": "/static/img/products/trail-lantern.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 0
+      },
+      "categories": [
+        "lighting"
+      ]
+    },
+    {
+      "id": "LS4PSXUNUM",
+      "name": "Expedition Camp Stove",
+      "description": "A compact camping stove with folding pot supports and a simple control. A small piece of kit for the camp kitchen.",
+      "picture": "/static/img/products/expedition-camp-stove.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 0
+      },
+      "categories": [
+        "cooking"
+      ]
+    },
+    {
+      "id": "9SIQT8TOJO",
+      "name": "RestPoint Sleeping Pad",
+      "description": "An olive-green inflatable sleeping pad with a matching stuff sack. Make a little room for rest in your camping setup.",
+      "picture": "/static/img/products/restpoint-sleeping-pad.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 79,
+        "nanos": 0
+      },
+      "categories": [
+        "sleep"
+      ]
+    },
+    {
+      "id": "6E92ZMYYFZ",
+      "name": "Ridge Insulated Bottle",
+      "description": "A forest-green bottle with a screw-top lid and a carry loop. A straightforward companion for trail breaks and everyday outings.",
+      "picture": "/static/img/products/ridge-insulated-bottle.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 0
+      },
+      "categories": [
+        "hydration"
+      ]
+    }
+  ]
+}

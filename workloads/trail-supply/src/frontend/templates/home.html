@@ -1,0 +1,56 @@
+<!--
+ Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+{{ define "home" }}
+{{ template "header" . }}
+<main id="main-content">
+  <section class="hero" aria-labelledby="hero-title">
+    <img class="hero-image" src="{{ $.baseUrl }}/static/images/hero/mountain-campsite.jpg" alt="A campsite overlooking a mountain valley at sunrise" fetchpriority="high" width="1672" height="941">
+    <div class="hero-shade"></div>
+    <div class="hero-content container">
+      <p class="eyebrow">THE OUTSIDE IS CALLING</p>
+      <h1 id="hero-title">Gear up.<br>Get outside.</h1>
+      <p class="hero-description">Equipment for the trail, the campsite,<br class="desktop-break"> and everything in between.</p>
+      <a class="button button-sand" href="#shop">Explore gear <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+  <section class="section container" id="adventures" aria-labelledby="adventures-title">
+    <div class="section-heading"><div><p class="eyebrow">FOLLOW YOUR OWN PATH</p><h2 id="adventures-title">Find your next adventure</h2></div><p>A little further from the everyday.</p></div>
+    <div class="adventure-grid">
+      <a class="adventure-card" href="{{ $.baseUrl }}/product/OLJCESPC7Z"><img src="{{ $.baseUrl }}/static/images/lifestyle/hiking-mountain-view.jpg" alt="A hiker looking out across a sunlit mountain valley" loading="lazy" width="1448" height="1086"><div><h3>Hiking</h3><span>Find your trail <span aria-hidden="true">↗</span></span></div></a>
+      <a class="adventure-card" href="{{ $.baseUrl }}/product/66VCHSJNUP"><img src="{{ $.baseUrl }}/static/images/lifestyle/camping-at-dusk.jpg" alt="An illuminated tent in the mountains at dusk" loading="lazy" width="1448" height="1086"><div><h3>Camping</h3><span>Make yourself at home <span aria-hidden="true">↗</span></span></div></a>
+      <a class="adventure-card" href="#shop"><img src="{{ $.baseUrl }}/static/images/lifestyle/outdoor-essentials.jpg" alt="An outdoor equipment arrangement at a mountain campsite" loading="lazy" width="1448" height="1086"><div><h3>Essentials</h3><span>Pack for the moments ahead <span aria-hidden="true">↗</span></span></div></a>
+    </div>
+  </section>
+  <section class="section catalog-section container" id="shop" aria-labelledby="catalog-title">
+    <div class="section-heading"><div><p class="eyebrow">GOOD GEAR. GREAT DAYS.</p><h2 id="catalog-title">Explore our gear</h2></div><p>Nine essentials. Endless possibilities.</p></div>
+    <div class="product-grid">
+      {{ range $.products }}
+      <article class="product-card">
+        <a class="product-card-image" href="{{ $.baseUrl }}/product/{{ .Item.Id }}" aria-label="View {{ .Item.Name }}"><img src="{{ $.baseUrl }}{{ .Item.Picture }}" alt="{{ .Item.Name }}" loading="lazy" width="1254" height="1254"></a>
+        <div class="product-card-details"><h3><a href="{{ $.baseUrl }}/product/{{ .Item.Id }}">{{ .Item.Name }}</a></h3><p class="product-card-price">{{ renderMoney .Price }} <span>{{ $.user_currency }}</span></p></div>
+      </article>
+      {{ end }}
+    </div>
+  </section>
+  <section class="story-section container" id="our-story" aria-labelledby="story-title">
+    <img class="story-image" src="{{ $.baseUrl }}/static/images/lifestyle/forest-trail.jpg" alt="A hiker following a trail through a misty mountain forest" loading="lazy" width="1448" height="1086">
+    <div class="story-copy"><p class="eyebrow">A LITTLE CLOSER TO NATURE</p><h2 id="story-title">Inspired by nature.<br>Made for adventure.</h2><p>Trail Supply brings together practical outdoor essentials for weekends in the wilderness, early mornings on the trail, and quiet nights under the stars.</p><a class="text-link" href="#shop">Find your next essential <span aria-hidden="true">→</span></a><img class="story-wordmark" src="{{ $.baseUrl }}/static/branding/trail-supply-logo.png" alt="Trail Supply — Gear up. Get outside." loading="lazy" width="2172" height="724"></div>
+  </section>
+</main>
+{{ template "footer" . }}
+{{ end }}

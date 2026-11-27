@@ -1,0 +1,54 @@
+<!--
+ Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+{{ define "cart" }}
+{{ template "header" . }}
+<main id="main-content" class="cart-page container">
+  <a class="back-link" href="{{ $.baseUrl }}/#shop">← Continue exploring</a>
+  <div class="page-heading"><p class="eyebrow">YOUR NEXT ADVENTURE STARTS HERE</p><h1>Your gear, ready to go.</h1></div>
+  {{ if eq (len $.items) 0 }}
+  <section class="empty-cart panel"><span class="empty-cart-symbol" aria-hidden="true">↗</span><h2>Your cart is taking a breather.</h2><p>Your shopping cart is empty. Find something for your next adventure.</p><a class="button button-primary" href="{{ $.baseUrl }}/#shop">Explore gear</a></section>
+  {{ else }}
+  <p class="demo-notice"><strong>A practice adventure.</strong> Checkout, payment, shipping and confirmation email are simulated. Use fictional details and the demo card below. Never enter real payment information.</p>
+  <div class="checkout-layout">
+    <section class="cart-summary panel" aria-labelledby="cart-title"><div class="cart-summary-heading"><h2 id="cart-title">Your cart <span>({{ $.cart_size }})</span></h2><form method="POST" action="{{ $.baseUrl }}/cart/empty"><button class="text-button" type="submit">Empty cart</button></form></div>
+      {{ range $.items }}<article class="cart-item"><a class="cart-item-image" href="{{ $.baseUrl }}/product/{{ .Item.Id }}"><img src="{{ $.baseUrl }}{{ .Item.Picture }}" alt="{{ .Item.Name }}" width="1254" height="1254"></a><div><h3><a href="{{ $.baseUrl }}/product/{{ .Item.Id }}">{{ .Item.Name }}</a></h3><p class="muted">SKU {{ .Item.Id }}</p><p>Quantity: {{ .Quantity }}</p><strong>{{ renderMoney .Price }}</strong></div></article>{{ end }}
+      <dl class="cart-totals"><div><dt>Shipping estimate</dt><dd>{{ renderMoney .shipping_cost }}</dd></div><div class="total-row"><dt>Total <span>{{ $.user_currency }}</span></dt><dd>{{ renderMoney .total_cost }}</dd></div></dl><a class="text-link" href="{{ $.baseUrl }}/#shop">Continue shopping →</a>
+    </section>
+    <section class="checkout-panel panel" aria-labelledby="checkout-title"><p class="eyebrow">DEMO CHECKOUT</p><h2 id="checkout-title">Make it an adventure.</h2><form class="cart-checkout-form" action="{{ $.baseUrl }}/cart/checkout" method="POST">
+      <fieldset><legend>Shipping address</legend><div class="form-grid">
+        <div class="form-field full-width"><label for="email">Email address</label><input type="email" id="email" name="email" value="hiker@example.invalid" autocomplete="off" required></div>
+        <div class="form-field full-width"><label for="street_address">Street address</label><input type="text" id="street_address" name="street_address" value="123 Demo Trail" autocomplete="off" required></div>
+        <div class="form-field"><label for="city">City</label><input type="text" id="city" name="city" value="Demo Valley" autocomplete="off" required></div>
+        <div class="form-field"><label for="state">State</label><input type="text" id="state" name="state" value="CA" autocomplete="off" required></div>
+        <div class="form-field"><label for="zip_code">ZIP code</label><input type="text" id="zip_code" name="zip_code" value="10001" inputmode="numeric" autocomplete="off" pattern="\d{4,5}" required></div>
+        <div class="form-field"><label for="country">Country</label><input type="text" id="country" name="country" value="United States" autocomplete="off" required></div>
+      </div></fieldset>
+      <fieldset><legend>Simulated payment</legend><p class="form-help" id="payment-help">This demo never charges a card. Use the provided test number only.</p><div class="form-grid">
+        <div class="form-field full-width"><label for="credit_card_number">Demo card number</label><input type="text" id="credit_card_number" name="credit_card_number" value="4111111111111111" inputmode="numeric" autocomplete="off" pattern="\d{16}" aria-describedby="payment-help" required></div>
+        <div class="form-field"><label for="credit_card_expiration_month">Expiry month</label><select name="credit_card_expiration_month" id="credit_card_expiration_month"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+        <div class="form-field"><label for="credit_card_expiration_year">Expiry year</label><select name="credit_card_expiration_year" id="credit_card_expiration_year">{{ range $i, $y := $.expiration_years }}<option value="{{ $y }}" {{ if eq $i 1 }}selected{{ end }}>{{ $y }}</option>{{ end }}</select></div>
+        <div class="form-field"><label for="credit_card_cvv">Demo CVV</label><input type="password" id="credit_card_cvv" name="credit_card_cvv" value="123" inputmode="numeric" autocomplete="off" pattern="\d{3}" required></div>
+      </div></fieldset>
+      <button class="button button-primary checkout-button" type="submit">Place demo order <span aria-hidden="true">→</span></button><p class="form-help">A fictional order. No charge. No physical shipment.</p>
+    </form></section>
+  </div>
+  {{ end }}
+</main>
+{{ if $.recommendations }}{{ template "recommendations" . }}{{ end }}
+{{ template "footer" . }}
+{{ end }}

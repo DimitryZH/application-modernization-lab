@@ -1,0 +1,119 @@
+/**
+ * Copyright 2020 Google LLC
+ * Modified for Trail Supply: consistent storefront and demo states.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.order-page,.error-page {
+  padding-block:64px;
+}
+.order-complete,.error-panel {
+  max-width:700px;
+  margin-inline:auto;
+  padding:48px;
+  text-align:center;
+}
+.confirmation-mark {
+  display:inline-flex;
+  width:64px;
+  height:64px;
+  background:#E7EBDD;
+  border-radius:50%;
+  align-items:center;
+  justify-content:center;
+  color:var(--forest);
+  font-size:1.8rem;
+  margin-bottom:24px;
+}
+.order-complete h1,.error-panel h1 {
+  font-size:2.65rem;
+  margin-bottom:20px;
+}
+.order-complete>p:not(.eyebrow):not(.demo-notice),.error-panel>p:not(.eyebrow) {
+  color:var(--muted);
+}
+.order-details {
+  text-align:left;
+  margin-block:32px;
+}
+.order-details>div {
+  padding-bottom:12px;
+}
+.order-details dt {
+  font-size:.8rem;
+  flex-shrink:0;
+}
+.order-details dd {
+  font-size:.8rem;
+  overflow-wrap:anywhere;
+  text-align:right;
+}
+.order-details .total-row dd {
+  font-size:1.25rem;
+}
+.order-details dd span {
+  font-size:.75rem;
+  font-weight:400;
+}
+.order-complete .demo-notice {
+  text-align:left;
+}
+.order-complete .button {
+  margin-top:8px;
+}
+.error-details {
+  text-align:left;
+  margin-block:28px;
+  font-size:.85rem;
+}
+.error-details summary {
+  cursor:pointer;
+  color:var(--forest);
+  padding:8px 0;
+}
+.error-details pre {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  max-width:100%;
+  background:var(--canvas);
+  border:1px solid var(--line);
+  padding:16px;
+  color:var(--charcoal);
+  font-size:.75rem;
+}
+.error-status {
+  font-size:.8rem;
+}
+.error-panel .button {
+  margin-top:12px;
+}
+@media(max-width:600px) {
+  .order-page,.error-page {
+    padding-block:36px;
+  }
+  .order-complete,.error-panel {
+    padding:32px 22px;
+  }
+  .order-complete h1,.error-panel h1 {
+    font-size:2rem;
+  }
+  .order-details>div {
+    gap:16px;
+  }
+  .order-details dt {
+    max-width:100px;
+  }
+  .order-details dd {
+    max-width:60%;
+  }
+}

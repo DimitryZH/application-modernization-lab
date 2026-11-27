@@ -1,0 +1,23 @@
+<!--
+ Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+{{ define "order" }}
+{{ template "header" . }}
+<main id="main-content" class="order-page container"><section class="order-complete panel" aria-labelledby="order-title"><span class="confirmation-mark" aria-hidden="true">✓</span><p class="eyebrow">THANKS FOR EXPLORING WITH US</p><h1 id="order-title">Adventure, confirmed.</h1><p>Your demo order is complete. Now imagine the possibilities.</p><dl class="order-details"><div><dt>Confirmation #</dt><dd>{{ .order.OrderId }}</dd></div><div><dt>Simulated tracking #</dt><dd>{{ .order.ShippingTrackingId }}</dd></div><div class="total-row"><dt>Demo total</dt><dd>{{ renderMoney .total_paid }} <span>{{ $.user_currency }}</span></dd></div></dl><p class="demo-notice">No payment was taken, no shipment will be made, and no real confirmation email was sent. This was a simulated checkout.</p><a class="button button-primary" href="{{ $.baseUrl }}/#shop">Keep exploring →</a></section></main>
+{{ if $.recommendations }}{{ template "recommendations" . }}{{ end }}
+{{ template "footer" . }}
+{{ end }}

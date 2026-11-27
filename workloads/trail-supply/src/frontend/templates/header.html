@@ -1,0 +1,69 @@
+<!--
+ Copyright 2020 Google LLC
+ Modified for Trail Supply: local assets, accessible navigation and outdoor branding.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+{{ define "header" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Trail Supply — a fictional outdoor equipment store. Gear up. Get outside.">
+  <title>Trail Supply | Outdoor Equipment Store</title>
+  <link rel="stylesheet" href="{{ $.baseUrl }}/static/styles/styles.css">
+  <link rel="stylesheet" href="{{ $.baseUrl }}/static/styles/cart.css">
+  <link rel="stylesheet" href="{{ $.baseUrl }}/static/styles/order.css">
+  <link rel="stylesheet" href="{{ $.baseUrl }}/static/styles/bot.css">
+  {{ if $.is_cymbal_brand }}
+  <link rel="icon" href="{{ $.baseUrl }}/static/favicon-cymbal.ico" type="image/x-icon">
+  {{ else }}
+  <link rel="icon" href="{{ $.baseUrl }}/static/favicon.ico" type="image/x-icon">
+  {{ end }}
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    {{ if $.frontendMessage }}<div class="announcement">{{ $.frontendMessage }}</div>{{ end }}
+    <div class="header-inner container">
+      <a href="{{ $.baseUrl }}/" class="brand" aria-label="Trail Supply home">
+        <img src="{{ $.baseUrl }}/static/branding/trail-supply-icon.png" width="48" height="48" alt="">
+        <span>TRAIL SUPPLY<small>OUTDOOR EQUIPMENT STORE</small></span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="{{ $.baseUrl }}/#shop">Shop</a>
+        <a href="{{ $.baseUrl }}/#adventures">Explore</a>
+        <a href="{{ $.baseUrl }}/#our-story">Our Story</a>
+      </nav>
+      <div class="header-tools">
+        {{ if $.show_currency }}
+        <form method="POST" action="{{ $.baseUrl }}/setCurrency" id="currency_form" class="currency-form">
+          <label class="sr-only" for="currency_code">Currency</label>
+          <select name="currency_code" id="currency_code" aria-label="Currency" onchange="this.form.submit()">
+            {{ range $.currencies }}<option value="{{ . }}" {{ if eq . $.user_currency }}selected{{ end }}>{{ . }}</option>{{ end }}
+          </select>
+          <noscript><button type="submit">Apply currency</button></noscript>
+        </form>
+        {{ end }}
+        {{ if $.assistant_enabled }}<a class="utility-link" href="{{ $.baseUrl }}/assistant" aria-label="Shopping assistant"><img src="{{ $.baseUrl }}/static/icons/Hipster_WandIcon.svg" width="24" height="24" alt=""></a>{{ end }}
+        <a class="cart-link" href="{{ $.baseUrl }}/cart" aria-label="Shopping cart{{ if $.cart_size }}, {{ $.cart_size }} items{{ end }}">
+          <svg aria-hidden="true" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h4l4 15h13l3-11H7M11 24h.01M22 24h.01" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="cart-count">{{ if $.cart_size }}{{ $.cart_size }}{{ else }}0{{ end }}</span>
+        </a>
+      </div>
+    </div>
+  </header>
+  {{ if and $.platform_name (ne $.platform_name "local") }}<div class="environment-strip {{ $.platform_css }}">{{ $.platform_name }}</div>{{ end }}
+{{ end }}
