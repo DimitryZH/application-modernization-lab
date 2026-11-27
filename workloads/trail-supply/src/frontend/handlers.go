@@ -618,7 +618,10 @@ func cartSize(c []*pb.CartItem) int {
 
 func renderMoney(money pb.Money) string {
 	currencyLogo := renderCurrencyLogo(money.GetCurrencyCode())
-	return fmt.Sprintf("%s%d.%02d", currencyLogo, money.GetUnits(), money.GetNanos()/10000000)
+	// Currency conversion can return a fractional-cent floating-point remainder.
+	// Round the displayed amount instead of truncating an approved $129 to $128.99.
+	amount := float64(money.GetUnits()) + float64(money.GetNanos())/1e9
+	return fmt.Sprintf("%s%.2f", currencyLogo, amount)
 }
 
 func renderCurrencyLogo(currencyCode string) string {

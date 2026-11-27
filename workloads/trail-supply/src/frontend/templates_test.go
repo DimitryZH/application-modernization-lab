@@ -75,3 +75,19 @@ func TestEmptyCartAndLegacyFaviconSwitch(t *testing.T) {
 		}
 	}
 }
+
+func TestDisplayedMoneyRoundsConversionRemainders(t *testing.T) {
+	for _, tc := range []struct {
+		money pb.Money
+		want  string
+	}{
+		{pb.Money{CurrencyCode: "USD", Units: 129}, "$129.00"},
+		{pb.Money{CurrencyCode: "USD", Units: 128, Nanos: 999999999}, "$129.00"},
+		{pb.Money{CurrencyCode: "EUR", Units: 39, Nanos: 123456789}, "€39.12"},
+		{pb.Money{CurrencyCode: "USD", Units: -2, Nanos: -50000000}, "$-2.05"},
+	} {
+		if got := renderMoney(tc.money); got != tc.want {
+			t.Errorf("got %q, want %q", got, tc.want)
+		}
+	}
+}
