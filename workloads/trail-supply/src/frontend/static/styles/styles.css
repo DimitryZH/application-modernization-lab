@@ -521,9 +521,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
   font-size:.85rem;
 }
 .footer-bottom {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px 64px;
   padding-top:28px;
   padding-bottom:28px;
 }
@@ -532,23 +529,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
   line-height:1.8;
   color:#F6F4EFCC;
   margin-bottom:0;
-}
-.footer-bottom a {
-  text-decoration:underline;
-  text-underline-offset:3px;
-}
-.runtime-details {
-  font-size:.65rem;
-  color:#F6F4EFCC;
-  grid-column:1/-1;
-  overflow-wrap:anywhere;
-}
-.runtime-details summary {
-  cursor:pointer;
-  padding:6px 0;
-}
-.runtime-details p {
-  margin:8px 0;
 }
 .back-link {
   display:inline-block;
@@ -774,9 +754,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
   .recommendations-grid {
     gap:16px;
   }
-  .footer-bottom {
-    gap:20px 32px;
-  }
 }
 @media(max-width:760px) {
   .container {
@@ -885,9 +862,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
     flex-direction:column;
     gap:20px;
     padding-block:28px;
-  }
-  .footer-bottom {
-    grid-template-columns:1fr;
   }
   .site-footer nav {
     gap:28px;

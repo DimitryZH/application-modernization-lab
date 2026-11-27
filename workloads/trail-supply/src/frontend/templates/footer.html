@@ -23,8 +23,6 @@
   </div>
   <div class="container footer-bottom">
     <p>A fictional outdoor store, built for demonstration. Orders, payment, shipping and email are simulated. Please use demo information only.</p>
-    <p>Trail Supply demo storefront · <a href="https://github.com/GoogleCloudPlatform/microservices-demo">Upstream source</a></p>
-    <details class="runtime-details"><summary>Demo runtime details</summary><p>{{ if $.session_id }}Session: {{ $.session_id }}<br>{{ end }}{{ if $.request_id }}Request: {{ $.request_id }}<br>{{ end }}{{ range $key, $value := $.deploymentDetails }}{{ if $value }}{{ $key }}: {{ $value }}<br>{{ end }}{{ end }}</p></details>
   </div>
 </footer>
 </body>

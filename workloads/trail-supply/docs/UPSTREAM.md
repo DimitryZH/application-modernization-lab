@@ -54,6 +54,9 @@ publisher verification or deployment is claimed.
 
 The inherited [Apache License 2.0](../LICENSE), original Google LLC copyright
 headers, generated-code notices, Gradle wrapper licensing, SVG modification
-notices, image credits and frontend Google/source attribution remain unchanged.
+notices and image credits remain preserved. Upstream attribution is retained in
+source-code headers and this repository record. The storefront footer shows only
+Trail Supply navigation and the demo disclosure; it does not expose upstream
+repository links or technical runtime identifiers to shoppers.
 The root repository license does not replace the inherited license. Owner-provided graphical assets are documented separately in [ASSETS.md](ASSETS.md).
 No third-party application dependency is added by storefront modernization.
