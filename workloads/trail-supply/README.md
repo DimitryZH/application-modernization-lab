@@ -1,47 +1,41 @@
-# Trail Supply — workload foundation
+# Trail Supply — Outdoor Equipment Store
 
-Trail Supply is a separate workload under development, derived from Online Shop
-at `67b6cd85ae01c698bbf86904d953d5145b7b5820`. The original workload remains
-unchanged. This stage preserves the existing storefront, catalog, advertising,
-backend behavior and assets; visual modernization is deferred.
+A fictional outdoor storefront built on the existing Go HTML templates and
+microservice architecture. **Gear up. Get outside.**
 
-All application/protocol sources and Dockerfiles are inherited byte-for-byte.
-Operational service names, protobuf packages, the `online-shop` telemetry
-namespace and `ONLINE_SHOP_*` runtime settings intentionally remain unchanged.
-The accepted recommendation catalog deadline correction is included.
+The storefront includes an editorial mountain hero, Hiking/Camping/Essentials
+features, nine catalog products, a brand-story section, product details, cart,
+simulated checkout, confirmation and error states. Currency conversion, product
+IDs, service identities, `online-shop` telemetry namespace and runtime interfaces
+are preserved. No new backend, database or frontend framework is introduced.
 
-## Build and run boundaries
+## Build, run and validate
 
-- [Build contract and planner](docs/BUILDING.md): eleven independent source builds
-  rooted entirely in this workload; Redis remains an external dependency.
-- [Local browser review](local/README.md): source-built images, unique Compose
-  project, localhost storefront, explicit startup/status/cleanup; stays running
-  until the owner stops it. Docker Desktop is not started by any helper.
-- [Runtime requirements](docs/RUNTIME.md), [telemetry semantics](docs/TELEMETRY.md),
-  and [Redis contract](docs/REDIS.md) retain the inherited service interfaces.
-- [Validation](docs/VALIDATION.md) distinguishes static checks from future builds,
-  browser review and runtime acceptance.
+- [Local review](local/README.md): source-built images, a unique Compose project,
+  loopback storefront and explicit cleanup. The owner-review stack stays running.
+- [Build contract](docs/BUILDING.md): eleven workload-local build contexts and the
+  selected-revision planner; Redis remains external.
+- [Runtime](docs/RUNTIME.md), [telemetry](docs/TELEMETRY.md), [Redis](docs/REDIS.md).
+- [Assets](docs/ASSETS.md): owner-provided ChatGPT-generated graphics, exact mapping
+  and delivery sizes; no external image/font/CDN dependency.
+- [Validation](docs/VALIDATION.md): static, source-build and browser evidence
+  boundaries. Owner visual acceptance remains pending until explicit review.
 
-`local/compose.yaml` is for manual review. `validation/otel/compose.yaml` remains
-an isolated fault/telemetry test harness with automated cleanup. Neither is a
-production deployment. The inherited `kubernetes/online-shop.yaml` and
-`images.lock.json` retain historical artifact references, not independently built
-Trail Supply artifacts. Do not deploy that manifest as a Trail Supply release.
+## Lineage and compatibility
 
-## Lineage and acceptance status
+The independent foundation is `9033f3e8e4ec94d2f13edfbad95b608b3cb4a069`, derived
+from Online Shop at `67b6cd85ae01c698bbf86904d953d5145b7b5820` using tracked content.
+[Source lineage](source-lineage.json) and [upstream attribution](docs/UPSTREAM.md)
+preserve the original Apache-2.0 license, Google copyright/source notices and
+historical evidence. Online Shop and historical experiments are unchanged.
 
-[Source lineage](source-lineage.json) records the accepted AML base, upstream
-snapshot and omitted historical evidence paths. [Upstream record](docs/UPSTREAM.md)
-links to the immutable original evidence; no result files were copied as new
-acceptance. [Foundation results](validation/FOUNDATION-RESULTS.md) records only
-checks actually executed for this stage.
+The same nine IDs now identify outdoor products. Old persisted carts would resolve
+to the new names, prices and imagery; use isolated new sessions/storage for review.
+Payment, shipping and email are simulated; never enter real payment/customer data.
+Assistant and packaging backends are not supplied or enabled for local review.
 
-Container builds, Docker/Compose runtime acceptance, browser review, image
-publication and deployment have not been performed for Trail Supply. The Redis
-canonical mirror's inherited publication/equality/attestation prerequisites remain
-pending; a pinned reference alone does not prove that it is pullable.
-
-Future SDP consumers must select `workloads/trail-supply`, its planner from the
-same immutable revision, and its own build/release evidence. Keep the existing
-service identities and namespace; distinguish parallel environments through
-platform isolation and resource attributes. No downstream repository is changed.
+`images.lock.json` and `kubernetes/online-shop.yaml` retain inherited artifact
+identities/provenance gaps; they are not newly published Trail Supply artifacts.
+No SDP build trust, signing, admission, release or deployment is claimed.
+Downstream consumers must select this workload and a new immutable source revision,
+build/admit their own images and isolate the unchanged service identities.

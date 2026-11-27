@@ -1,5 +1,6 @@
 <!--
  Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,29 +16,5 @@
 -->
 
 {{ define "recommendations" }}
-<section class="recommendations">
-    <div class="container">
-      <div class="row">
-        <div class="col-xl-10 offset-xl-1">
-          <h2>You May Also Like</h2>
-          <div class="row">
-            {{ range .recommendations }}
-            <div class="col-md-3">
-              <div>
-                <a href="{{ $.baseUrl }}/product/{{.Id}}">
-                  <img alt="" src="{{ $.baseUrl }}{{.Picture}}">
-                </a>
-                <div>
-                  <h5>
-                    {{ .Name }}
-                  </h5>
-                </div>
-              </div>
-            </div>
-            {{ end }}
-          </div>
-        </div>
-      </div>
-    </div>
-</section>
+<section class="recommendations section container" aria-labelledby="recommendations-title"><div class="section-heading"><div><p class="eyebrow">KEEP EXPLORING</p><h2 id="recommendations-title">Good company for your gear</h2></div></div><div class="recommendations-grid">{{ range .recommendations }}<a class="recommendation-card" href="{{ $.baseUrl }}/product/{{ .Id }}"><img src="{{ $.baseUrl }}{{ .Picture }}" alt="{{ .Name }}" loading="lazy" width="1254" height="1254"><h3>{{ .Name }}</h3></a>{{ end }}</div></section>
 {{ end }}

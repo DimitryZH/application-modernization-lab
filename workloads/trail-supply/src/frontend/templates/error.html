@@ -1,5 +1,6 @@
 <!--
  Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,26 +16,7 @@
 -->
 
 {{ define "error" }}
-    {{ template "header" . }}
-    <div {{ with $.platform_css }} class="{{.}}" {{ end }}>
-        <span class="platform-flag">
-          {{$.platform_name}}
-        </span>
-      </div>
-    <main role="main">
-        <div class="py-5">
-            <div class="container bg-light py-3 px-lg-5 py-lg-5">
-                <h1>Uh, oh!</h1>
-                <p>Something has failed. Below are some details for debugging.</p>
-
-                <p><strong>HTTP Status:</strong> {{.status_code}} {{.status}}</p>
-                <pre class="border border-danger p-3"
-                    style="white-space: pre-wrap; word-break: keep-all;">
-                    {{- .error -}}
-                </pre>
-            </div>
-        </div>
-    </main>
-
-    {{ template "footer" . }}
-    {{ end }}
+{{ template "header" . }}
+<main id="main-content" class="error-page container"><section class="error-panel panel" aria-labelledby="error-title"><p class="eyebrow">A SMALL DETOUR</p><h1 id="error-title">We hit a rough patch.</h1><p>We couldn't complete that request. Check your details or head back to the gear.</p><p class="error-status">HTTP {{ .status_code }} · {{ .status }}</p><details class="error-details"><summary>Request details</summary><pre>{{ .error }}</pre></details><a class="button button-primary" href="{{ $.baseUrl }}/#shop">Back to the trail →</a></section></main>
+{{ template "footer" . }}
+{{ end }}

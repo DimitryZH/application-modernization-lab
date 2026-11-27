@@ -1,8 +1,8 @@
 # Local Trail Supply browser review
 
 This configuration runs source-built application images in a dedicated Compose
-project until explicitly stopped. It does not start Docker Desktop. The existing
-storefront, products and advertising are intentionally unchanged in the foundation.
+project until explicitly stopped. It does not start Docker Desktop. The
+storefront and catalog use the owner-approved Trail Supply concept and assets.
 It is a demo: payment/shipping are simulated, confirmation email is dummy, and
 assistant/packaging are disabled. Never enter real personal or payment data.
 
@@ -12,7 +12,7 @@ application build contexts/runtime settings with direct service endpoints. It
 keeps service identities and Redis security/persistence settings, while disabling
 SDK export for manual review. No probe, fault proxy or Collector is needed.
 
-## Prepare and start (future owner-approved runtime step)
+## Prepare and start
 
 Use Docker Desktop's Linux containers after the owner explicitly starts it.
 Requires local build capacity, package/registry network access and a pullable
@@ -28,6 +28,7 @@ $trailProject = 'trail-supply-review-' + [guid]::NewGuid().ToString('N').Substri
 $trailCompose = 'workloads/trail-supply/local/compose.yaml'
 $env:SOURCE_REVISION = (git describe --always --dirty --abbrev=40).Trim()
 $env:FRONTEND_PORT = '18081'
+$env:BASE_URL = ''
 Write-Output $trailProject
 
 docker compose -p $trailProject -f $trailCompose config --quiet
@@ -71,8 +72,8 @@ docker compose -p $trailProject -f $trailCompose logs --tail 100 frontend cartse
 
 Keep the stack running while the owner reviews desktop/mobile pages, all nine
 products, quantity/cart, empty cart, currency change, demo checkout, confirmation,
-error states and keyboard navigation. Browser CDN/font dependencies remain inherited
-until the storefront stage. No browser acceptance is claimed by this foundation.
+error states and keyboard navigation. All displayed images, styles and fonts are local. See the validation record for
+actual browser checks; owner visual acceptance is separate.
 SDK export is disabled, but ordinary application logs continue; this is not a
 correlated-log/telemetry-delivery validation session.
 
@@ -91,3 +92,13 @@ docker compose -p $trailProject -f $trailCompose down --volumes --remove-orphans
 There is no auto-cleanup so owner review can continue as long as needed. If startup
 fails, inspect logs and use the same scoped cleanup command. Local review consumes
 resources until stopped; no cloud resource or image publication is involved.
+
+## Prefixed storefront checks
+
+The frontend passes through `BASE_URL`, `FRONTEND_MESSAGE`, `CYMBAL_BRANDING` and
+`BANNER_COLOR` unchanged. `BANNER_COLOR` retains its inherited unused behavior;
+`CYMBAL_BRANDING=true` explicitly selects the legacy alternate favicon. Use a
+separate temporary project and port (for example 18082) with `BASE_URL=/trail` to
+check `/trail/` without touching the owner-review session. Loadgenerator does not
+support prefixed paths and must remain disabled. Restore `BASE_URL` to empty for
+the default owner URL. Cleanup only that temporary project's synthetic resources.

@@ -27,6 +27,10 @@ services:
       SHOPPING_ASSISTANT_SERVICE_ADDR: 127.0.0.1:1
       ENABLE_ASSISTANT: 'false'
       ENV_PLATFORM: local
+      BASE_URL: ${BASE_URL:-}
+      FRONTEND_MESSAGE: ${FRONTEND_MESSAGE:-}
+      CYMBAL_BRANDING: ${CYMBAL_BRANDING:-false}
+      BANNER_COLOR: ${BANNER_COLOR:-}
     stop_grace_period: 15s
     logging:
       driver: json-file

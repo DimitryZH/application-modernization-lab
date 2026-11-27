@@ -134,3 +134,9 @@ Adaptations:
 - Include no SRE infrastructure, failure-injection workload, assistant service, cloud provisioning, environment credentials, ConfigMaps or secret dependencies.
 
 Redis carts are ephemeral and reset with the Pod's storage. Load generation is enabled at the upstream defaults of 10 users and rate 1, so this profile consumes resources and sends synthetic checkout traffic whenever started. Browser assets retain upstream public CDN/font URLs. Optional backend/cloud code remains in imported sources but is not selected by this profile. No deployment was performed; production exposure, persistence, policy, sizing and runtime compatibility require separate review.
+
+## Trail Supply catalog compatibility
+
+All nine product IDs are intentionally retained with new outdoor product data and
+USD prices. Existing persisted cart IDs would resolve to the new merchandise.
+Use new isolated sessions/storage; no shared Redis flush or migration is implied.

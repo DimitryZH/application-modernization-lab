@@ -1,5 +1,6 @@
 <!--
  Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,12 +16,5 @@
 -->
 
 {{ define "text_ad" }}
-<div class="container py-3 px-lg-5 py-lg-5">
-    <div role="alert">
-        <strong>Ad</strong>
-        <a href="{{$.baseUrl}}{{.ad.RedirectUrl}}" rel="nofollow noopener noreferrer" target="_blank">
-            {{.ad.Text}}
-        </a>
-    </div>
-</div>
+<aside class="container gear-spotlight" aria-label="Advertisement"><p class="eyebrow">GEAR SPOTLIGHT · ADVERTISEMENT</p><a class="text-link" href="{{ $.baseUrl }}{{ .ad.RedirectUrl }}" rel="nofollow noopener noreferrer" target="_blank">{{ .ad.Text }} <span aria-hidden="true">↗</span></a></aside>
 {{ end }}

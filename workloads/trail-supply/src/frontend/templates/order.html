@@ -1,5 +1,6 @@
 <!--
  Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,66 +16,8 @@
 -->
 
 {{ define "order" }}
-
-    {{ template "header" . }}
-
-    <div {{ with $.platform_css }} class="{{.}}" {{ end }}>
-        <span class="platform-flag">
-            {{$.platform_name}}
-        </span>
-    </div>
-
-    <main role="main" class="order">
-
-        <section class="container order-complete-section">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <h3>
-                        Your order is complete!
-                    </h3>
-                </div>
-                <div class="col-12 text-center">
-                    <p>We've sent you a confirmation email.</p>
-                </div>
-            </div>
-            <div class="row border-bottom-solid padding-y-24">
-                <div class="col-6 pl-md-0">
-                    Confirmation #
-                </div>
-                <div class="col-6 pr-md-0 text-right">
-                    {{.order.OrderId}}
-                </div>
-            </div>
-            <div class="row border-bottom-solid padding-y-24">
-                <div class="col-6 pl-md-0">
-                    Tracking #
-                </div>
-                <div class="col-6 pr-md-0 text-right">
-                    {{.order.ShippingTrackingId}}
-                </div>
-            </div>
-            <div class="row padding-y-24">
-                <div class="col-6 pl-md-0">
-                    Total Paid
-                </div>
-                <div class="col-6 pr-md-0 text-right">
-                    {{renderMoney .total_paid}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12 text-center">
-                    <a class="cymbal-button-primary" href="{{ $.baseUrl }}/" role="button">
-                        Continue Shopping
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        {{ if $.recommendations }}
-            {{ template "recommendations" $ }}
-        {{ end }}
-
-    </main>
-
-    {{ template "footer" . }}
-    {{ end }}
+{{ template "header" . }}
+<main id="main-content" class="order-page container"><section class="order-complete panel" aria-labelledby="order-title"><span class="confirmation-mark" aria-hidden="true">✓</span><p class="eyebrow">THANKS FOR EXPLORING WITH US</p><h1 id="order-title">Adventure, confirmed.</h1><p>Your demo order is complete. Now imagine the possibilities.</p><dl class="order-details"><div><dt>Confirmation #</dt><dd>{{ .order.OrderId }}</dd></div><div><dt>Simulated tracking #</dt><dd>{{ .order.ShippingTrackingId }}</dd></div><div class="total-row"><dt>Demo total</dt><dd>{{ renderMoney .total_paid }} <span>{{ $.user_currency }}</span></dd></div></dl><p class="demo-notice">No payment was taken, no shipment will be made, and no real confirmation email was sent. This was a simulated checkout.</p><a class="button button-primary" href="{{ $.baseUrl }}/#shop">Keep exploring →</a></section></main>
+{{ if $.recommendations }}{{ template "recommendations" . }}{{ end }}
+{{ template "footer" . }}
+{{ end }}

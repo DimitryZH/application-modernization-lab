@@ -1,5 +1,6 @@
 <!--
  Copyright 2020 Google LLC
+ Modified for Trail Supply: storefront presentation and demo content.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,71 +17,19 @@
 
 {{ define "product" }}
 {{ template "header" . }}
-<div {{ with $.platform_css }} class="{{.}}" {{ end }}>
-  <span class="platform-flag">
-    {{$.platform_name}}
-  </span>
-</div>
-
-<main role="main">
-  <div class="h-product container">
-    <div class="row">
-      <div class="col-md-6">
-        <img class="product-image" alt="" src="{{ $.baseUrl }}{{$.product.Item.Picture}}" />
+<main id="main-content" class="product-page">
+  <div class="container"><a class="back-link" href="{{ $.baseUrl }}/#shop">← Back to all gear</a>
+    <section class="product-layout" aria-labelledby="product-title">
+      <div class="product-image-panel"><img class="product-image" src="{{ $.baseUrl }}{{ $.product.Item.Picture }}" alt="{{ $.product.Item.Name }}" width="1254" height="1254"></div>
+      <div class="product-info"><p class="eyebrow">TRAIL SUPPLY / OUTDOOR ESSENTIALS</p><h1 id="product-title">{{ $.product.Item.Name }}</h1><p class="product-price">{{ renderMoney $.product.Price }} <span>{{ $.user_currency }}</span></p><p class="product-description">{{ $.product.Item.Description }}</p>
+        <form method="POST" action="{{ $.baseUrl }}/cart" class="add-to-cart-form"><input type="hidden" name="product_id" value="{{ $.product.Item.Id }}"><div class="quantity-field"><label for="quantity">Quantity</label><select name="quantity" id="quantity"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>10</option></select></div><button class="button button-primary" type="submit">Add to cart <span aria-hidden="true">+</span></button></form>
+        <p class="product-meta">SKU {{ $.product.Item.Id }} · Part of our fictional demo collection</p>
+        {{ if $.packagingInfo }}<div class="packaging-info"><h2>Packaging</h2><dl><dt>Weight</dt><dd>{{ if $.packagingInfo.Weight }}{{ $.packagingInfo.Weight }} lb{{ else }}n/a{{ end }}</dd><dt>Width</dt><dd>{{ if $.packagingInfo.Width }}{{ $.packagingInfo.Width }} cm{{ else }}n/a{{ end }}</dd><dt>Height</dt><dd>{{ if $.packagingInfo.Height }}{{ $.packagingInfo.Height }} cm{{ else }}n/a{{ end }}</dd><dt>Depth</dt><dd>{{ if $.packagingInfo.Depth }}{{ $.packagingInfo.Depth }} cm{{ else }}n/a{{ end }}</dd></dl></div>{{ end }}
       </div>
-      <div class="product-info col-md-5">
-        <div class="product-wrapper">
-
-          <h2>{{ $.product.Item.Name }}</h2>
-          <p class="product-price">{{ renderMoney $.product.Price }}</p>
-          <p>{{ $.product.Item.Description }}</p>
-
-          {{ if $.packagingInfo }}
-          <div class="product-packaging">
-            <h3>Packaging</h3>
-            <span>
-              Weight: {{ if $.packagingInfo.Weight }}{{ $.packagingInfo.Weight }}lb{{ else }}n/a{{ end }}
-            </span>
-            <span>
-              Width: {{ if $.packagingInfo.Width }}{{ $.packagingInfo.Width }}cm{{ else }}n/a{{ end }}
-            </span>
-            <span>
-              Height: {{ if $.packagingInfo.Height }}{{ $.packagingInfo.Height }}cm{{ else }}n/a{{ end }}
-            </span>
-            <span>
-              Depth: {{ if $.packagingInfo.Depth }}{{ $.packagingInfo.Depth }}cm{{ else }}n/a{{ end }}
-            </span>
-          </div>
-          {{ end }}
-
-          <form method="POST" action="{{ $.baseUrl }}/cart">
-            <input type="hidden" name="product_id" value="{{$.product.Item.Id}}" />
-            <div class="product-quantity-dropdown">
-              <select name="quantity" id="quantity">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
-                <option>10</option>
-              </select>
-              <img src="{{ $.baseUrl }}/static/icons/Hipster_DownArrow.svg" alt="">
-            </div>
-            <button type="submit" class="cymbal-button-primary">Add To Cart</button>
-          </form>
-        </div>
-      </div>
-    </div>
+    </section>
   </div>
-  <div>
-    {{ if $.recommendations}}
-      {{ template "recommendations" $ }}
-    {{ end }}
-  </div>
-  <div class="ad">
-   {{ if $.ad }}{{ template "text_ad" $ }}{{ end }}
-  </div>
-
+  {{ if $.recommendations }}{{ template "recommendations" . }}{{ end }}
+  {{ if $.ad }}{{ template "text_ad" . }}{{ end }}
 </main>
 {{ template "footer" . }}
 {{ end }}

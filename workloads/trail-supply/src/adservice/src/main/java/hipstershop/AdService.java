@@ -161,49 +161,61 @@ public final class AdService {
     }
   }
 
+  // Modified for Trail Supply: descriptive catalog ads; selection behavior is unchanged.
   private static ImmutableListMultimap<String, Ad> createAdsMap() {
-    Ad hairdryer =
+    Ad backpack =
         Ad.newBuilder()
-            .setRedirectUrl("/product/2ZYFJ3GM2N")
-            .setText("Hairdryer for sale. 50% off.")
+            .setRedirectUrl("/product/OLJCESPC7Z")
+            .setText("Explore the Summit 45L Backpack for your next adventure.")
             .build();
-    Ad tankTop =
+    Ad tent =
         Ad.newBuilder()
             .setRedirectUrl("/product/66VCHSJNUP")
-            .setText("Tank top for sale. 20% off.")
+            .setText("Explore the Alpine 2P Tent for your next adventure.")
             .build();
-    Ad candleHolder =
-        Ad.newBuilder()
-            .setRedirectUrl("/product/0PUK6V6EV0")
-            .setText("Candle holder for sale. 30% off.")
-            .build();
-    Ad bambooGlassJar =
-        Ad.newBuilder()
-            .setRedirectUrl("/product/9SIQT8TOJO")
-            .setText("Bamboo glass jar for sale. 10% off.")
-            .build();
-    Ad watch =
+    Ad headlamp =
         Ad.newBuilder()
             .setRedirectUrl("/product/1YMWWN1N4O")
-            .setText("Watch for sale. Buy one, get second kit for free")
+            .setText("Explore the Pathfinder Headlamp for your next adventure.")
             .build();
-    Ad mug =
-        Ad.newBuilder()
-            .setRedirectUrl("/product/6E92ZMYYFZ")
-            .setText("Mug for sale. Buy two, get third one for free")
-            .build();
-    Ad loafers =
+    Ad poles =
         Ad.newBuilder()
             .setRedirectUrl("/product/L9ECAV7KIM")
-            .setText("Loafers for sale. Buy one, get second one for free")
+            .setText("Explore the Traverse Trekking Poles for your next adventure.")
+            .build();
+    Ad sleepingBag =
+        Ad.newBuilder()
+            .setRedirectUrl("/product/2ZYFJ3GM2N")
+            .setText("Explore the Basecamp Sleeping Bag for your next adventure.")
+            .build();
+    Ad lantern =
+        Ad.newBuilder()
+            .setRedirectUrl("/product/0PUK6V6EV0")
+            .setText("Explore the Trail Lantern for your next adventure.")
+            .build();
+    Ad stove =
+        Ad.newBuilder()
+            .setRedirectUrl("/product/LS4PSXUNUM")
+            .setText("Explore the Expedition Camp Stove for your next adventure.")
+            .build();
+    Ad sleepingPad =
+        Ad.newBuilder()
+            .setRedirectUrl("/product/9SIQT8TOJO")
+            .setText("Explore the RestPoint Sleeping Pad for your next adventure.")
+            .build();
+    Ad bottle =
+        Ad.newBuilder()
+            .setRedirectUrl("/product/6E92ZMYYFZ")
+            .setText("Explore the Ridge Insulated Bottle for your next adventure.")
             .build();
     return ImmutableListMultimap.<String, Ad>builder()
-        .putAll("clothing", tankTop)
-        .putAll("accessories", watch)
-        .putAll("footwear", loafers)
-        .putAll("hair", hairdryer)
-        .putAll("decor", candleHolder)
-        .putAll("kitchen", bambooGlassJar, mug)
+        .putAll("packs", backpack)
+        .putAll("shelter", tent)
+        .putAll("lighting", headlamp, lantern)
+        .putAll("hiking", poles)
+        .putAll("sleep", sleepingBag, sleepingPad)
+        .putAll("cooking", stove)
+        .putAll("hydration", bottle)
         .build();
   }
 

@@ -51,15 +51,15 @@ def shopping(label="checkout", expect_success=True):
     s = requests.Session()
     h = headers(label)
     r = s.get(BASE + "/", headers=h, timeout=20)
-    assert r.status_code == 200 and "Online Shop" in r.text
+    assert r.status_code == 200 and "Trail Supply" in r.text
     r = s.get(BASE + "/product/0PUK6V6EV0", timeout=20)
-    assert r.status_code == 200 and "Candle" in r.text
+    assert r.status_code == 200 and "Trail Lantern" in r.text
     r = s.post(
         BASE + "/cart", data={"product_id": "0PUK6V6EV0", "quantity": 2}, timeout=20
     )
     assert r.status_code == 200
     r = s.get(BASE + "/cart", timeout=20)
-    assert r.status_code == 200 and "Candle" in r.text
+    assert r.status_code == 200 and "Trail Lantern" in r.text
     form = {
         "email": "privacy-canary@example.invalid",
         "street_address": "PrivacyCanaryStreet",
@@ -132,7 +132,7 @@ def coverage():
             "productcatalogservice:3550",
             rpc.ProductCatalogServiceStub,
             "SearchProducts",
-            pb.SearchProductsRequest(query="candle"),
+            pb.SearchProductsRequest(query="lantern"),
         ),
         (
             "shippingservice:50051",

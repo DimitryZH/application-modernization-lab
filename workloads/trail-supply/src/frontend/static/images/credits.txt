@@ -1,2 +1,4 @@
-folded-clothes-on-white-chair.jpg,,https://unsplash.com/photos/fr0J5-GIVyg
-folded-clothes-on-white-chair-wide.jpg,,https://unsplash.com/photos/fr0J5-GIVyg
+Trail Supply displayed photography, wordmark and icon: owner-provided images generated specifically for this fictional demonstration with ChatGPT image generation.
+No stock photography source, photographer attribution or third-party image license is asserted.
+See asset-inventory.json and docs/ASSETS.md for mapping, processing and provenance.
+Inherited utility artwork retains its original upstream notices and Apache-2.0 source lineage.

@@ -4,6 +4,14 @@
 checks. Historical Online Shop evidence is linked in [UPSTREAM.md](UPSTREAM.md),
 not copied or asserted as independent Trail Supply acceptance.
 
+## Storefront checks
+
+`python -B workloads/trail-supply/validation/storefront_test.py` checks approved
+IDs/prices/Money, advertisement/category references, local assets/hashes and the
+build asset inventory. Frontend Go tests execute every complete template with
+empty and prefixed BASE_URL, real handler-shaped data, empty cart and favicon
+override states.
+
 ## Static checks (no container engine)
 
 From the repository root, with Python 3.10+, Git and the Docker Compose v2 CLI:

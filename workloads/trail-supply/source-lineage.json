@@ -10,10 +10,6 @@
     "revision": "474d0f2eb73d97525234995a40d7781b7923a07d",
     "version": "v0.10.4"
   },
-  "preservedTrees": [
-    "src",
-    "protos"
-  ],
   "inheritedEvidence": {
     "status": "historical-online-shop-only-not-trail-supply-acceptance",
     "excludedPaths": [
@@ -29,9 +25,24 @@
       "validation/otel/redis-evidence-summary.json"
     ]
   },
-  "acceptance": {
+  "foundationRevision": "9033f3e8e4ec94d2f13edfbad95b608b3cb4a069",
+  "foundationPreservedTrees": [
+    "src",
+    "protos"
+  ],
+  "foundationAcceptance": {
     "containerBuilds": "not-run",
     "runtime": "not-run",
     "browserReview": "not-run"
+  },
+  "modernization": {
+    "components": [
+      "frontend",
+      "productcatalogservice",
+      "adservice",
+      "emailservice"
+    ],
+    "assetProvenance": "Owner-provided ChatGPT image generation for this demo",
+    "ownerVisualAcceptance": "pending"
   }
 }

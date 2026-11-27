@@ -12,10 +12,11 @@ sys.path.insert(0, str(WORKLOAD / 'validation/otel'))
 from redis_contract import check
 
 
-def render(project):
+def render(project, prefix=''):
     env = {key: value for key, value in os.environ.items()
            if not key.startswith('COMPOSE_')}
-    env.update(SOURCE_REVISION='a' * 40, FRONTEND_PORT='18081')
+    env.update(SOURCE_REVISION='a' * 40, FRONTEND_PORT='18081',
+               BASE_URL=prefix, FRONTEND_MESSAGE='', CYMBAL_BRANDING='false', BANNER_COLOR='')
     return json.loads(subprocess.check_output(
         ['docker', 'compose', '-p', project, '-f', str(HERE / 'compose.yaml'),
          '--profile', 'load', 'config', '--format', 'json'],
@@ -111,6 +112,12 @@ class ReviewComposeTests(unittest.TestCase):
                             other['volumes']['redis-data']['name'])
         self.assertFalse(other['volumes']['redis-data'].get('external'))
         self.assertFalse(other['networks']['default'].get('external'))
+
+    def test_prefix_is_forwarded_without_changing_backend_endpoints(self):
+        prefixed = render('trail-supply-review-prefix', '/trail')
+        environment = prefixed['services']['frontend']['environment']
+        self.assertEqual(environment['BASE_URL'], '/trail')
+        self.assertEqual(environment['PRODUCT_CATALOG_SERVICE_ADDR'], 'productcatalogservice:3550')
 
 
 if __name__ == '__main__':

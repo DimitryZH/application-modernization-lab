@@ -1,6 +1,6 @@
 <!--
  Copyright 2020 Google LLC
- Modified for Online Shop: assistant greeting branding.
+ Modified for Trail Supply: assistant presentation and BASE_URL-aware images.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,28 +18,24 @@
 {{ define "assistant" }}
 
 {{ template "header" . }}
-<div {{ with $.platform_css }} class="{{.}}" {{ end }}>
-  <span class="platform-flag">
-    {{$.platform_name}}
-  </span>
-</div>
-
-<main role="main">
+<main id="main-content" class="assistant-page">
   <div class="container">
     <div class="row">
       <div class="col-md-12">
         <div id="chat-modal" class="chat-modal">
           <div id="bot-messages" class="bot-messages">
             <p class="bot-message">
-              <span class="bot-message-text">Hi, I'm the Online Shop assistant. I can help you with your shopping experience.</span>
+              <span class="bot-message-text">Hi, I'm the Trail Supply assistant. I can help you with your shopping experience.</span>
             </p>
             <p class="bot-message">
               <span class="bot-message-text">What can I help you with?</span>
             </p>
           </div>
           <div class="bot-input">
+            <label class="sr-only" for="bot-input-text">Message for the shopping assistant</label>
             <input id="bot-input-text" type="text" style="margin-right: 30px;" class="bot-input-text" placeholder="Recommend me items...">
-            <input type="file" class="bot-input-file-button"  onchange="getBase64()">
+            <label class="sr-only" for="bot-input-file">Optional reference image</label>
+            <input id="bot-input-file" type="file" class="bot-input-file-button"  onchange="getBase64()">
             <button id="bot-input-button" class="bot-input-button">Send</button>
           </div>
         </div>
@@ -178,7 +174,7 @@
 
         // Construct product image
         const botProductImg = document.createElement("img");
-        botProductImg.src = product["picture"];
+        botProductImg.src = "{{ $.baseUrl }}" + product["picture"];
         botProductImg.classList.add("bot-product-img");
         botProductImg.onerror = function() { this.style.display = 'none'; };
         botProductDiv.appendChild(botProductImg);
@@ -211,4 +207,5 @@
   main();
 </script>
 
+{{ template "footer" . }}
 {{ end }}

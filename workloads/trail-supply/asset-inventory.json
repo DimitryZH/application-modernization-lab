@@ -1,0 +1,219 @@
+{
+  "provenance": "Owner-provided images generated specifically for this fictional demo with ChatGPT image generation. No stock photographer, stock source URL or third-party image license is asserted.",
+  "suppliedImages": 18,
+  "selectedImages": 16,
+  "originalTotalBytes": 35948616,
+  "selectedOriginalBytes": 30803104,
+  "finalSelectedBytes": 6879411,
+  "faviconBytes": 21931,
+  "assets": [
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_50 AM-1.png",
+      "path": "/static/branding/trail-supply-logo.png",
+      "usage": "Mountain wordmark",
+      "width": 2172,
+      "height": 724,
+      "originalBytes": 603523,
+      "finalBytes": 603523,
+      "sha256": "9fe346af23593c671df201632ebcf53f6e86718d92393c411ca2dd2af0101219",
+      "processing": "Original transparent PNG; unchanged pixels and bytes"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_51 AM-2.png",
+      "path": "/static/branding/trail-supply-icon.png",
+      "usage": "Mountain and trail icon",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 918477,
+      "finalBytes": 918477,
+      "sha256": "6f443bc356a5c5806513f46bdc787e47516b917f726538e3cb677c56e5328c74",
+      "processing": "Original transparent PNG; unchanged pixels and bytes"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_51 AM-3.png",
+      "path": "/static/images/hero/mountain-campsite.jpg",
+      "usage": "Homepage hero",
+      "width": 1672,
+      "height": 941,
+      "originalBytes": 2256513,
+      "finalBytes": 525565,
+      "sha256": "fddc2b1ce7727ed5b631453585cc5d67c05aa6a1a80018007f216543e95cc487",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_52 AM-4.png",
+      "path": "/static/img/products/summit-45l-backpack.jpg",
+      "usage": "OLJCESPC7Z",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 2023698,
+      "finalBytes": 302679,
+      "sha256": "e8eec0db04f0641cb70f7aadd0861f9764f840276400f5a6d9fd4780d4796914",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_52 AM-5.png",
+      "path": "/static/img/products/alpine-2p-tent.jpg",
+      "usage": "66VCHSJNUP",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 1561158,
+      "finalBytes": 235431,
+      "sha256": "edc9ec851d95668118a3ddd94490a6676623beb035976576b7f087d13f74a510",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_53 AM-6.png",
+      "path": "/static/img/products/basecamp-sleeping-bag.jpg",
+      "usage": "2ZYFJ3GM2N",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 1801739,
+      "finalBytes": 266726,
+      "sha256": "711ea5a06d889ad475ead89b14fd9eabe75448aa8c4be5c71e32a11bd0fb7649",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_53 AM-7.png",
+      "path": "/static/img/products/trail-lantern.jpg",
+      "usage": "0PUK6V6EV0",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 1639154,
+      "finalBytes": 208076,
+      "sha256": "c9471bcb2a168b1c9e72a60b719ba43137eb70c8a42fa2088ed5998051b3dec4",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_54 AM-8.png",
+      "path": "/static/img/products/ridge-insulated-bottle.jpg",
+      "usage": "6E92ZMYYFZ",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 1809409,
+      "finalBytes": 202386,
+      "sha256": "63cea729606a5fc81a0cd0b43e154d56d112d4033ff371abc55baccd7cdfa592",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_54 AM-9.png",
+      "path": "/static/img/products/traverse-trekking-poles.jpg",
+      "usage": "L9ECAV7KIM",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 1599912,
+      "finalBytes": 163984,
+      "sha256": "575b24f471ae517ea1fbe1830b11c10da9069d121a8fae8f912560a22b2bffa8",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_1",
+      "suppliedFilename": "ChatGPT Image Nov 27, 2026, 10_56_55 AM-10.png",
+      "path": "/static/img/products/expedition-camp-stove.jpg",
+      "usage": "LS4PSXUNUM",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 1915181,
+      "finalBytes": 261100,
+      "sha256": "eb0181ead10f52cc559828ac0c8bce55d52bac2e5124ab6910e8a85a939c1f8b",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Hiker Overlooking a Golden Mountain Valley-1.png",
+      "path": "/static/images/lifestyle/hiking-mountain-view.jpg",
+      "usage": "Hiking adventure",
+      "width": 1448,
+      "height": 1086,
+      "originalBytes": 2400503,
+      "finalBytes": 539745,
+      "sha256": "d4202f81d0f82707c7505bfe3b32b669aed5ae0615a25f8f4aa58cd6e4a8107f",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Glowing Tent Over Mountain Valleys-2.png",
+      "path": "/static/images/lifestyle/camping-at-dusk.jpg",
+      "usage": "Camping adventure",
+      "width": 1448,
+      "height": 1086,
+      "originalBytes": 2549356,
+      "finalBytes": 634191,
+      "sha256": "c2db35e3c7b8b7082494a298fde5ffc071e8fe656479c386d3113ced1aed2613",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Golden Mountain Camping Gear-3.png",
+      "path": "/static/images/lifestyle/outdoor-essentials.jpg",
+      "usage": "Essentials adventure",
+      "width": 1448,
+      "height": 1086,
+      "originalBytes": 2922623,
+      "finalBytes": 703619,
+      "sha256": "f5360ef7e2a85630b356e9a08c5ccf9888d9d87cb54896ce0d606c9ec1b1a5f4",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Misty Mountain Trail Hiker-4.png",
+      "path": "/static/images/lifestyle/forest-trail.jpg",
+      "usage": "Brand story",
+      "width": 1448,
+      "height": 1086,
+      "originalBytes": 2835261,
+      "finalBytes": 690766,
+      "sha256": "1920543a9ce494634c1692802f0f9cb192e464d21205da96e3bd4bea100c8ce2",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Olive Green Inflatable Camping Pad and Stuff Sack-1.png",
+      "path": "/static/img/products/restpoint-sleeping-pad.jpg",
+      "usage": "9SIQT8TOJO",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 2142160,
+      "finalBytes": 337360,
+      "sha256": "28a0193450d420536e3fdb03381ccb56caeed4d2e2f6c4b2899ac9c27e72e31a",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    },
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Rugged Olive Green Headlamp Product Shot-2.png",
+      "path": "/static/img/products/pathfinder-headlamp.jpg",
+      "usage": "1YMWWN1N4O",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 1824437,
+      "finalBytes": 285783,
+      "sha256": "5d79320a257eff58618fd63ecda45748ff9b3aca85ba371b54e24bc49d20aa40",
+      "processing": "JPEG quality 94, 4:4:4 chroma, progressive; original resolution; no resampling"
+    }
+  ],
+  "optionalNotCopied": [
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Alpine Lakeside Camping at Sunrise-6.png",
+      "usage": "Alpine lakeside camping",
+      "originalBytes": 2800044,
+      "status": "Approved optional promotional image; not copied or presented as a product alternate view"
+    },
+    {
+      "package": "Package_2",
+      "suppliedFilename": "Olive Green Hiking Backpack in Nature Setting-5.png",
+      "usage": "Styled backpack feature",
+      "originalBytes": 2345468,
+      "status": "Approved optional promotional image; not copied or presented as a product alternate view"
+    }
+  ]
+}
