@@ -1,5 +1,9 @@
 # Footer branding refinement — focused validation
 
+The final owner-requested cleanup is recorded below under
+[Shopper-facing footer cleanup](#shopper-facing-footer-cleanup). It supersedes
+the initial visible footer state recorded here; the earlier checks remain historical.
+
 Date: 2026-11-27. Frontend source revision:
 `8006950de7d5cb2f9d6dfce87fb569463b075a1b`.
 
@@ -44,3 +48,42 @@ Local screenshots are ignored artifacts:
 The application remains running for final owner review at
 `http://127.0.0.1:18081/`. PR #30 stays Draft; issue #29 remains open.
 No new owner visual acceptance or downstream release acceptance is claimed.
+
+## Shopper-facing footer cleanup
+
+Date: 2026-11-27. Frontend source revision:
+`c7ed4c4a867720598f5cfe1984b26eebdf3e55f0`.
+
+Following owner review, removed the complete upstream-source paragraph and
+runtime-details disclosure (session/request IDs, hostname and deployment details)
+from the shared footer. Removed their unused CSS and the obsolete two-column
+footer-bottom layout. Trail Supply branding/navigation, colors and the existing
+demo disclaimer remain. Google copyright and Apache-2.0 source headers, LICENSE
+and repository attribution remain intact. Backend data, logging and telemetry
+were not changed.
+
+- PASS: `go test . -run "TestStorefrontTemplates|TestEmptyCartAndLegacyFaviconSwitch" -count=1`
+  in the existing disposable network-disabled Go validation container, using
+  read-only source and existing Go cache volumes. The complete templates cover
+  12 page/prefix cases plus the empty-cart/alternate-favicon case.
+- PASS: rebuilt only frontend and recreated only its container in
+  `trail-supply-review-6a3e949e` with `up -d --no-build --no-deps --force-recreate frontend`.
+  Before/after container and image IDs confirm every other service, Redis and
+  the completed ownership helper retained its identity.
+- PASS: HTTP 200 at `http://127.0.0.1:18081/`; browser reload confirms the footer
+  has only branding, internal navigation and the demo disclaimer. No external
+  footer links or details disclosure remain. Compact (319px content width) and
+  desktop (1425px content width) checks found no horizontal overflow. The
+  temporary viewport override was reset.
+- PASS: Git whitespace/scope checks; original Online Shop and experiments unchanged.
+  The complete telemetry suite and unrelated builds were not rerun for this
+  presentation-only change. Earlier broader evidence retains its original scope.
+
+The frontend local image is
+`sha256:f00557315af2595751f6d113eb07156619f6e9b5842406c6e971ee7c1107eb53`,
+with revision label matching the source above. Other application images remain
+at `10f570d1e5763ac789db86991abd77a097534375`. The local ignored screenshot is
+`local/output/screenshots/footer-cleanup.jpg`.
+
+The same review stack remains running for final owner review. PR #30 remains
+Draft and issue #29 remains open. No final owner acceptance is claimed.

@@ -53,7 +53,7 @@ selected JPEG output and the supplied image mapping were inspected visually.
 
 The session below records the original review cohort. The subsequent
 [footer refinement](FOOTER-REFINEMENT.md) updates only the frontend image to
-`8006950de7d5cb2f9d6dfce87fb569463b075a1b`; all other containers/images are
+`c7ed4c4a867720598f5cfe1984b26eebdf3e55f0`; all other containers/images are
 unchanged. Use that focused record for the current footer verification.
 
 - URL: `http://127.0.0.1:18081/`.
